@@ -1,16 +1,16 @@
 import React from 'react';
-// Importamos el logo de Gaddyel - ¡Corregida la ruta!
+import { NavLink } from 'react-router-dom';
+// Importamos el logo de Gaddyel
 import LogoGaddyel from '../Activos/imagenes/logo-gaddyel.png';
 
-// Importamos tus imágenes del carrusel - ¡Ahora en la parte superior del archivo!
-// Asegúrate de que los nombres de archivo y extensiones (.jpeg, .jpg) coincidan exactamente
+// Importamos tus imágenes del carrusel
 import carrusel1 from '../Activos/Imagenes/ImgCarrusel/carrusel-1.jpeg';
 import carrusel2 from '../Activos/imagenes/ImgCarrusel/carrusel-2.jpeg';
 import carrusel3 from '../Activos/imagenes/ImgCarrusel/carrusel-3.jpeg';
 import carrusel4 from '../Activos/imagenes/ImgCarrusel/carrusel-4.jpeg';
 import carrusel5 from '../Activos/imagenes/ImgCarrusel/carrusel-5.jpeg';
 
-// Importamos el componente Carrusel - ¡Corregida la ruta!
+// Importamos el componente Carrusel
 import Carrusel from '../Componentes/UI/Carrusel/Carrusel.jsx';
 import { productos } from '../Datos/productos.js';
 
@@ -22,7 +22,7 @@ const TarjetaProductoDestacado = ({ producto }) => (
         <h3 className="text-xl font-bold text-gray-800 mb-2">{producto.nombre}</h3>
         <p className="text-gray-600 text-sm mb-4">{producto.descripcion}</p>
         {/* El botón ahora apunta a la URL correcta del producto */}
-        <a href={`/catalogo/${producto.id}`} className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-full text-lg shadow-lg transition-transform transform hover:scale-105 duration-300">Ver Producto</a>
+        <NavLink to={`/catalogo/${producto.id}`} className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-full text-lg shadow-lg transition-transform transform hover:scale-105 duration-300">Ver Producto</NavLink>
     </div>
 );
 
@@ -49,15 +49,15 @@ const Inicio = () => {
                     alt="Logo de Gaddyel"
                     className="mx-auto h-40 md:h-64 lg:h-80 mb-4"
                 />
-                <h1 className="text-5xl md:text-6xl font-extrabold text-indigo-800 mb-8 leading-tight">
+                <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-indigo-800 mb-8 leading-tight max-w-4xl mx-auto">
                     <span className="block text-gray-700">Blanquería Personalizada con Distinción</span>
                 </h1>
                 <p className="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto mb-8">
                     Diseños exclusivos, materiales de primera calidad y un toque único para tu spa, centro de estética, hotel o cabaña.
                 </p>
-                <a href="/catalogo" className="inline-block bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg transition-transform transform hover:scale-105 duration-300">
+                <NavLink to="/catalogo" className="inline-block bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg transition-transform transform hover:scale-105 duration-300">
                     Explorar Catálogo
-                </a>
+                </NavLink>
             </section>
 
             {/* Sección del Carrusel - El contenedor principal se centra */}
@@ -89,9 +89,9 @@ const Inicio = () => {
                 <p className="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto mb-8">
                     Personaliza tu blanquería y eleva la imagen de tu marca.
                 </p>
-                <a href="/contacto" className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg transition-transform transform hover:scale-105 duration-300">
+                <NavLink to="/contacto" className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg transition-transform transform hover:scale-105 duration-300">
                     Contáctanos Ahora
-                </a>
+                </NavLink>
             </section>
         </div>
     );
