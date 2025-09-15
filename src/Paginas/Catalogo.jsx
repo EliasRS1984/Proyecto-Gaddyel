@@ -21,7 +21,7 @@ const Catalogo = () => {
                         </NavLink>
                         <p className="text-gray-600 mb-4">{producto.descripcion}</p>
                         {/* Enlace para el botón "Ver Detalles" */}
-                        <NavLink to={`/catalogo/${producto.id}`} className="mt-auto bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-full text-lg shadow-lg transition-transform transform hover:scale-105 duration-300">
+                        <NavLink to={`/catalogo/${producto.id}`} className="mt-auto bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-6 rounded-full text-lg shadow-lg transition-transform transform hover:scale-105 duration-300">
                             Ver Detalles
                         </NavLink>
                     </div>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import LogoGaddyel from '../../../Activos/Imagenes/Logo-Gaddyel.png';
+import LogoGaddyel from './Activos/Imagenes/Logo-Gaddyel.png';
 
 const Navbar = () => {
     // Estado para controlar la visibilidad del menú en dispositivos móviles
@@ -27,7 +27,7 @@ const Navbar = () => {
                         <img
                             src={LogoGaddyel}
                             alt="Logo de Gaddyel"
-                            className="h-16 rounded-lg"
+                            className="h-16 rounded-lg transition-transform duration-300 transform hover:scale-105"
                         />
                     </NavLink>
                 </div>
@@ -50,15 +50,11 @@ const Navbar = () => {
 
                 {/* Enlaces de navegación para escritorio */}
                 <div className="hidden md:flex items-center space-x-6">
-                    <NavLink to="/" className={activeLinkStyle}>
-                        Inicio
-                    </NavLink>
-                    <NavLink to="/catalogo" className={activeLinkStyle}>
-                        Catálogo
-                    </NavLink>
-                    <NavLink to="/contacto" className={activeLinkStyle}>
-                        Contacto
-                    </NavLink>
+                    <NavLink to="/" className={activeLinkStyle}>Inicio</NavLink>
+                    <NavLink to="/catalogo" className={activeLinkStyle}>Catálogo</NavLink>
+                    <NavLink to="/nosotros" className={activeLinkStyle}>Nosotros</NavLink>
+                    <NavLink to="/contacto" className={activeLinkStyle}>Contacto</NavLink>
+                    <NavLink to="/proceso" className={activeLinkStyle}>Nuestro Proceso</NavLink>
                 </div>
             </nav>
 
@@ -67,15 +63,11 @@ const Navbar = () => {
                 className={`md:hidden ${isOpen ? 'block' : 'hidden'} transition-all duration-300 ease-in-out transform`}
             >
                 <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 flex flex-col items-center">
-                    <NavLink to="/" className="w-full text-center py-2 text-xl font-bold rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700" onClick={closeMenu}>
-                        Inicio
-                    </NavLink>
-                    <NavLink to="/catalogo" className="w-full text-center py-2 text-xl font-bold rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700" onClick={closeMenu}>
-                        Catálogo
-                    </NavLink>
-                    <NavLink to="/contacto" className="w-full text-center py-2 text-xl font-bold rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700" onClick={closeMenu}>
-                        Contacto
-                    </NavLink>
+                    <NavLink to="/" className="w-full text-center py-2 text-xl font-bold rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700" onClick={closeMenu}>Inicio</NavLink>
+                    <NavLink to="/catalogo" className="w-full text-center py-2 text-xl font-bold rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700" onClick={closeMenu}>Catálogo</NavLink>
+                    <NavLink to="/nosotros" className="w-full text-center py-2 text-xl font-bold rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700" onClick={closeMenu}>Nosotros</NavLink>
+                    <NavLink to="/contacto" className="w-full text-center py-2 text-xl font-bold rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700" onClick={closeMenu}>Contacto</NavLink>
+                    <NavLink to="/proceso" className="w-full text-center py-2 text-xl font-bold rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700" onClick={closeMenu}>Nuestro Proceso</NavLink>
                 </div>
             </div>
         </header>

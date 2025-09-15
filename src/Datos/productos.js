@@ -1,63 +1,89 @@
 import Toallas from '../Activos/Imagenes/ImgCatalogo/Toallas-1.jpg';
-import Batas from '../Activos/Imagenes/ImgCatalogo/Batas-saten-1.jpg';
-import Vinchas from  '../Activos/Imagenes/ImgCatalogo/Vinchas-1.jpg';
-import Pads from '../Activos/Imagenes/ImgCatalogo/Pads-1.jpeg';
-import KitFacial from '../Activos/Imagenes/ImgCatalogo/Kit-limpieza-facial-1.jpeg';
+import Toallas2 from '../Activos/Imagenes/ImgCatalogo/Toallas-2.jpg';
+import Toallas3 from '../Activos/Imagenes/ImgCatalogo/Toallas-3.jpeg';
 
-// Imágenes genéricas para el carrusel vertical
-const imgGenerica1 = 'https://via.placeholder.com/500x700.png?text=Imagen+Adicional+1';
-const imgGenerica2 = 'https://via.placeholder.com/500x700.png?text=Imagen+Adicional+2';
-const imgGenerica3 = 'https://via.placeholder.com/500x700.png?text=Imagen+Adicional+3';
-const imgGenerica4 = 'https://via.placeholder.com/500x700.png?text=Imagen+Adicional+4';
+import Batas from '../Activos/Imagenes/ImgCatalogo/Batas/Batas-saten-1.jpg';
+import Batas2 from '../Activos/Imagenes/ImgCatalogo/Batas/Batas-saten-2.jpeg';
+import Batas3 from '../Activos/Imagenes/ImgCatalogo/Batas/Batas-saten-3.jpg';
+import BatasPlush from '../Activos/Imagenes/ImgCatalogo/Batas/Batas-plush.jpeg';
+import BatasPlush2 from '../Activos/Imagenes/ImgCatalogo/Batas/Batas-plush-2.jpg';
+
+import Vinchas from '../Activos/Imagenes/ImgCatalogo/Vinchas-1.jpg';
+import Vinchas2 from '../Activos/Imagenes/ImgCatalogo/Vinchas-2.jpg';
+import Vinchas3 from '../Activos/Imagenes/ImgCatalogo/Vinchas-3.jpg';
+
+import Pads from '../Activos/Imagenes/ImgCatalogo/Pads/Pads-1.jpeg';
+import Pads2 from '../Activos/Imagenes/ImgCatalogo/Pads/Pads-2.jpeg';
+import Pads3 from '../Activos/Imagenes/ImgCatalogo/Pads/Pads-3.jpg';
+
+import KitFacial from '../Activos/Imagenes/ImgCatalogo/KitFacial/Kit-limpieza-facial-1.jpeg';
+import kitFacial2 from '../Activos/Imagenes/ImgCatalogo/KitFacial/Kit-limpieza-facial-2.jpeg';
+import kitFacial3 from '../Activos/Imagenes/ImgCatalogo/KitFacial/Kit-limpieza-facial-3.jpeg';
+import kitFacial4 from '../Activos/Imagenes/ImgCatalogo/KitFacial/Kit-limpieza-facial-4.jpeg';
+
+import Pareo from '../Activos/Imagenes/ImgCatalogo/Pareo-1.jpg';
+import Pareo2 from '../Activos/Imagenes/ImgCatalogo/Pareo-2.jpg';
+import Pareo3 from '../Activos/Imagenes/ImgCatalogo/Pareo-3.jpg';
+
+import ConjuntoCamilla from '../Activos/Imagenes/ImgCatalogo/ConjuntoCamilla/sabanas-camilla-1.jpeg';
+import ConjuntoCamilla2 from '../Activos/Imagenes/ImgCatalogo/ConjuntoCamilla/sabanas-camilla-2.jpeg';
+import ConjuntoCamilla3 from '../Activos/Imagenes/ImgCatalogo/ConjuntoCamilla/sabanas-camilla-3.jpeg';
+
+import Turbantes from '../Activos/Imagenes/ImgCatalogo/Turbante/Turbante.jpeg';
+import Turbantes2 from '../Activos/Imagenes/ImgCatalogo/Turbante/Turbante-2.jpeg';
+import Turbantes3 from '../Activos/Imagenes/ImgCatalogo/Turbante/Turbante-3.jpg';
 
 export const productos = [
   {
     id: '1',
-    nombre: 'Set de Toallas Premium',
+    nombre: 'Set Toallas para Manos Premium',
     descripcion: 'Suavidad y absorción para tus clientes, ideal para spas y centros de estética.',
-    descripcionCompleta: 'Nuestro set de toallas premium está confeccionado con 100% algodón de alta calidad. Ofrece una suavidad inigualable y una absorción superior, ideal para el uso profesional en spas, salones de belleza y hoteles. Son duraderas, de fácil lavado y mantienen su textura después de múltiples ciclos de uso.',
+    descripcionCompleta: 'Nuestro set de toallas premium está confeccionado con 100% algodón de alta calidad. Ofrece una suavidad inigualable y una absorción superior, ideal para el uso profesional en spas, salones de belleza y centros de estética. Son duraderas, de fácil lavado y mantienen su textura después de múltiples ciclos de uso.',
     imagenSrc: Toallas,
-    destacado: true,
+    destacado: false,
     material: '100% Algodón',
-    tamanos: ['Grande', 'Mediano', 'Pequeño'],
-    colores: ['Blanco', 'Gris', 'Azul'],
+    tamanos: ['(40x30cm)', '30x50cm', '40x70cm'],
+    colores: ['Blanco'],
     personalizable: true,
     imagenes: [
       { src: Toallas, alt: 'Set de Toallas Premium' },
-      { src: imgGenerica1, alt: 'Detalle de Toalla' },
-      { src: imgGenerica2, alt: 'Toalla doblada' }
+      { src: Toallas2, alt: 'Toalla' },
+      { src: Toallas3, alt: 'Toalla' }
     ],
   },
   {
     id: '2',
-    nombre: 'Batas Personalizadas',
-    descripcion: 'El toque de lujo y exclusividad para tu establecimiento. Caricias sin fin.',
-    descripcionCompleta: 'Estas batas de satén no solo son elegantes, sino que también son increíblemente cómodas. Pueden ser personalizadas con el logo de tu negocio, lo que las convierte en el uniforme perfecto para tu personal o en un regalo de lujo para tus clientes más exclusivos. Su tejido ligero y suave proporciona una experiencia de máximo confort.',
-    imagenSrc: Batas,
+    nombre: 'Batas Beauty',
+    descripcion: 'El toque de lujo y exclusividad para tu establecimiento. Beautiful.',
+    descripcionCompleta: 'Estas batas de satén no solo son elegantes, sino que también son increíblemente cómodas. Pueden ser personalizadas con el logo de tu establecimiento, lo que las convierte en algo perfecto! o en un regalo de lujo para tus clientes más exclusivos. Su tejido ligero y suave proporciona una experiencia de máximo confort.',
+    imagenSrc: Batas3,
     destacado: true,
     material: 'Satén de seda',
-    tamanos: ['Único'],
-    colores: ['Blanco', 'Negro', 'Rosa'],
+    tamanos: ['standard', 'Especial'],
+    colores: ['Blanco', 'Negro', 'Marfil', 'Champagne'],
     personalizable: true,
     imagenes: [
+      { src: Batas3, alt: 'Batas Personalizadas' },
       { src: Batas, alt: 'Batas Personalizadas' },
-      { src: imgGenerica3, alt: 'Batas de satén en uso' },
+      { src: Batas2, alt: 'Batas de satén en uso' },
+      
     ],
   },
   {
     id: '3',
     nombre: 'Vinchas para Tratamientos Faciales',
     descripcion: 'Comodidad y estilo para cada sesión de belleza. Material hipoalergénico.',
-    descripcionCompleta: 'Fabricadas con microfibra suave e hipoalergénica, estas vinchas están diseñadas para mantener el cabello alejado del rostro durante cualquier tratamiento facial o de maquillaje. Son elásticas, no aprietan y se adaptan a cualquier tamaño de cabeza, garantizando la comodidad de tus clientes durante toda la sesión.',
+    descripcionCompleta: 'Fabricadas con plush suave e hipoalergénica, estas vinchas están diseñadas para mantener el cabello alejado del rostro durante cualquier tratamiento facial o de maquillaje. Son elásticas, no aprietan y se adaptan a cualquier tamaño de cabeza, garantizando la comodidad de tus clientes durante toda la sesión.',
     imagenSrc: Vinchas,
     destacado: false,
-    material: 'Microfibra',
+    material: 'Plush',
     tamanos: ['Único'],
-    colores: ['Blanco', 'Rosa', 'Azul Claro'],
-    personalizable: false,
+    colores: ['Blanco', 'Negro', 'Verde Inglés'],
+    personalizable: true,
     imagenes: [
       { src: Vinchas, alt: 'Vinchas para Tratamientos Faciales' },
-      { src: imgGenerica4, alt: 'Vinchas en uso' },
+      { src: Vinchas2, alt: 'Vinchas ' },
+      { src: Vinchas3, alt: 'Vinchas ' }
     ],
   },
   {
@@ -67,13 +93,14 @@ export const productos = [
     descripcionCompleta: 'Nuestros pads de limpieza facial reutilizables son la alternativa sostenible a los discos de algodón desechables. Hechos de un material ultra suave, eliminan el maquillaje y las impurezas de manera efectiva y delicada. Ideales para el cuidado diario de la piel y el uso profesional en salones de belleza.',
     imagenSrc: Pads,
     destacado: false,
-    material: 'Microfibra',
+    material: 'plush y toalla',
     tamanos: ['Único'],
-    colores: ['Blanco'],
+    colores: ['Varios'],
     personalizable: false,
     imagenes: [
       { src: Pads, alt: 'Pads de limpieza facial' },
-      { src: imgGenerica1, alt: 'Paquetes de pads' }
+      { src: Pads2, alt: 'Paquetes de pads' },
+      { src: Pads3, alt: 'Paquetes de pads' }
     ],
   },
   {
@@ -83,15 +110,84 @@ export const productos = [
     descripcionCompleta: 'El kit de limpieza facial es un conjunto completo para un cuidado de la piel profundo. Incluye una vincha, toalla facial y pads, todo fabricado con materiales hipoalergénicos de la más alta calidad para asegurar una limpieza suave pero efectiva. Perfecto para rituales de spa en casa o como un detalle de bienvenida para tus clientes.',
     imagenSrc: KitFacial,
     destacado: true,
-    material: 'Microfibra',
+    material: 'Varios',
     tamanos: ['Único'],
     colores: ['Varios'],
     personalizable: true,
     imagenes: [
       { src: KitFacial, alt: 'Kit de Limpieza Facial' },
-      { src: imgGenerica2, alt: 'Productos del kit' }
+      { src: kitFacial2, alt: 'Productos del kit' },
+      { src: kitFacial3, alt: 'Productos del kit' },
+      { src: kitFacial4, alt: 'Productos del kit' }
     ],
   },
+  { id: '6',
+    nombre: 'Pareos',
+    descripcion: 'Pareos caricias sin fin. Material hipoalergénico.',
+    descripcionCompleta: 'Pareos caricias sin fin para tratamientos corporales. suaves y ergonomicos, ideal para el uso profesional en salones de belleza y centros de estética.',
+    imagenSrc: Pareo,
+    destacado: true,
+    material: 'plush',
+    tamanos: ['Único'],
+    colores: ['Varios'],
+    personalizable: true,
+    imagenes: [
+      { src: Pareo, alt: 'Pareos' },
+      { src: Pareo2, alt: 'Pareos' },
+      { src: Pareo3, alt: 'Pareos' } 
+    ],
+
+  },
+  {
+    id: '7',
+    nombre: 'Conjunto para Camilla',
+    descripcion: 'Sabana más Funda de Almohada.',
+    descripcionCompleta: 'Diseñados para un entorno profesional y de confort. Ideal para el uso profesional en Salones de Belleza, Centros de Estética y Spas.',
+    imagenSrc: ConjuntoCamilla,
+    destacado: false,
+    material: 'Microfibra',
+    tamanos: ['2x1.20m', '2.40x1.20m'],
+    colores: ['Blanco'],
+    personalizable: true,
+    imagenes: [
+      { src: ConjuntoCamilla, alt: 'Conjunto para Camilla' },
+      { src: ConjuntoCamilla2, alt: 'conjunto para camilla' },
+      { src: ConjuntoCamilla3, alt: 'conjunto para camilla' },
+    ],
+  },
+  {
+    id: '8',
+    nombre: 'Turbantes',
+    descripcion: 'Toalla Turbante.',
+    descripcionCompleta: ' Envuelve delicadamente el cabello, reduciendo el tiempo de secado y minimizando el frizz sin necesidad de fricción. Ideal para el uso post-tratamiento capilar, facial o corporal, nuestro turbante ofrece una solución confortable que eleva la experiencia del cliente.',
+    imagenSrc: Turbantes,
+    destacado: false,
+    material: '100% algodón',
+    tamanos: ['Único'],
+    colores: ['Varios'],
+    personalizable: true,
+    imagenes: [
+      { src: Turbantes, alt: 'Toalla Turbante' },
+      { src: Turbantes2, alt: 'Toalla Turbante' },
+      { src: Turbantes3, alt: 'Toalla Turbante' },
+    ],
+  },
+  {
+    id: '9',
+    nombre: 'Batas Caricias sin fin',
+    descripcion: 'Batas Caricias Sin Fin. Donde el bienestar se siente, y el lujo se vive.',
+    descripcionCompleta: 'Diseñadas para ofrecer una sensación de calidez y ligereza, son el complemento perfecto para relajar los sentidos antes y después de cada tratamiento. Permita que sus clientes experimenten la sublime suavidad que prolonga la serenidad y eleva el estándar de confort..',
+    imagenSrc: BatasPlush,
+    destacado: false,
+    material: 'plush',
+    tamanos: ['Único'],
+    colores: ['Blanco'],
+    personalizable: true,
+    imagenes: [
+      { src: BatasPlush, alt: 'Batas Caricias sin fin' },
+      { src: BatasPlush2, alt: 'Batas Caricias sin fin' },
+    ],
+  }
 ];
 
 

@@ -1,1 +1,10 @@
-@import 'tailwindcss'
+/* 💡 CORRECCIÓN: La importación de la URL de la fuente debe ir al inicio del archivo */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+@import 'tailwindcss';
+
+/* Establecemos 'Inter' como la fuente principal para toda la aplicación */
+html,
+body {
+    font-family: 'Inter', sans-serif;
+}

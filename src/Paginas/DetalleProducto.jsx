@@ -1,17 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, NavLink } from 'react-router-dom';
-// Asegúrate de que la ruta de importación de productos es la correcta
 import { productos } from '../Datos/productos';
 import CarruselVertical from '../Componentes/UI/Carrusel/CarruselVertical';
 
 const DetalleProducto = () => {
-    // Usamos useParams para obtener el ID del producto de la URL
     const { id } = useParams();
-    // Buscamos el producto correspondiente en el array de productos.
-    // **CORRECCIÓN CLAVE:** Hemos eliminado parseInt() para que la comparación sea entre strings.
     const producto = productos.find(p => p.id === id);
 
-    // Si el producto no se encuentra, mostramos un mensaje de error
     if (!producto) {
         return (
             <div className="container mx-auto p-8 text-center min-h-screen flex flex-col items-center justify-center">
@@ -50,20 +45,16 @@ const DetalleProducto = () => {
                 {producto.personalizable && (
                     <div className="p-4 bg-yellow-50 rounded-lg border-l-4 border-yellow-500 mb-6">
                         <p className="font-semibold text-yellow-800">
-                            ✨ ¡Este producto es personalizable! Contáctanos para discutir los detalles de tu diseño.
+                            ✨ ¡Este producto es personalizable! Contáctanos para obtener los detalles de tu diseño.
                         </p>
                     </div>
                 )}
                 
-                <p className="text-4xl font-extrabold text-indigo-700 my-6">${producto.precio}</p>
 
-                {/* Botones de acción */}
+                {/* Botón de acción */}
                 <div className="flex flex-col sm:flex-row gap-4">
-                    <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-full text-lg shadow-lg transition-transform transform hover:scale-105 duration-300">
-                        Añadir al Carrito
-                    </button>
-                    <NavLink to="/contacto" className="text-center bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-8 rounded-full text-lg shadow-lg transition-transform transform hover:scale-105 duration-300">
-                        Personalizar
+                    <NavLink to="/contacto" className="text-center bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 px-8 rounded-full text-lg shadow-lg transition-transform transform hover:scale-105 duration-300">
+                        Contactar
                     </NavLink>
                 </div>
             </div>
