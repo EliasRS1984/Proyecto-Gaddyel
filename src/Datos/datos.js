@@ -2,7 +2,7 @@
 import { productos } from './productos.js';
 
 // Importamos las URLs de las imágenes y activos para su uso local
-import LogoGaddyel from '../Activos/imagenes/logo-gaddyel.png';
+import LogoGaddyel from '../Activos/imagenes/Logo-Gaddyel.png';
 import imagenFondo from '../Activos/imagenes/imagenFondo.png';
 import carrusel1 from '../Activos/imagenes/ImgCarrusel/carrusel-1.jpg';
 import carrusel2 from '../Activos/imagenes/ImgCarrusel/carrusel-2.jpeg';
