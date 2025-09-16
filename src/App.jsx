@@ -6,6 +6,8 @@ import Catalogo from './Paginas/Catalogo';
 import SobreGaddyel from './Paginas/SobreGaddyel'; 
 import Contacto from './Paginas/Contacto';
 import PieDePagina from './Componentes/Layout/PieDePagina/PieDePagina';
+import ScrollTop from './Componentes/Layout/ScrollTop/ScrollTop';
+
 
 // La importación de DetalleProducto estaba causando el error. 
 // Aquí está la ruta correcta.
@@ -35,6 +37,7 @@ const App = () => {
 
     return (
         <Router>
+            <ScrollTop />
             <div className="flex flex-col min-h-screen font-sans">
                 <header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md py-1 transition-all duration-300">
                     <div className="container mx-auto px-4 flex justify-between items-center">

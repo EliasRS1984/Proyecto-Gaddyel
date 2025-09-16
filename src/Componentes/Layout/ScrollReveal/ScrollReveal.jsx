@@ -25,7 +25,7 @@ const ScrollReveal = ({ children }) => {
             {
                 root: null, // El viewport es el área de referencia.
                 rootMargin: '0px',
-                threshold: 0.4, // El observador se activa cuando el 20% del elemento es visible.
+                threshold: 0.3, // El observador se activa cuando el 20% del elemento es visible.
             }
         );
 
