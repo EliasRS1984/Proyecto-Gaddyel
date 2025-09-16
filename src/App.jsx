@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
+
 import Inicio from './Paginas/Inicio';
 import Catalogo from './Paginas/Catalogo';
-// 💡 CORRECCIÓN: El nombre del componente importado ahora coincide con el nombre del archivo (SobreGaddyel.jsx)
 import SobreGaddyel from './Paginas/SobreGaddyel'; 
 import Contacto from './Paginas/Contacto';
 import PieDePagina from './Componentes/Layout/PieDePagina/PieDePagina';
@@ -36,6 +37,7 @@ const App = () => {
     };
 
     return (
+        <HelmetProvider>
         <Router>
             <ScrollTop />
             <div className="flex flex-col min-h-screen font-sans">
@@ -120,6 +122,7 @@ const App = () => {
                 <PieDePagina />
             </div>
         </Router>
+        </HelmetProvider>
     );
 };
 
