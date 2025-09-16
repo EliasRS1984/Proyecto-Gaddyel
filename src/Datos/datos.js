@@ -13,14 +13,6 @@ import carrusel4 from '../Activos/Imagenes/ImgCarrusel/carrusel-4.jpeg';
 import carrusel5 from '../Activos/Imagenes/ImgCarrusel/carrusel-5.jpeg';
 import carrusel6 from '../Activos/Imagenes/ImgCarrusel/carrusel-6.jpg';
 
-import imagenFondo from '../Activos/Imagenes/imagenFondo.png';
-
-import carrusel1 from '../Activos/Imagenes/ImgCarrusel/carrusel-1.jpg';
-import carrusel2 from '../Activos/Imagenes/ImgCarrusel/carrusel-2.jpeg';
-import carrusel3 from '../Activos/Imagenes/ImgCarrusel/carrusel-3.jpg';
-import carrusel4 from '../Activos/Imagenes/ImgCarrusel/carrusel-4.jpeg';
-import carrusel5 from '../Activos/Imagenes/ImgCarrusel/carrusel-5.jpeg';
-import carrusel6 from '../Activos/Imagenes/ImgCarrusel/carrusel-6.jpg';
 
 
 // Exportamos los datos de las preguntas frecuentes (FAQ)
