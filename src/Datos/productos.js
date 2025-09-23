@@ -5,6 +5,8 @@ import Toallas3 from '../Activos/Imagenes/ImgCatalogo/Toallas-3.jpeg';
 import Batas from '../Activos/Imagenes/ImgCatalogo/Batas/Batas-saten-1.jpg';
 import Batas2 from '../Activos/Imagenes/ImgCatalogo/Batas/Batas-saten-2.jpeg';
 import Batas3 from '../Activos/Imagenes/ImgCatalogo/Batas/Batas-saten-3.jpg';
+import Batas4 from '../Activos/Imagenes/ImgCatalogo/Batas/Batas-saten-4.jpg';
+
 import BatasPlush from '../Activos/Imagenes/ImgCatalogo/Batas/Batas-plush.jpeg';
 import BatasPlush2 from '../Activos/Imagenes/ImgCatalogo/Batas/Batas-plush-2.jpg';
 
@@ -21,9 +23,10 @@ import kitFacial2 from '../Activos/Imagenes/ImgCatalogo/KitFacial/Kit-limpieza-f
 import kitFacial3 from '../Activos/Imagenes/ImgCatalogo/KitFacial/Kit-limpieza-facial-3.jpeg';
 import kitFacial4 from '../Activos/Imagenes/ImgCatalogo/KitFacial/Kit-limpieza-facial-4.jpeg';
 
-import Pareo from '../Activos/Imagenes/ImgCatalogo/Pareo-1.jpg';
-import Pareo2 from '../Activos/Imagenes/ImgCatalogo/Pareo-2.jpg';
-import Pareo3 from '../Activos/Imagenes/ImgCatalogo/Pareo-3.jpg';
+import Pareo from '../Activos/Imagenes/ImgCatalogo/Pareos/Pareo-1.jpg';
+import Pareo2 from '../Activos/Imagenes/ImgCatalogo/Pareos/Pareo-2.jpg';
+import Pareo3 from '../Activos/Imagenes/ImgCatalogo/Pareos/Pareo-3.jpg';
+import Pareo4 from '../Activos/Imagenes/ImgCatalogo/Pareos/Pareo-4.png';
 
 import ConjuntoCamilla from '../Activos/Imagenes/ImgCatalogo/ConjuntoCamilla/sabanas-camilla-1.jpeg';
 import ConjuntoCamilla2 from '../Activos/Imagenes/ImgCatalogo/ConjuntoCamilla/sabanas-camilla-2.jpeg';
@@ -68,6 +71,7 @@ export const productos = [
       { src: Batas3, alt: 'Batas Personalizadas' },
       { src: Batas, alt: 'Batas Personalizadas' },
       { src: Batas2, alt: 'Batas de satén en uso' },
+      { src: Batas4, alt: 'Batas Personalizadas' },
       
     ],
   },
@@ -135,12 +139,13 @@ export const productos = [
     categoria: 'Blanquería para Estética',
     material: 'plush',
     tamanos: ['Único'],
-    colores: ['Varios'],
+    colores: ['Negro, Blanco, Verde Inglés, Rosa, Natural'],
     personalizable: true,
     imagenes: [
       { src: Pareo, alt: 'Pareos' },
       { src: Pareo2, alt: 'Pareos' },
-      { src: Pareo3, alt: 'Pareos' } 
+      { src: Pareo3, alt: 'Pareos' },
+      { src: Pareo4, alt: 'Pareos' }, 
     ],
 
   },
