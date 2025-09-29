@@ -240,7 +240,7 @@ export const productos = [
     colores: ['Natural'],
     personalizable: true,
     precio: 17000,
-    cantidadUnidades: 10,
+    cantidadUnidades: 1,
     imagenes: [
       { src: ToteBag, alt: 'Tote Bag Playera' },
       { src: ToteBag2, alt: 'Tote Bag Playera' },
@@ -259,7 +259,7 @@ export const productos = [
     colores: ['Blanco'],
     personalizable: true,
     precio: 8000,
-    cantidadUnidades: 12,
+    cantidadUnidades: 1,
     imagenes: [
       { src: Neceser, alt: 'Neceser Porta Cosméticos' },
       { src: Neceser2, alt: 'Neceser Porta Cosméticos' },
