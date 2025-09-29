@@ -1,6 +1,6 @@
-import Toallas from '../Activos/Imagenes/ImgCatalogo/Toallas-1.jpg';
-import Toallas2 from '../Activos/Imagenes/ImgCatalogo/Toallas-2.jpg';
-import Toallas3 from '../Activos/Imagenes/ImgCatalogo/Toallas-3.jpeg';
+import Toallas from '../Activos/Imagenes/ImgCatalogo/Toallas/Toallas-1.jpg';
+import Toallas2 from '../Activos/Imagenes/ImgCatalogo/Toallas/Toallas-2.jpg';
+import Toallas3 from '../Activos/Imagenes/ImgCatalogo/Toallas/Toallas-3.jpg';
 
 import Batas from '../Activos/Imagenes/ImgCatalogo/Batas/Batas-saten-1.jpg';
 import Batas2 from '../Activos/Imagenes/ImgCatalogo/Batas/Batas-saten-2.jpeg';
@@ -10,9 +10,9 @@ import Batas4 from '../Activos/Imagenes/ImgCatalogo/Batas/Batas-saten-4.jpg';
 import BatasPlush from '../Activos/Imagenes/ImgCatalogo/Batas/Batas-plush.jpeg';
 import BatasPlush2 from '../Activos/Imagenes/ImgCatalogo/Batas/Batas-plush-2.jpg';
 
-import Vinchas from '../Activos/Imagenes/ImgCatalogo/Vinchas-1.jpg';
-import Vinchas2 from '../Activos/Imagenes/ImgCatalogo/Vinchas-2.jpg';
-import Vinchas3 from '../Activos/Imagenes/ImgCatalogo/Vinchas-3.jpg';
+import Vinchas from '../Activos/Imagenes/ImgCatalogo/Vinchas/Vinchas-1.jpg';
+import Vinchas2 from '../Activos/Imagenes/ImgCatalogo/Vinchas/Vinchas-2.jpg';
+import Vinchas3 from '../Activos/Imagenes/ImgCatalogo/Vinchas/Vinchas-3.jpg';
 
 import Pads from '../Activos/Imagenes/ImgCatalogo/Pads/Pads-1.jpeg';
 import Pads2 from '../Activos/Imagenes/ImgCatalogo/Pads/Pads-2.jpeg';
@@ -32,11 +32,11 @@ import ConjuntoCamilla from '../Activos/Imagenes/ImgCatalogo/ConjuntoCamilla/sab
 import ConjuntoCamilla2 from '../Activos/Imagenes/ImgCatalogo/ConjuntoCamilla/sabanas-camilla-2.jpeg';
 import ConjuntoCamilla3 from '../Activos/Imagenes/ImgCatalogo/ConjuntoCamilla/sabanas-camilla-3.jpeg';
 
-import Turbantes from '../Activos/Imagenes/ImgCatalogo/Turbante/Turbante.jpeg';
-import Turbantes2 from '../Activos/Imagenes/ImgCatalogo/Turbante/Turbante-2.jpeg';
+import Turbantes from '../Activos/Imagenes/ImgCatalogo/Turbante/Turbante.jpg';
+import Turbantes2 from '../Activos/Imagenes/ImgCatalogo/Turbante/Turbante-2.jpg';
 import Turbantes3 from '../Activos/Imagenes/ImgCatalogo/Turbante/Turbante-3.jpg';
 
-import ToteBag from '../Activos/Imagenes/ImgCatalogo/ToteBag/tote-bag-2.png';
+import ToteBag from '../Activos/Imagenes/ImgCatalogo/ToteBag/tote-bag-2.jpg';
 import ToteBag2 from '../Activos/Imagenes/ImgCatalogo/ToteBag/tote-bag.jpg';
 
 import Neceser from '../Activos/Imagenes/ImgCatalogo/Neceser/neceser.jpg';
