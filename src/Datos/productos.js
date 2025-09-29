@@ -36,6 +36,13 @@ import Turbantes from '../Activos/Imagenes/ImgCatalogo/Turbante/Turbante.jpeg';
 import Turbantes2 from '../Activos/Imagenes/ImgCatalogo/Turbante/Turbante-2.jpeg';
 import Turbantes3 from '../Activos/Imagenes/ImgCatalogo/Turbante/Turbante-3.jpg';
 
+import ToteBag from '../Activos/Imagenes/ImgCatalogo/ToteBag/tote-bag-2.png';
+import ToteBag2 from '../Activos/Imagenes/ImgCatalogo/ToteBag/tote-bag.jpg';
+
+import Neceser from '../Activos/Imagenes/ImgCatalogo/Neceser/neceser.jpg';
+import Neceser2 from '../Activos/Imagenes/ImgCatalogo/Neceser/neceser-2.png';
+
+
 export const productos = [
   {
     id: '1',
@@ -46,9 +53,11 @@ export const productos = [
     destacado: false,
     categoria: 'Blanquería para Estética',
     material: '100% Algodón',
-    tamanos: ['(40x30cm)', '30x50cm', '40x70cm'],
+    tamanos: ['(40x30cm)'],
     colores: ['Blanco'],
     personalizable: true,
+    precio: 68000,
+    cantidadUnidades: 12,
     imagenes: [
       { src: Toallas, alt: 'Set de Toallas Premium' },
       { src: Toallas2, alt: 'Toalla' },
@@ -67,6 +76,8 @@ export const productos = [
     tamanos: ['standard', 'Especial'],
     colores: ['Blanco', 'Negro', 'Marfil', 'Champagne'],
     personalizable: true,
+    precio: 87000,
+    cantidadUnidades: 2,
     imagenes: [
       { src: Batas3, alt: 'Batas Personalizadas' },
       { src: Batas, alt: 'Batas Personalizadas' },
@@ -87,6 +98,8 @@ export const productos = [
     tamanos: ['Único'],
     colores: ['Blanco', 'Negro', 'Verde Inglés'],
     personalizable: true,
+    precio: 66000,
+    cantidadUnidades: 12,
     imagenes: [
       { src: Vinchas, alt: 'Vinchas para Tratamientos Faciales' },
       { src: Vinchas2, alt: 'Vinchas ' },
@@ -105,6 +118,8 @@ export const productos = [
     tamanos: ['Único'],
     colores: ['Varios'],
     personalizable: false,
+    precio: 36000,
+    cantidadUnidades: 12,
     imagenes: [
       { src: Pads, alt: 'Pads de limpieza facial' },
       { src: Pads2, alt: 'Paquetes de pads' },
@@ -115,7 +130,7 @@ export const productos = [
     id: '5',
     nombre: 'Kit de Limpieza Facial',
     descripcion: 'Kit de limpieza facial. Material hipoalergénico.',
-    descripcionCompleta: 'El kit de limpieza facial es un conjunto completo para un cuidado de la piel profundo. Incluye una vincha, toalla facial y pads, todo fabricado con materiales hipoalergénicos de la más alta calidad para asegurar una limpieza suave pero efectiva. Perfecto para rituales de spa en casa o como un detalle de bienvenida para tus clientes.',
+    descripcionCompleta: 'El kit de limpieza facial es un conjunto completo para un cuidado de la piel profundo. Incluye una vincha, toalla facial y pads, todo fabricado con materiales hipoalergénicos de la más alta calidad para asegurar una limpieza suave pero efectiva. Perfecto para rituales de spa en casa o como un detalle de bienvenida para tus clientes.(6 Toallas de manos, 6 Vinchas, 12 Pads)',
     imagenSrc: KitFacial,
     destacado: true,
     categoria: 'Blanquería para Estética',
@@ -123,6 +138,8 @@ export const productos = [
     tamanos: ['Único'],
     colores: ['Varios'],
     personalizable: true,
+    precio: 103000,
+    cantidadUnidades: 24,
     imagenes: [
       { src: KitFacial, alt: 'Kit de Limpieza Facial' },
       { src: kitFacial2, alt: 'Productos del kit' },
@@ -141,6 +158,8 @@ export const productos = [
     tamanos: ['Único'],
     colores: ['Negro, Blanco, Verde Inglés, Rosa, Natural'],
     personalizable: true,
+    precio: 56000,
+    cantidadUnidades: 2,
     imagenes: [
       { src: Pareo, alt: 'Pareos' },
       { src: Pareo2, alt: 'Pareos' },
@@ -161,6 +180,8 @@ export const productos = [
     tamanos: ['2x1.20m', '2.40x1.20m'],
     colores: ['Blanco'],
     personalizable: true,
+    precio: 26000,
+    cantidadUnidades: 1,
     imagenes: [
       { src: ConjuntoCamilla, alt: 'Conjunto para Camilla' },
       { src: ConjuntoCamilla2, alt: 'conjunto para camilla' },
@@ -179,6 +200,8 @@ export const productos = [
     tamanos: ['Único'],
     colores: ['Varios'],
     personalizable: true,
+    precio: 60000,
+    cantidadUnidades: 4,
     imagenes: [
       { src: Turbantes, alt: 'Toalla Turbante' },
       { src: Turbantes2, alt: 'Toalla Turbante' },
@@ -197,10 +220,51 @@ export const productos = [
     tamanos: ['Único'],
     colores: ['Blanco'],
     personalizable: true,
+    precio: 90000,
+    cantidadUnidades: 2,
     imagenes: [
       { src: BatasPlush, alt: 'Batas Caricias sin fin' },
       { src: BatasPlush2, alt: 'Batas Caricias sin fin' },
     ],
+  },
+  {
+    id: '10',
+    nombre: 'Tote Bag Playera',
+    descripcion: 'Descubre el equilibrio perfecto entre estilo, resistencia y funcionalidad con nuestro Tote Bag.',
+    descripcionCompleta: 'Confeccionado en lienzo premium de alta durabilidad, este bolso está diseñado para acompañarte en tu día a día ',
+    imagenSrc: ToteBag,
+    destacado: false,
+    categoria: 'Blanquería para Estética',
+    material: 'Lienzo Premium',
+    tamanos: ['Único'],
+    colores: ['Natural'],
+    personalizable: true,
+    precio: 17000,
+    cantidadUnidades: 10,
+    imagenes: [
+      { src: ToteBag, alt: 'Tote Bag Playera' },
+      { src: ToteBag2, alt: 'Tote Bag Playera' },
+    ],
+  },
+  {
+    id: '11',
+    nombre: 'Neceser',
+    descripcion: 'Eleva tu rutina de belleza con nuestro Neceser Porta Cosméticos.',
+    descripcionCompleta: 'Confeccionado en material Nido de Abeja (Waffle) de alta calidad, Elegancia natural. El detalle de spa que tus cosméticos merecen.',
+    imagenSrc: Neceser2,
+    destacado: false,
+    categoria: 'Blanquería para Estética',
+    material: 'Nido de Abeja',
+    tamanos: ['Único'],
+    colores: ['Blanco'],
+    personalizable: true,
+    precio: 8000,
+    cantidadUnidades: 12,
+    imagenes: [
+      { src: Neceser, alt: 'Neceser Porta Cosméticos' },
+      { src: Neceser2, alt: 'Neceser Porta Cosméticos' },
+    ],
+
   }
 ];
 

@@ -12,6 +12,7 @@ import carrusel3 from '../Activos/Imagenes/ImgCarrusel/carrusel-3.jpg';
 import carrusel4 from '../Activos/Imagenes/ImgCarrusel/carrusel-4.jpg';
 import carrusel5 from '../Activos/Imagenes/ImgCarrusel/carrusel-5.jpg';
 import carrusel6 from '../Activos/Imagenes/ImgCarrusel/carrusel-6.jpg';
+import carrusel7 from '../Activos/Imagenes/ImgCarrusel/carrusel-7.jpg';
 
 
 
@@ -64,6 +65,7 @@ export const imagenesCarrusel = [
     { src: carrusel4, alt: 'Blanquería para Salones de Belleza Gaddyel' },
     { src: carrusel5, alt: 'Suministros para Barbería Gaddyel' },
     { src: carrusel6, alt: 'Batas Beauty Gaddyel' },
+    { src: carrusel7, alt: 'Tote Bags y Neceser Gaddyel' },
 ];
 
 // Re-exportamos los productos y activos importados para que estén disponibles
