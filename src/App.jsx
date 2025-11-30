@@ -9,16 +9,17 @@ import SobreGaddyel from './Paginas/SobreGaddyel';
 import Contacto from './Paginas/Contacto';
 import PieDePagina from './Componentes/Layout/PieDePagina/PieDePagina';
 import ScrollTop from './Componentes/Layout/ScrollTop/ScrollTop';
-
-
-// La importación de DetalleProducto estaba causando el error. 
-// Aquí está la ruta correcta.
 import DetalleProducto from './Paginas/DetalleProducto';
+import NuestroProceso from './Paginas/NuestroProceso';
+import Cart from './Componentes/Cart';
+import Checkout from './Paginas/Checkout';
+import PedidoConfirmado from './Paginas/PedidoConfirmado';
+import PedidoPendiente from './Paginas/PedidoPendiente';
+import PedidoFallido from './Paginas/PedidoFallido';
+import CartIcon from './Componentes/CartIcon';
+import { CartProvider } from './Context/CartContext';
 
 import LogoGaddyel from './Activos/Imagenes/Logo-Gaddyel.png';
-
-// 💡 NUEVO: Importación del componente de Nuestro Proceso.
-import NuestroProceso from './Paginas/NuestroProceso';
 
 
 const App = () => {
@@ -39,52 +40,58 @@ const App = () => {
 
     return (
         <HelmetProvider>
-            <Router>
-                <ScrollTop />
-                <div className="flex flex-col min-h-screen font-sans">
-                    <header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md py-1 transition-all duration-300">
-                        <div className="container mx-auto px-4 flex justify-between items-center">
-                            <NavLink to="/"
-                                onClick={manejarScrollAInicio} className="flex-shrink-0">
-                                <img
-                                    src={LogoGaddyel}
-                                    alt="Logo de Gaddyel"
-                                    className="h-16 transition-transform duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg rounded-lg"
-                                />
-                            </NavLink>
-                            {/* 💡 CORRECCIÓN: Ocultamos el menú principal en pantallas pequeñas */}
-                            <nav className="hidden md:flex space-x-4 md:space-x-8">
+            <CartProvider>
+                <Router>
+                    <ScrollTop />
+                    <div className="flex flex-col min-h-screen font-sans">
+                        <header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md py-1 transition-all duration-300">
+                            <div className="container mx-auto px-4 flex justify-between items-center">
                                 <NavLink to="/"
-                                    onClick={manejarScrollAInicio} className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
-                                    Inicio
+                                    onClick={manejarScrollAInicio} className="flex-shrink-0">
+                                    <img
+                                        src={LogoGaddyel}
+                                        alt="Logo de Gaddyel"
+                                        className="h-16 transition-transform duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg rounded-lg"
+                                    />
                                 </NavLink>
-                                <NavLink to="/catalogo" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
-                                    Catálogo
-                                </NavLink>
-                                <NavLink to="/nosotros" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
-                                    Nosotros
-                                </NavLink>
-                                <NavLink to="/contacto" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
-                                    Contacto
-                                </NavLink>
-                                {/* 💡 NUEVO: Enlace para 'Nuestro Proceso' en el menú de escritorio */}
-                                <NavLink to="/proceso" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
-                                    Nuestro Proceso
-                                </NavLink>
-                            </nav>
+                                {/* 💡 CORRECCIÓN: Ocultamos el menú principal en pantallas pequeñas */}
+                                <nav className="hidden md:flex space-x-4 md:space-x-8">
+                                    <NavLink to="/"
+                                        onClick={manejarScrollAInicio} className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
+                                        Inicio
+                                    </NavLink>
+                                    <NavLink to="/catalogo" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
+                                        Catálogo
+                                    </NavLink>
+                                    <NavLink to="/nosotros" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
+                                        Nosotros
+                                    </NavLink>
+                                    <NavLink to="/contacto" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
+                                        Contacto
+                                    </NavLink>
+                                    {/* 💡 NUEVO: Enlace para 'Nuestro Proceso' en el menú de escritorio */}
+                                    <NavLink to="/proceso" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
+                                        Nuestro Proceso
+                                    </NavLink>
+                                </nav>
 
-                            {/* 💡 NUEVO: Botón del menú hamburguesa para pantallas pequeñas */}
-                            <button onClick={toggleMenu} className="md:hidden text-gray-600 hover:text-blue-600 focus:outline-none">
-                                <svg className="h-8 w-8" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
-                                    {isMenuOpen ? (
-                                        <path d="M6 18L18 6M6 6l12 12" />
-                                    ) : (
-                                        <path d="M4 6h16M4 12h16M4 18h16" />
-                                    )}
-                                </svg>
-                            </button>
-                        </div>
-                    </header>
+                                <div className="flex items-center gap-4">
+                                    {/* Icono del carrito */}
+                                    <CartIcon />
+                                    
+                                    {/* 💡 NUEVO: Botón del menú hamburguesa para pantallas pequeñas */}
+                                    <button onClick={toggleMenu} className="md:hidden text-gray-600 hover:text-blue-600 focus:outline-none">
+                                        <svg className="h-8 w-8" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                                            {isMenuOpen ? (
+                                                <path d="M6 18L18 6M6 6l12 12" />
+                                            ) : (
+                                                <path d="M4 6h16M4 12h16M4 18h16" />
+                                            )}
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </header>
 
                     {/* 💡 NUEVO: Contenedor del menú móvil que se muestra condicionalmente */}
                     {isMenuOpen && (
@@ -117,12 +124,18 @@ const App = () => {
                             <Route path="/contacto" element={<Contacto />} />
                             <Route path="/catalogo/:id" element={<DetalleProducto />} />
                             <Route path="/proceso" element={<NuestroProceso />} />
+                            <Route path="/carrito" element={<Cart />} />
+                            <Route path="/checkout" element={<Checkout />} />
+                            <Route path="/pedido-confirmado" element={<PedidoConfirmado />} />
+                            <Route path="/pedido-pendiente" element={<PedidoPendiente />} />
+                            <Route path="/pedido-fallido" element={<PedidoFallido />} />
                         </Routes>
                     </main>
                     <PieDePagina />
                     <Analytics />
                 </div>
             </Router>
+            </CartProvider>
         </HelmetProvider>
     );
 };

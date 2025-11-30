@@ -1,20 +1,9 @@
-// Importamos los datos de productos existentes
-import { productos } from './productos.js';
+
 
 // Importamos las URLs de las imágenes y activos para su uso local
 import LogoGaddyel from '../Activos/Imagenes/Logo-Gaddyel.png';
 
 import imagenFondo from '../Activos/Imagenes/imagenFondo.jpg';
-
-import carrusel1 from '../Activos/Imagenes/ImgCarrusel/carrusel-1.jpg';
-import carrusel2 from '../Activos/Imagenes/ImgCarrusel/carrusel-2.jpg';
-import carrusel3 from '../Activos/Imagenes/ImgCarrusel/carrusel-3.jpg';
-import carrusel4 from '../Activos/Imagenes/ImgCarrusel/carrusel-4.jpg';
-import carrusel5 from '../Activos/Imagenes/ImgCarrusel/carrusel-5.jpg';
-import carrusel6 from '../Activos/Imagenes/ImgCarrusel/carrusel-6.jpg';
-import carrusel7 from '../Activos/Imagenes/ImgCarrusel/carrusel-7.jpg';
-
-
 
 // Exportamos los datos de las preguntas frecuentes (FAQ)
 export const faqs = [
@@ -57,16 +46,5 @@ export const faqs = [
     
 ];
 
-// Exportamos las imágenes para el carrusel
-export const imagenesCarrusel = [
-    { src: carrusel1, alt: 'Kit Faciales de Gaddyel' },
-    { src: carrusel2, alt: 'Kit Faciales y de Spa de Gaddyel' },
-    { src: carrusel3, alt: 'Productos de Blanquería Personalizada Gaddyel' },
-    { src: carrusel4, alt: 'Blanquería para Salones de Belleza Gaddyel' },
-    { src: carrusel5, alt: 'Suministros para Barbería Gaddyel' },
-    { src: carrusel6, alt: 'Batas Beauty Gaddyel' },
-    { src: carrusel7, alt: 'Tote Bags y Neceser Gaddyel' },
-];
-
 // Re-exportamos los productos y activos importados para que estén disponibles
-export { productos, LogoGaddyel, imagenFondo };
+export { LogoGaddyel, imagenFondo };
