@@ -30,7 +30,7 @@ export const CartProvider = ({ children }) => {
 
     /**
      * Agregar producto al carrito
-     * Si ya existe, incrementa cantidad
+     * Si ya existe, incrementa cantidad pero mantiene cantidadUnidades del producto
      */
     const addToCart = (producto, cantidad = 1) => {
         setCartItems(prevItems => {
@@ -39,7 +39,11 @@ export const CartProvider = ({ children }) => {
             if (exists) {
                 return prevItems.map(item =>
                     item._id === producto._id
-                        ? { ...item, cantidad: item.cantidad + cantidad }
+                        ? { 
+                            ...item, 
+                            cantidad: item.cantidad + cantidad
+                            // cantidadUnidades se mantiene del producto (no se acumula)
+                          }
                         : item
                 );
             }
@@ -97,13 +101,13 @@ export const CartProvider = ({ children }) => {
 
     /**
      * Obtener detalles para enviar al servidor
+     * El backend solo necesita productoId y cantidad
+     * El backend calculará precios y validará stock
      */
     const getCartForCheckout = () => {
         return cartItems.map(item => ({
             productoId: item._id,
-            cantidad: item.cantidad,
-            precioUnitario: item.precio,
-            nombre: item.nombre
+            cantidad: item.cantidad
         }));
     };
 

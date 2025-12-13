@@ -1,10 +1,22 @@
-import React, { useState, useCallback } from 'react';
-import { NavLink } from 'react-router-dom';
-import LogoGaddyel from './Activos/Imagenes/Logo-Gaddyel.png';
+import React, { useState, useCallback, useContext, useEffect } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../../Context/AuthContext';
+import CartIcon from '../../CartIcon';
+import LogoGaddyel from '../../../Activos/Imagenes/Logo-Gaddyel.png';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+    const { isAuthenticated, cliente, cerrarSesion } = useContext(AuthContext);
+    const navigate = useNavigate();
     const logoSrc = LogoGaddyel || 'https://via.placeholder.com/64?text=Logo';
+
+    // Monitorear cambios en autenticación
+    useEffect(() => {
+        console.log('📊 [Navbar] Estado actualizado:');
+        console.log('  isAuthenticated:', isAuthenticated);
+        console.log('  cliente:', cliente?.nombre || 'No autenticado');
+    }, [isAuthenticated, cliente]);
 
     const toggleMenu = () => {
         setIsOpen((prev) => !prev);
@@ -12,6 +24,21 @@ const Navbar = () => {
 
     const closeMenu = () => {
         setIsOpen(false);
+    };
+
+    const toggleUserMenu = () => {
+        setIsUserMenuOpen((prev) => !prev);
+    };
+
+    const closeUserMenu = () => {
+        setIsUserMenuOpen(false);
+    };
+
+    const handleLogout = () => {
+        console.log('👉 Logout iniciado desde Navbar');
+        cerrarSesion();
+        closeUserMenu();
+        navigate('/', { replace: true });
     };
 
     const activeLinkStyle = useCallback(
@@ -81,6 +108,97 @@ const Navbar = () => {
                             {link.label}
                         </NavLink>
                     ))}
+
+                    {/* CartIcon */}
+                    <CartIcon />
+
+                    {/* Menú de usuario */}
+                    <div className="relative">
+                        {isAuthenticated ? (
+                            <>
+                                <button
+                                    onClick={toggleUserMenu}
+                                    className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 rounded-lg px-3 py-2"
+                                    aria-label="Menú de usuario"
+                                    aria-expanded={isUserMenuOpen}
+                                >
+                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                                    </svg>
+                                    <span className="font-medium">{cliente?.nombre?.split(' ')[0] || 'Usuario'}</span>
+                                    <svg className={`w-4 h-4 transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+
+                                {/* Dropdown de usuario autenticado */}
+                                {isUserMenuOpen && (
+                                    <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2 z-50">
+                                        <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+                                            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{cliente?.nombre}</p>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{cliente?.email}</p>
+                                        </div>
+                                        <button
+                                            onClick={() => {
+                                                navigate('/perfil');
+                                                closeUserMenu();
+                                            }}
+                                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                                        >
+                                            Mi Perfil
+                                        </button>
+                                        <button
+                                            onClick={handleLogout}
+                                            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900"
+                                        >
+                                            Cerrar Sesión
+                                        </button>
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            <>
+                                <button
+                                    onClick={toggleUserMenu}
+                                    className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 rounded-lg px-3 py-2"
+                                    aria-label="Menú de autenticación"
+                                    aria-expanded={isUserMenuOpen}
+                                >
+                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                                    </svg>
+                                    <span className="font-medium">Cuenta</span>
+                                    <svg className={`w-4 h-4 transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+
+                                {/* Dropdown de invitado */}
+                                {isUserMenuOpen && (
+                                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2 z-50">
+                                        <button
+                                            onClick={() => {
+                                                navigate('/login');
+                                                closeUserMenu();
+                                            }}
+                                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                                        >
+                                            Iniciar Sesión
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                navigate('/registro');
+                                                closeUserMenu();
+                                            }}
+                                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                                        >
+                                            Registrarse
+                                        </button>
+                                    </div>
+                                )}
+                            </>
+                        )}
+                    </div>
                 </div>
             </nav>
 
@@ -106,6 +224,58 @@ const Navbar = () => {
                             {link.label}
                         </NavLink>
                     ))}
+
+                    {/* Separador */}
+                    <div className="w-full border-t border-gray-300 dark:border-gray-700 my-2"></div>
+
+                    {/* Opciones de autenticación en móvil */}
+                    {isAuthenticated ? (
+                        <>
+                            <div className="w-full text-center py-2 px-4">
+                                <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{cliente?.nombre}</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">{cliente?.email}</p>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    navigate('/perfil');
+                                    closeMenu();
+                                }}
+                                className="w-full text-center py-2 text-lg font-bold rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700"
+                            >
+                                Mi Perfil
+                            </button>
+                            <button
+                                onClick={() => {
+                                    handleLogout();
+                                    closeMenu();
+                                }}
+                                className="w-full text-center py-2 text-lg font-bold rounded-lg text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900"
+                            >
+                                Cerrar Sesión
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <button
+                                onClick={() => {
+                                    navigate('/login');
+                                    closeMenu();
+                                }}
+                                className="w-full text-center py-2 text-lg font-bold rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700"
+                            >
+                                Iniciar Sesión
+                            </button>
+                            <button
+                                onClick={() => {
+                                    navigate('/registro');
+                                    closeMenu();
+                                }}
+                                className="w-full text-center py-2 text-lg font-bold rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700"
+                            >
+                                Registrarse
+                            </button>
+                        </>
+                    )}
                 </div>
             </div>
         </header>

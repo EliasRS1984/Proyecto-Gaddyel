@@ -89,9 +89,11 @@ const DetalleProducto = () => {
                     <p className="text-gray-600 text-lg mb-6">{descripcionCompleta}</p>
 
                     <div className="p-4 bg-purple-50 border-l-4 border-purple-500 shadow-md rounded-lg mb-6">
-                        <p className="text-2xl font-bold text-purple-950">
-                            ${precio.toLocaleString('es-AR')} por {cantidadUnidades}{' '}
-                            {cantidadUnidades === 1 ? 'unidad' : 'unidades'}
+                        <p className="text-2xl font-bold text-purple-950 mb-2">
+                            ${precio.toLocaleString('es-AR')}
+                        </p>
+                        <p className="text-sm text-purple-700 font-medium">
+                            Incluye {cantidadUnidades} {cantidadUnidades === 1 ? 'unidad' : 'unidades'} por pedido
                         </p>
                     </div>
 

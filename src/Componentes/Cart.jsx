@@ -24,6 +24,13 @@ export const Cart = () => {
     }
 
     const total = getTotal();
+    
+    // Calcular cantidad de solicitudes (TOTAL de veces que se agregaron productos)
+    const cantidadSolicitudes = cartItems.reduce((sum, item) => sum + item.cantidad, 0);
+    const envioGratis = cantidadSolicitudes >= 3;  // 3 o más solicitudes = gratis
+    const costoEnvio = envioGratis ? 0 : 12000;
+    const totalConEnvio = total + costoEnvio;
+    const productosRestantes = envioGratis ? 0 : 3 - cantidadSolicitudes;
 
     return (
         <div className="max-w-4xl mx-auto bg-white rounded-lg shadow overflow-hidden">
@@ -54,7 +61,9 @@ export const Cart = () => {
 
                             {/* Detalles */}
                             <div className="flex-grow">
-                                <h3 className="font-bold text-lg">{item.nombre}</h3>
+                                <h3 className="font-bold text-lg">
+                                    {item.nombre}: {item.cantidad} {item.cantidadUnidades && `(${item.cantidadUnidades * item.cantidad} ${(item.cantidadUnidades * item.cantidad) === 1 ? 'unidad' : 'unidades'})`}
+                                </h3>
                                 <p className="text-blue-600 font-semibold">
                                     ${item.precio.toFixed(2)} c/u
                                 </p>
@@ -101,6 +110,32 @@ export const Cart = () => {
 
                 {/* Resumen */}
                 <div className="mt-8 border-t pt-6">
+                    {/* Mensaje de envío gratis */}
+                    {envioGratis ? (
+                        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6 flex items-center">
+                            <svg className="w-6 h-6 text-green-600 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/>
+                                <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z"/>
+                            </svg>
+                            <div>
+                                <p className="font-semibold text-green-800">¡Envío Gratis!</p>
+                                <p className="text-sm text-green-700">Tienes {cantidadSolicitudes} {cantidadSolicitudes === 1 ? 'producto' : 'productos'} en tu carrito</p>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex items-center">
+                            <svg className="w-6 h-6 text-blue-600 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd"/>
+                            </svg>
+                            <div>
+                                <p className="font-semibold text-blue-800">¡Aprovecha el envío gratis!</p>
+                                <p className="text-sm text-blue-700">
+                                    Agrega {productosRestantes} producto{productosRestantes > 1 ? 's' : ''} más y obtén envío gratis
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
                     <div className="flex justify-end mb-6">
                         <div className="w-64">
                             <div className="flex justify-between mb-2">
@@ -109,11 +144,13 @@ export const Cart = () => {
                             </div>
                             <div className="flex justify-between mb-4 text-sm text-gray-600">
                                 <span>Envío:</span>
-                                <span>Calcular en checkout</span>
+                                <span className={envioGratis ? 'text-green-600 font-semibold' : ''}>
+                                    {envioGratis ? 'Gratis' : `$${costoEnvio.toFixed(2)}`}
+                                </span>
                             </div>
                             <div className="flex justify-between text-xl font-bold border-t pt-4">
                                 <span>Total:</span>
-                                <span className="text-blue-600">${total.toFixed(2)}</span>
+                                <span className="text-blue-600">${totalConEnvio.toFixed(2)}</span>
                             </div>
                         </div>
                     </div>
