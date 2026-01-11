@@ -1,11 +1,12 @@
 import { useState, useContext, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../Context/AuthContext';
+import * as authService from '../Servicios/authService';
 
 const Login = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { iniciarSesion } = useContext(AuthContext);
+    const { establecerCliente } = useContext(AuthContext);
 
     const [formData, setFormData] = useState({
         email: '',
@@ -18,16 +19,10 @@ const Login = () => {
     // URL de redirección después del login (por defecto a inicio)
     const from = location.state?.from?.pathname || '/';
 
-    // Limpiar localStorage al llegar a la página de login (asegurar que no hay sesión anterior)
+    // ✅ FLUJO: Al llegar a Login, limpiar sesión anterior si existe
+    // Responsabilidad: Asegurar que no hay sesión activa antes de nuevo login
     useEffect(() => {
-        console.log('🔄 [Login] Verificando sesión previa...');
-        const tokenExistente = localStorage.getItem('clientToken');
-        if (tokenExistente) {
-            console.log('⚠️ [Login] Encontrada sesión previa, limpiar localStorage');
-            localStorage.removeItem('clientToken');
-            localStorage.removeItem('clientData');
-            console.log('✅ [Login] localStorage limpiado');
-        }
+        authService.limpiarSesionAnterior();
     }, []);
 
     const handleChange = (e) => {
@@ -36,7 +31,7 @@ const Login = () => {
             ...prev,
             [name]: value
         }));
-        setError(''); // Limpiar error al escribir
+        setError('');
     };
 
     const handleSubmit = async (e) => {
@@ -52,11 +47,12 @@ const Login = () => {
         setIsLoading(true);
 
         try {
-            const resultado = await iniciarSesion(formData.email, formData.password);
+            // ✅ FLUJO: Llamar authService.login() directamente (responsabilidad única)
+            const resultado = await authService.login(formData.email, formData.password);
 
             if (resultado.exito) {
-                console.log('✅ Login exitoso');
-                // Redirigir a la página anterior o al inicio
+                // ✅ Actualizar estado global en AuthContext
+                establecerCliente(resultado.cliente);
                 navigate(from, { replace: true });
             } else {
                 setError(resultado.mensaje || 'Error al iniciar sesión');

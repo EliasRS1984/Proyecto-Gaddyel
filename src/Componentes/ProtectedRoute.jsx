@@ -1,13 +1,14 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { AuthContext } from '../Context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
+import { logger } from '../utils/logger';
 
 /**
  * Componente de ruta protegida para clientes
  * Requiere autenticación para acceder a ciertas páginas (ej: checkout)
  */
 const ProtectedRoute = ({ redirectTo = '/login' }) => {
-    const { isAuthenticated, isLoading } = useContext(AuthContext);
+    const { isAuthenticated, isLoading } = useAuth(); // ✅ Usar hook useAuth
     const location = useLocation();
 
     // Mientras se verifica la autenticación, no mostrar nada
@@ -24,12 +25,12 @@ const ProtectedRoute = ({ redirectTo = '/login' }) => {
 
     // Si no está autenticado, redirigir a login guardando la ubicación actual
     if (!isAuthenticated) {
-        console.log('🔒 [ProtectedRoute] Usuario no autenticado, redirigiendo a login');
+        logger.debug('[ProtectedRoute] Usuario no autenticado, redirigiendo a login');
         return <Navigate to={redirectTo} state={{ from: location }} replace />;
     }
 
     // Si está autenticado, renderizar el componente hijo
-    console.log('✅ [ProtectedRoute] Usuario autenticado, permitiendo acceso');
+    logger.debug('[ProtectedRoute] Usuario autenticado, permitiendo acceso');
     return <Outlet />;
 };
 

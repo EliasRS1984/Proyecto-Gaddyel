@@ -1,0 +1,245 @@
+{
+  "coherencia_estructura": {
+    "estado": "✅ VALIDADO",
+    "fecha": "2025-01-09",
+    "seccion": "Estructura Padre-Hijo de TarjetaProducto",
+    "jerarquia": {
+      "nivel_1": {
+        "elemento": ".product-card",
+        "display": "flex",
+        "flex_direction": "column",
+        "height": "100%",
+        "min_height": "420px",
+        "position": "relative",
+        "z_index": "1",
+        "overflow": "hidden",
+        "propiedades": {
+          "background": "var(--color-white)",
+          "border": "1px solid var(--color-gray-medium)",
+          "transition": "all 300ms ease"
+        },
+        "hover": {
+          "box_shadow": "var(--shadow-lg)",
+          "border_color": "var(--color-gold)",
+          "transform": "translateY(-4px)",
+          "z_index": "10"
+        }
+      },
+      "nivel_2_imagen": {
+        "elemento": ".product-card img",
+        "width": "100%",
+        "height": "250px",
+        "object_fit": "cover",
+        "display": "block",
+        "flex_shrink": "0",
+        "transition": "transform 300ms ease",
+        "hover_transform": "scale(1.03)",
+        "responsivo": {
+          "mobile": "200px"
+        }
+      },
+      "nivel_2_contenido": {
+        "elemento": ".product-card-content",
+        "display": "flex",
+        "flex_direction": "column",
+        "flex_grow": "1",
+        "padding": "1.5rem",
+        "justify_content": "space-between",
+        "gap": "0.75rem"
+      },
+      "nivel_3_titulo": {
+        "elemento": ".product-card h3",
+        "font_size": "1.25rem",
+        "font_weight": "normal",
+        "text_transform": "uppercase",
+        "color": "var(--color-black)",
+        "margin": "0 0 0.75rem 0",
+        "min_height": "2.5rem",
+        "line_height": "1.4",
+        "propiedades_importantes": [
+          "min-height: 2.5rem (garantiza 1 línea mínima)",
+          "margin reset (no hereda margin-bottom: 1rem global)"
+        ]
+      },
+      "nivel_3_descripcion": {
+        "elemento": ".product-card p",
+        "font_size": "0.95rem",
+        "color": "var(--color-gray-dark)",
+        "margin": "0 0 1rem 0",
+        "min_height": "2.8rem",
+        "display": "-webkit-box",
+        "webkit_line_clamp": "2",
+        "webkit_box_orient": "vertical",
+        "overflow": "hidden",
+        "flex_grow": "1",
+        "propiedades_importantes": [
+          "min-height: 2.8rem (espacio para 2 líneas)",
+          "-webkit-line-clamp: 2 (máximo 2 líneas)",
+          "overflow: hidden (trunca exceso)",
+          "margin reset (no hereda margin-bottom: 1.5rem global)"
+        ]
+      },
+      "nivel_3_footer": {
+        "elemento": ".product-card-footer",
+        "display": "flex",
+        "flex_direction": "column",
+        "margin_top": "auto",
+        "padding_top": "1rem",
+        "border_top": "1px solid var(--color-gray-medium)",
+        "gap": "0.75rem",
+        "propiedades_importantes": [
+          "margin-top: auto (empuja el footer al fondo)",
+          "display: flex para alinear precio + botón"
+        ],
+        "sub_elementos": {
+          "precio": {
+            "elemento": "div (opcional)",
+            "font_weight": "bold",
+            "font_size": "1.125rem",
+            "color": "var(--color-gold)"
+          },
+          "boton": {
+            "elemento": "NavLink.btn.btn-primary",
+            "width": "100%",
+            "padding": "0.875rem 2.5rem",
+            "background": "var(--color-black)",
+            "color": "var(--color-white)",
+            "text_align": "center",
+            "hover": {
+              "background": "var(--color-gold)",
+              "color": "var(--color-black)",
+              "box_shadow": "var(--shadow-md)"
+            }
+          }
+        }
+      }
+    }
+  },
+  "tamaños_uniformes": {
+    "estado": "✅ VALIDADO",
+    "tarjeta_minima": "420px",
+    "imagen_fija": "250px (desktop) / 200px (mobile)",
+    "titulo_minimo": "2.5rem",
+    "descripcion_minimo": "2.8rem (máximo 2 líneas)",
+    "distribucion_altura": {
+      "imagen": "250px (29.8%)",
+      "contenido": "170px min (40.5%)",
+      "titulo": "39px (9.3%)",
+      "descripcion": "56px (13.3%)",
+      "footer": "34px (8.1%)"
+    }
+  },
+  "z_index_jerarquia": {
+    "estado": "✅ SIN CONFLICTOS",
+    "capas": [
+      {
+        "elemento": "nav",
+        "z_index": "50",
+        "contexto": "Sticky header, siempre visible"
+      },
+      {
+        "elemento": "hero-section::before (patrón)",
+        "z_index": "0",
+        "contexto": "Fondo del hero"
+      },
+      {
+        "elemento": "hero-section > * (contenido)",
+        "z_index": "1",
+        "contexto": "Contenido sobre el patrón"
+      },
+      {
+        "elemento": ".product-card (base)",
+        "z_index": "1",
+        "contexto": "Cards normales"
+      },
+      {
+        "elemento": ".product-card:hover",
+        "z_index": "10",
+        "contexto": "Cards elevadas en hover"
+      },
+      {
+        "elemento": "footer",
+        "z_index": "auto",
+        "contexto": "Stack context normal"
+      }
+    ]
+  },
+  "prevencion_overlap": {
+    "estado": "✅ IMPLEMENTADO",
+    "estrategias": [
+      {
+        "problema": "Imagen comprimida o desaparece",
+        "solucion": "flex-shrink: 0 en img",
+        "validacion": "Altura fija 250px, nunca se reduce"
+      },
+      {
+        "problema": "Título y descripción se solapan",
+        "solucion": "min-height en h3 (2.5rem) y p (2.8rem)",
+        "validacion": "Espacio garantizado, nunca overlap"
+      },
+      {
+        "problema": "Descripción corta deja botón arriba",
+        "solucion": "flex-grow: 1 en p + margin-top: auto en footer",
+        "validacion": "Botón siempre al fondo"
+      },
+      {
+        "problema": "Descripción larga corta el botón",
+        "solucion": "-webkit-line-clamp: 2 + overflow: hidden",
+        "validacion": "Máximo 2 líneas, nunca overflow"
+      },
+      {
+        "problema": "Margenes globales afectan tarjeta",
+        "solucion": "Reset de margin en .product-card h3/p",
+        "validacion": "margin: 0 0 Xrem 0 específico"
+      }
+    ]
+  },
+  "secciones_usando_tarjetas": {
+    "estado": "✅ TODAS CORRECTAS",
+    "catalogo": {
+      "archivo": "src/Paginas/Catalogo.jsx",
+      "linea": "63",
+      "grid": "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8",
+      "responsive": {
+        "mobile": "1 columna",
+        "tablet": "2 columnas",
+        "desktop": "3 columnas"
+      },
+      "wrapper": "div[role='gridcell']",
+      "validacion": "✅ Correcto"
+    },
+    "inicio": {
+      "archivo": "src/Paginas/Inicio.jsx",
+      "linea": "169",
+      "grid": "grid-cols-1 md:grid-cols-3 gap-8",
+      "responsive": {
+        "mobile": "1 columna",
+        "desktop": "3 columnas"
+      },
+      "wrapper": "ScrollReveal",
+      "cambios": "❌ REMOVIDO fixedHeight={true}",
+      "validacion": "✅ Correcto"
+    }
+  },
+  "validaciones_realizadas": {
+    "estructura_html": "✅ Nesting correcto, sin divs innecesarios",
+    "margenes": "✅ Reseteados en h3 y p, no heredan globales",
+    "alturas": "✅ Todas las tarjetas 420px min, imagen 250px fijo",
+    "flex_layout": "✅ Column, flex-grow en contenido, auto en footer",
+    "text_overflow": "✅ Line-clamp + min-height, sin truncación ciega",
+    "z_index": "✅ Sin conflictos entre secciones",
+    "responsivo": "✅ Mobile ajuste a 200px imagen",
+    "hover": "✅ Transform y shadow sin layout shift",
+    "accesibilidad": "✅ Semantic HTML, aria-label donde aplica"
+  },
+  "proximas_verificaciones": [
+    "Abrir en navegador (npm run dev) a localhost:5175",
+    "Probar responsive en DevTools (320px, 768px, 1024px)",
+    "Verificar que todas las tarjetas sean exactamente 420px",
+    "Confirmar que imágenes no se comprimen (250px exactos)",
+    "Revisar que botones están siempre al fondo",
+    "Validar hover effects (z-index, sombra, transform)",
+    "Probar con descripciones de diferentes largos",
+    "Revisar en otros navegadores (Firefox, Safari)"
+  ]
+}

@@ -1,9 +1,14 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 
 /**
- * CartContext - Manejo global del carrito de compras
+ * ✅ CartContext - Manejo global del carrito de compras (OPTIMIZADO)
  * Proporciona funciones para agregar, eliminar, actualizar items
  * Persiste en localStorage
+ * 
+ * ✅ OPTIMIZACIONES:
+ * - useMemo: Cálculos de total e itemCount solo se recalculan si cartItems cambia
+ * - useCallback: Funciones de acción (addToCart, etc) memorizadas
+ * - Reduce renders innecesarios en componentes suscritos
  */
 const CartContext = createContext();
 
@@ -29,10 +34,10 @@ export const CartProvider = ({ children }) => {
     }, [cartItems]);
 
     /**
-     * Agregar producto al carrito
+     * ✅ Agregar producto al carrito (memoizado)
      * Si ya existe, incrementa cantidad pero mantiene cantidadUnidades del producto
      */
-    const addToCart = (producto, cantidad = 1) => {
+    const addToCart = useCallback((producto, cantidad = 1) => {
         setCartItems(prevItems => {
             const exists = prevItems.find(item => item._id === producto._id);
             
@@ -50,20 +55,20 @@ export const CartProvider = ({ children }) => {
             
             return [...prevItems, { ...producto, cantidad }];
         });
-    };
+    }, []);
 
     /**
-     * Quitar producto del carrito completamente
+     * ✅ Quitar producto del carrito completamente (memoizado)
      */
-    const removeFromCart = (productoId) => {
+    const removeFromCart = useCallback((productoId) => {
         setCartItems(prevItems => prevItems.filter(item => item._id !== productoId));
-    };
+    }, []);
 
     /**
-     * Actualizar cantidad de un producto
+     * ✅ Actualizar cantidad de un producto (memoizado)
      * Si cantidad es 0, lo elimina
      */
-    const updateQuantity = (productoId, cantidad) => {
+    const updateQuantity = useCallback((productoId, cantidad) => {
         if (cantidad <= 0) {
             removeFromCart(productoId);
             return;
@@ -76,52 +81,71 @@ export const CartProvider = ({ children }) => {
                     : item
             )
         );
-    };
+    }, [removeFromCart]);
 
     /**
-     * Limpiar carrito completamente
+     * ✅ Limpiar carrito completamente (memoizado)
      */
-    const clearCart = () => {
+    const clearCart = useCallback(() => {
         setCartItems([]);
-    };
+    }, []);
 
     /**
-     * Calcular total del carrito
+     * ✅ OPTIMIZACIÓN: Calcular total del carrito con useMemo
+     * Exponer valor directo, no función wrapper
      */
-    const getTotal = () => {
-        return cartItems.reduce((total, item) => total + (item.precio * item.cantidad), 0);
-    };
+    const total = useMemo(() => {
+        return cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+    }, [cartItems]);
 
     /**
-     * Calcular cantidad total de items
+     * ✅ OPTIMIZACIÓN: Calcular cantidad total de items con useMemo
+     * Exponer valor directo, no función wrapper
      */
-    const getTotalItems = () => {
-        return cartItems.reduce((total, item) => total + item.cantidad, 0);
-    };
+    const itemCount = useMemo(() => {
+        return cartItems.reduce((sum, item) => sum + item.cantidad, 0);
+    }, [cartItems]);
 
     /**
-     * Obtener detalles para enviar al servidor
-     * El backend solo necesita productoId y cantidad
-     * El backend calculará precios y validará stock
+     * ✅ Verificar si carrito está vacío (memoizado)
      */
-    const getCartForCheckout = () => {
+    const isEmpty = useMemo(() => cartItems.length === 0, [cartItems]);
+
+    /**
+     * ✅ Obtener detalles para enviar al servidor (callback)
+     */
+    const getCartForCheckout = useCallback(() => {
         return cartItems.map(item => ({
             productoId: item._id,
             cantidad: item.cantidad
         }));
-    };
+    }, [cartItems]);
 
-    const value = {
+    /**
+     * ✅ Value memoizado para evitar recreación en cada render
+     */
+    const value = useMemo(() => ({
         cartItems,
         addToCart,
         removeFromCart,
         updateQuantity,
         clearCart,
-        getTotal,
-        getTotalItems,
         getCartForCheckout,
-        isEmpty: cartItems.length === 0
-    };
+        // ✅ Exponer valores calculados directamente (no funciones)
+        total,
+        itemCount,
+        isEmpty
+    }), [
+        cartItems,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        clearCart,
+        getCartForCheckout,
+        total,
+        itemCount,
+        isEmpty
+    ]);
 
     return (
         <CartContext.Provider value={value}>

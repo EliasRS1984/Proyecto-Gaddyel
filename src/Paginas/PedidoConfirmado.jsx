@@ -1,7 +1,9 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
+import { useCart } from '../Context/CartContext';
+import orderStorage from '../utils/orderStorage';
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000';
 
 /**
  * Función para formatear fecha (fuera del componente para evitar problemas de hooks)
@@ -18,16 +20,24 @@ const formatearFecha = (fecha) => {
 
 /**
  * PedidoConfirmado - Página de éxito después de crear el pedido
+ * 
+ * FLUJO:
+ * 1. Mercado Pago redirige con: /pedido-confirmado/:ordenId?status=approved
+ * 2. Página carga datos de localStorage
+ * 3. Limpia el carrito (pago exitoso)
+ * 4. Muestra resumen del pedido
  */
 const PedidoConfirmado = () => {
     const { id: ordenId } = useParams();
     const [searchParams] = useSearchParams();
+    const { clearCart } = useCart();
     const [orden, setOrden] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     
     // useRef para evitar que React Strict Mode cause múltiples lecturas
     const hasLoadedRef = useRef(false);
+    const hasCleanedCartRef = useRef(false);
 
     useEffect(() => {
         // Si ya hemos cargado los datos, no hacerlo de nuevo
@@ -39,40 +49,64 @@ const PedidoConfirmado = () => {
             try {
                 setLoading(true);
                 
+                // Log de parámetros recibidos
+                console.log('🔍 [PedidoConfirmado] Parámetros:', {
+                    ordenId,
+                    status: searchParams.get('status'),
+                    payment_id: searchParams.get('payment_id'),
+                    collection_status: searchParams.get('collection_status')
+                });
+                
                 if (ordenId) {
                     console.log('✅ Pedido confirmado con ID:', ordenId);
                     
-                    // Obtener datos de localStorage
-                    const pedidoDataStr = localStorage.getItem('lastOrderData');
-                    let pedidoData = {};
+                    // ✅ CORRECCIÓN: Usar orderStorage.getOrder() para obtener datos completos
+                    // Antes intentaba acceder a 'lastOrderData' que no existía
+                    const pedidoData = orderStorage.getOrder() || {};
                     
-                    if (pedidoDataStr) {
-                        try {
-                            pedidoData = JSON.parse(pedidoDataStr);
-                            console.log('📦 Datos del pedido recuperados:', pedidoData);
-                        } catch (e) {
-                            console.warn('⚠️ No se pudo parsear lastOrderData:', e);
-                        }
+                    // ✅ DEBUG: Mostrar qué se obtuvo
+                    console.log('📖 [PedidoConfirmado] Datos obtenidos de orderStorage:', {
+                        hasData: Object.keys(pedidoData).length > 0,
+                        ordenId: pedidoData.ordenId,
+                        total: pedidoData.total,
+                        subtotal: pedidoData.subtotal,
+                        costoEnvio: pedidoData.costoEnvio,
+                        itemsCount: pedidoData.items?.length || 0,
+                        allKeys: Object.keys(pedidoData)
+                    });
+                    
+                    if (Object.keys(pedidoData).length > 0) {
+                        console.log('📦 Datos del pedido recuperados desde orderStorage:', pedidoData);
                     } else {
-                        console.warn('⚠️ No hay lastOrderData en localStorage');
+                        console.warn('⚠️ No hay datos de pedido en orderStorage');
                     }
                     
-                    // Usar datos que devolvió el backend + items del carrito
+                    // Limpiar carrito después de pago exitoso (solo una vez)
+                    if (!hasCleanedCartRef.current && searchParams.get('status') === 'approved') {
+                        console.log('🧹 Limpiando carrito después de pago exitoso');
+                        clearCart();
+                        hasCleanedCartRef.current = true;
+                    }
+                    
+                    // ✅ CORRECCIÓN: Usar datos correctos del objeto
+                    // El backend retorna: ordenId, total, subtotal, costoEnvio, items, etc.
                     const orderNumber = pedidoData.orderNumber || `G-${ordenId.slice(-6).toUpperCase()}`;
-                    const totalGeneral = pedidoData.total || 0;
+                    const totalGeneral = pedidoData.total || pedidoData.totalFinal || 0;
                     const costoEnvio = pedidoData.costoEnvio !== undefined ? pedidoData.costoEnvio : 12000;
-                    const subtotal = pedidoData.subtotal || 0;
+                    const subtotal = pedidoData.subtotal || pedidoData.total || 0;
                     const items = pedidoData.items || [];
+                    const datosComprador = pedidoData || {};
                     
                     // Cantidad de solicitudes = suma total de cantidades
-                    const cantidadProductos = items.reduce((sum, item) => sum + item.cantidad, 0);
+                    const cantidadProductos = items.reduce((sum, item) => sum + (item.cantidad || 1), 0);
                     
                     console.log('✅ Datos procesados:', { 
                         orderNumber, 
                         cantidadProductos, 
                         costoEnvio,
                         totalGeneral,
-                        items: items.slice(0, 1)
+                        subtotal,
+                        itemsCount: items.length
                     });
                     
                     // Crear objeto completo de orden para mostrar
@@ -84,7 +118,7 @@ const PedidoConfirmado = () => {
                         costoEnvio: costoEnvio,
                         cantidadProductos: cantidadProductos,
                         items: items,
-                        datosComprador: pedidoData.datosComprador || {}, // Incluir datos del comprador para mostrar dirección
+                        datosComprador: datosComprador,
                         envio: {
                             mensaje: 'Tu pedido será procesado en aproximadamente 20 días corridos desde la confirmación del pago.',
                             diasProduccion: 20,

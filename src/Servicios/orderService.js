@@ -10,7 +10,9 @@
  * - Manejo de errores estandarizado
  */
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
+import { logger } from '../utils/logger';
+
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000';
 const isDev = import.meta.env.DEV;
 
 /**
@@ -34,11 +36,8 @@ const normalizeCheckoutData = (checkoutData, cartItems) => {
       nombre: checkoutData.nombre,
       email: checkoutData.email,
       whatsapp: checkoutData.whatsapp,
-      // El backend usa 'direccion' (singular) para el domicilio
-      direccion: checkoutData.domicilio,
-      // El backend usa 'ciudad' para la localidad
-      ciudad: checkoutData.localidad,
-      // Los campos restantes se envían igual
+      domicilio: checkoutData.domicilio,
+      localidad: checkoutData.localidad,
       provincia: checkoutData.provincia,
       codigoPostal: checkoutData.codigoPostal,
       notasAdicionales: checkoutData.notasAdicionales,
@@ -96,12 +95,24 @@ export const createOrder = async (checkoutData, cartItems, options = {}) => {
   try {
     const { includeItems = true } = options;
 
+    // Debug de entrada
+    console.log('🔍 [orderService] createOrder llamado con:', {
+      checkoutData: checkoutData ? 'presente' : 'ausente',
+      cartItems: cartItems ? `${cartItems.length} items` : 'ausente',
+      cartItemsArray: cartItems
+    });
+
     // Validaciones iniciales
     if (!checkoutData) {
       throw new Error('Los datos del checkout son requeridos');
     }
 
     if (!cartItems || cartItems.length === 0) {
+      console.error('❌ [orderService] Validación falló:', {
+        cartItems,
+        isArray: Array.isArray(cartItems),
+        length: cartItems?.length
+      });
       throw new Error('El carrito está vacío');
     }
 
@@ -109,16 +120,17 @@ export const createOrder = async (checkoutData, cartItems, options = {}) => {
     const normalizedData = normalizeCheckoutData(checkoutData, cartItems);
 
     if (isDev) {
-      console.log('📦 orderService: Creando orden con datos normalizados');
-      console.log('  Frontend data:', checkoutData);
-      console.log('  Normalized data:', normalizedData);
+      logger.debug('📦 orderService: Creando orden con datos normalizados');
+      logger.debug('  Frontend data:', checkoutData);
+      logger.debug('  Cart items:', cartItems);
+      logger.debug('  Normalized data:', normalizedData);
     }
 
     // Crear AbortController para timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 segundos
 
-    const response = await fetch(`${API_BASE}/pedidos/crear`, {
+    const response = await fetch(`${API_BASE}/api/pedidos/crear`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -140,8 +152,8 @@ export const createOrder = async (checkoutData, cartItems, options = {}) => {
     const backendResponse = await response.json();
 
     if (isDev) {
-      console.log('✅ orderService: Orden creada exitosamente');
-      console.log('  Backend response:', backendResponse);
+      logger.success('✅ orderService: Orden creada exitosamente');
+      logger.debug('  Backend response:', backendResponse);
     }
 
     // Desnormalizar respuesta
@@ -152,7 +164,7 @@ export const createOrder = async (checkoutData, cartItems, options = {}) => {
       try {
         localStorage.setItem('lastOrderData', JSON.stringify(denormalizedResponse));
         if (isDev) {
-          console.log('💾 orderService: Datos de la orden guardados en localStorage');
+          logger.debug('💾 orderService: Datos de la orden guardados en localStorage');
         }
       } catch (e) {
         console.error('❌ orderService: Error al guardar en localStorage', e);
@@ -186,7 +198,7 @@ export const getOrder = async (orderId) => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-    const response = await fetch(`${API_BASE}/orders/${orderId}`, {
+    const response = await fetch(`${API_BASE}/api/orders/${orderId}`, {
       method: 'GET',
       headers: { 'Accept': 'application/json' },
       credentials: 'include',
@@ -205,7 +217,7 @@ export const getOrder = async (orderId) => {
     const data = await response.json();
 
     if (isDev) {
-      console.log('✅ orderService: Orden obtenida:', data);
+      logger.debug('✅ orderService: Orden obtenida:', data);
     }
 
     return denormalizeResponse(data);
@@ -235,7 +247,7 @@ export const retryPayment = async (orderId) => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-    const response = await fetch(`${API_BASE}/orders/${orderId}/retry`, {
+    const response = await fetch(`${API_BASE}/api/orders/${orderId}/retry`, {
       method: 'POST',
       headers: { 'Accept': 'application/json' },
       credentials: 'include',
@@ -252,7 +264,7 @@ export const retryPayment = async (orderId) => {
     const data = await response.json();
 
     if (isDev) {
-      console.log('✅ orderService: Reintento iniciado:', data);
+      logger.debug('✅ orderService: Reintento iniciado:', data);
     }
 
     return denormalizeResponse(data);

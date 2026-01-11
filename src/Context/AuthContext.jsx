@@ -1,34 +1,39 @@
-import { createContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useState, useEffect, useCallback, useMemo } from 'react';
 import * as authService from '../Servicios/authService';
 
 // Crear contexto de autenticación
 export const AuthContext = createContext();
 
 /**
- * Proveedor de contexto de autenticación para clientes
- * Gestiona el estado de autenticación globalmente en la tienda
+ * ✅ REFACTORIZADO: AuthContext - Gestión de Estado Únicamente
+ * 
+ * RESPONSABILIDAD: Proveer estado global de autenticación (cliente, isAuthenticated, isLoading)
+ * NO HACE: Funciones wrapper de authService (que duplican lógica)
+ * 
+ * FLUJO:
+ * - Login.jsx → authService.login() → setCliente + setIsAuthenticated
+ * - Registro.jsx → authService.registro() → setCliente + setIsAuthenticated
+ * - Logout → authService.logout() + setCliente(null)
+ * 
+ * Los componentes son responsables de llamar authService directamente
+ * AuthContext solo mantiene el estado sincronizado
  */
 export const AuthProvider = ({ children }) => {
     const [cliente, setCliente] = useState(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Verificar autenticación al montar componente
+    // ✅ FLUJO: Al montar, verificar si hay sesión activa
+    // Leer localStorage y restaurar estado
     useEffect(() => {
         const verificarAutenticacion = () => {
             const token = authService.obtenerToken();
             const clienteLocal = authService.obtenerClienteLocal();
 
-            console.log('🔍 Verificando autenticación:');
-            console.log('  Token:', token ? '✅ Existe' : '❌ No existe');
-            console.log('  Cliente:', clienteLocal ? '✅ Existe' : '❌ No existe');
-
             if (token && clienteLocal) {
                 setCliente(clienteLocal);
                 setIsAuthenticated(true);
-                console.log('✅ Usuario autenticado:', clienteLocal.email);
             } else {
-                console.log('❌ No hay sesión activa');
                 setCliente(null);
                 setIsAuthenticated(false);
             }
@@ -39,110 +44,42 @@ export const AuthProvider = ({ children }) => {
         verificarAutenticacion();
     }, []);
 
-    // Registrar nuevo cliente
-    const registrar = useCallback(async (datosCliente) => {
-        try {
-            const response = await authService.registro(datosCliente);
-            
-            if (response.exito) {
-                setCliente(response.cliente);
-                setIsAuthenticated(true);
-                return { exito: true, mensaje: response.mensaje };
-            } else {
-                return { exito: false, mensaje: response.mensaje };
-            }
-        } catch (error) {
-            console.error('❌ Error al registrar:', error);
-            return { 
-                exito: false, 
-                mensaje: error.mensaje || 'Error al registrar usuario' 
-            };
-        }
+    /**
+     * ✅ FUNCIÓN: Actualizar estado de autenticación después de login/registro
+     * Responsabilidad: Sincronizar estado global con datos nuevos
+     * Llamada desde: Login.jsx, Registro.jsx
+     */
+    const establecerCliente = useCallback((datosCliente) => {
+        setCliente(datosCliente);
+        setIsAuthenticated(!!datosCliente);
     }, []);
 
-    // Iniciar sesión
-    const iniciarSesion = useCallback(async (email, password) => {
-        try {
-            const response = await authService.login(email, password);
-            
-            if (response.exito) {
-                setCliente(response.cliente);
-                setIsAuthenticated(true);
-                return { exito: true, mensaje: response.mensaje };
-            } else {
-                return { exito: false, mensaje: response.mensaje };
-            }
-        } catch (error) {
-            console.error('❌ Error al iniciar sesión:', error);
-            return { 
-                exito: false, 
-                mensaje: error.mensaje || 'Error al iniciar sesión' 
-            };
-        }
-    }, []);
-
-    // Cerrar sesión
+    /**
+     * ✅ FUNCIÓN: Cerrar sesión limpiando estado global y localStorage
+     * Responsabilidad: Limpiar todos los datos de autenticación
+     * Llamada desde: Navbar.jsx, Login.jsx, componentes protegidos
+     */
     const cerrarSesion = useCallback(() => {
-        console.log('🔐 Cerrando sesión...');
         authService.logout();
         setCliente(null);
         setIsAuthenticated(false);
-        console.log('✅ Sesión cerrada, localStorage limpiado');
     }, []);
 
-    // Actualizar perfil
-    const actualizarPerfil = useCallback(async (datosActualizados) => {
-        try {
-            const response = await authService.actualizarPerfil(datosActualizados);
-            
-            if (response.exito) {
-                setCliente(response.cliente);
-                return { exito: true, mensaje: response.mensaje };
-            }
-            
-            return { exito: false, mensaje: response.mensaje };
-        } catch (error) {
-            console.error('❌ Error al actualizar perfil:', error);
-            return { 
-                exito: false, 
-                mensaje: error.mensaje || 'Error al actualizar perfil' 
-            };
-        }
-    }, []);
 
-    // Refrescar datos del perfil
-    const refrescarPerfil = useCallback(async () => {
-        try {
-            const response = await authService.obtenerPerfil();
-            
-            if (response.exito) {
-                setCliente(response.cliente);
-                return { exito: true };
-            }
-            
-            return { exito: false };
-        } catch (error) {
-            console.error('❌ Error al refrescar perfil:', error);
-            
-            // Si hay error de autenticación, cerrar sesión
-            if (error.mensaje?.includes('sesión')) {
-                cerrarSesion();
-            }
-            
-            return { exito: false };
-        }
-    }, [cerrarSesion]);
-
-    const value = {
+    // ✅ OPTIMIZACIÓN: Memoizar value para prevenir re-renders innecesarios
+    const value = useMemo(() => ({
         cliente,
         isAuthenticated,
         isLoading,
-        registrar,
-        iniciarSesion,
-        cerrarSesion,
-        actualizarPerfil,
-        refrescarPerfil
-    };
+        establecerCliente,
+        cerrarSesion
+    }), [
+        cliente,
+        isAuthenticated,
+        isLoading,
+        establecerCliente,
+        cerrarSesion
+    ]);
 
     return (
         <AuthContext.Provider value={value}>

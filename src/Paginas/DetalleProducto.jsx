@@ -4,7 +4,7 @@ import CarruselVertical from '../Componentes/UI/Carrusel/CarruselVertical';
 import { Helmet } from 'react-helmet-async';
 import { useCart } from '../Context/CartContext';
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000';
 
 const DetalleProducto = () => {
     const { id } = useParams();
@@ -18,7 +18,7 @@ const DetalleProducto = () => {
     useEffect(() => {
         const fetchProducto = async () => {
             try {
-                const response = await fetch(`${API_BASE}/productos/${id}`);
+                const response = await fetch(`${API_BASE}/api/productos/${id}`);
                 if (!response.ok) throw new Error('Error al obtener el producto');
                 const data = await response.json();
                 setProductoData(data);
@@ -74,8 +74,35 @@ const DetalleProducto = () => {
                 <title>{`${nombre} - ${categoria} | Gaddyel`}</title>
                 <meta
                     name="description"
-                    content={`Detalles completos de ${nombre}. Descubre las características, calidad y precio de nuestro producto de ${categoria}.`}
+                    content={`${descripcionCompleta.substring(0, 160)}... Compra ${nombre} en Gaddyel.`}
                 />
+                {/* ✅ Open Graph para redes sociales */}
+                <meta property="og:title" content={`${nombre} - Gaddyel`} />
+                <meta property="og:description" content={`${descripcionCompleta.substring(0, 160)}...`} />
+                <meta property="og:type" content="product" />
+                <meta property="og:image" content={imagenes[0]?.src || productoData.imagenSrc} />
+                
+                {/* ✅ Schema.org Product */}
+                <script type="application/ld+json">
+                    {JSON.stringify({
+                        "@context": "https://schema.org/",
+                        "@type": "Product",
+                        "name": nombre,
+                        "description": descripcionCompleta,
+                        "image": imagenes.map(img => img.src),
+                        "brand": {
+                            "@type": "Brand",
+                            "name": "Gaddyel"
+                        },
+                        "offers": {
+                            "@type": "Offer",
+                            "url": `https://gaddyel.com/catalogo/${id}`,
+                            "priceCurrency": "ARS",
+                            "price": precio.toString(),
+                            "availability": "https://schema.org/InStock"
+                        }
+                    })}
+                </script>
             </Helmet>
             <div className="container mx-auto p-4 md:p-8 flex flex-col lg:flex-row items-start gap-8 min-h-screen">
                 {/* Carrusel de imágenes */}
@@ -89,11 +116,11 @@ const DetalleProducto = () => {
                     <p className="text-gray-600 text-lg mb-6">{descripcionCompleta}</p>
 
                     <div className="p-4 bg-purple-50 border-l-4 border-purple-500 shadow-md rounded-lg mb-6">
-                        <p className="text-2xl font-bold text-purple-950 mb-2">
+                        <p className="!text-5xl !font-bold !text-purple-950 !mb-2" style={{ fontSize: '3rem', fontWeight: '700', color: '#4c1d95', marginBottom: '0.5rem' }}>
                             ${precio.toLocaleString('es-AR')}
                         </p>
-                        <p className="text-sm text-purple-700 font-medium">
-                            Incluye {cantidadUnidades} {cantidadUnidades === 1 ? 'unidad' : 'unidades'} por pedido
+                        <p className="!text-sm !text-purple-700 !font-bold" style={{ fontSize: '0.875rem', fontWeight: '700', color: '#7e22ce' }}>
+                            Incluye {cantidadUnidades} {cantidadUnidades === 1 ? 'unidad' : 'unidades'}
                         </p>
                     </div>
 
@@ -137,13 +164,13 @@ const DetalleProducto = () => {
                                 setAddedToCart(true);
                                 setTimeout(() => setAddedToCart(false), 2000);
                             }}
-                            className="flex-1 text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-full text-lg shadow-lg transition-all transform hover:scale-105 duration-300"
+                            className="flex-1 bg-blue-500 hover:bg-blue-700 text-black hover:text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg btn"
                         >
                             {addedToCart ? '✓ Agregado al Carrito' : '🛒 Agregar al Carrito'}
                         </button>
                         <NavLink
                             to="/contacto"
-                            className="text-center bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 px-8 rounded-full text-lg shadow-lg transition-transform transform hover:scale-105 duration-300"
+                            className="bg-purple-500 hover:bg-purple-700 text-black hover:text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg btn"
                             aria-label={`Contactar para comprar ${nombre}`}
                         >
                             Contactar

@@ -1,8 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import orderService from '../Servicios/orderService';
+import orderStorage from '../utils/orderStorage';
+import { logger } from '../utils/logger';
 
 /**
  * OrderContext - Gestiona el estado global de órdenes
+ * ✅ Ahora usa orderStorage centralizado para localStorage
+ * 
  * Proporciona acceso a:
  * - Orden actual en proceso
  * - Orden completada/confirmada
@@ -15,19 +19,15 @@ export const OrderProvider = ({ children }) => {
   // Orden en proceso (para checkout)
   const [currentOrder, setCurrentOrder] = useState(null);
 
-  // Última orden confirmada (post-checkout)
+  // ✅ Última orden confirmada usando orderStorage centralizado
   const [lastOrder, setLastOrder] = useState(() => {
-    try {
-      const stored = localStorage.getItem('lastOrder');
-      return stored ? JSON.parse(stored) : null;
-    } catch {
-      return null;
-    }
+    const stored = orderStorage.getOrder();
+    return stored || null;
   });
 
-  // Estado de la última orden
+  // ✅ Estado de la última orden usando orderStorage
   const [lastOrderStatus, setLastOrderStatus] = useState(() => {
-    return localStorage.getItem('lastOrderStatus') || null;
+    return orderStorage.getStatus() || null;
   });
 
   // Error de la última operación
@@ -36,23 +36,24 @@ export const OrderProvider = ({ children }) => {
   // Loading state
   const [isLoading, setIsLoading] = useState(false);
 
-  // Persistir última orden en localStorage cuando cambia
+  // ✅ Limpiar órdenes antiguas al montar
+  useEffect(() => {
+    const wasCleanedUp = orderStorage.cleanup();
+    if (wasCleanedUp) {
+      logger.info('[OrderContext] Órdenes antiguas limpiadas');
+      setLastOrder(null);
+      setLastOrderStatus(null);
+    }
+  }, []);
+
+  // ✅ Persistir usando orderStorage centralizado
   useEffect(() => {
     if (lastOrder) {
-      localStorage.setItem('lastOrder', JSON.stringify(lastOrder));
+      orderStorage.save(lastOrder, lastOrderStatus || 'pending_payment');
     } else {
-      localStorage.removeItem('lastOrder');
+      orderStorage.clear();
     }
-  }, [lastOrder]);
-
-  // Persistir estado de orden en localStorage
-  useEffect(() => {
-    if (lastOrderStatus) {
-      localStorage.setItem('lastOrderStatus', lastOrderStatus);
-    } else {
-      localStorage.removeItem('lastOrderStatus');
-    }
-  }, [lastOrderStatus]);
+  }, [lastOrder, lastOrderStatus]);
 
   /**
    * Crea una nueva orden
@@ -67,21 +68,18 @@ export const OrderProvider = ({ children }) => {
     try {
       const response = await orderService.createOrder(checkoutData, cartItems);
 
-      // Guardar como última orden confirmada
+      // ✅ Guardar usando orderStorage (limpia automáticamente keys antiguas)
       setLastOrder(response);
       setLastOrderStatus('pending_payment');
-      setCurrentOrder(null); // Limpiar orden en proceso
+      setCurrentOrder(null);
 
-      // Limpiar localStorage viejo de múltiples keys
-      localStorage.removeItem('lastOrderData');
-      localStorage.removeItem('lastOrderTotal');
-      localStorage.removeItem('lastOrderNumber');
-      localStorage.removeItem('lastOrderShipping');
+      logger.success('[OrderContext] Orden creada y guardada:', response.ordenId);
 
       return response;
     } catch (error) {
       const errorMessage = error.message || 'Error al crear la orden';
       setLastError(errorMessage);
+      logger.error('[OrderContext] Error creando orden:', errorMessage);
       throw error;
     } finally {
       setIsLoading(false);

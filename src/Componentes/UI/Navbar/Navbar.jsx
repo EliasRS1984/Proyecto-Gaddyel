@@ -1,21 +1,33 @@
-import React, { useState, useCallback, useContext, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { AuthContext } from '../../../Context/AuthContext';
+import { useAuth } from '../../../hooks/useAuth';
 import CartIcon from '../../CartIcon';
 import LogoGaddyel from '../../../Activos/Imagenes/Logo-Gaddyel.png';
+import { logger } from '../../../utils/logger';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-    const { isAuthenticated, cliente, cerrarSesion } = useContext(AuthContext);
+    const [scrolled, setScrolled] = useState(false);
+    const { isAuthenticated, cliente, cerrarSesion } = useAuth(); // ✅ Usar hook useAuth
     const navigate = useNavigate();
     const logoSrc = LogoGaddyel || 'https://via.placeholder.com/64?text=Logo';
 
+    // Monitorear scroll para sombra dinámica
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 20);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
     // Monitorear cambios en autenticación
     useEffect(() => {
-        console.log('📊 [Navbar] Estado actualizado:');
-        console.log('  isAuthenticated:', isAuthenticated);
-        console.log('  cliente:', cliente?.nombre || 'No autenticado');
+        logger.debug('[Navbar] Estado actualizado:', {
+            isAuthenticated,
+            cliente: cliente?.nombre || 'No autenticado'
+        });
     }, [isAuthenticated, cliente]);
 
     const toggleMenu = () => {
@@ -35,19 +47,30 @@ const Navbar = () => {
     };
 
     const handleLogout = () => {
-        console.log('👉 Logout iniciado desde Navbar');
+        logger.info('[Navbar] Logout iniciado');
         cerrarSesion();
         closeUserMenu();
         navigate('/', { replace: true });
     };
 
-    const activeLinkStyle = useCallback(
-        ({ isActive }) =>
-            isActive
-                ? 'text-gray-900 border-b-2 border-gray-900 dark:text-gray-100 dark:border-gray-100 transition-colors duration-200'
-                : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors duration-200',
-        []
-    );
+    const handleScrollToTop = useCallback(() => {
+        // ✅ HELPER: Scroll suave al tope de la página
+        // ¿Por qué? Logo debe llevar a inicio Y hacer scroll al top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, []);
+
+    const handleLogoClick = useCallback((e) => {
+        // ✅ Si ya estamos en inicio, solo hace scroll
+        // Si estamos en otra página, NavLink navega y luego scroll
+        if (window.location.pathname === '/') {
+            e.preventDefault();
+            handleScrollToTop();
+        } else {
+            // NavLink se encargará de la navegación
+            // Scroll sucederá en el siguiente render
+            setTimeout(handleScrollToTop, 0);
+        }
+    }, [handleScrollToTop]);
 
     const navLinks = [
         { to: '/', label: 'Inicio' },
@@ -58,10 +81,17 @@ const Navbar = () => {
     ];
 
     return (
-        <header className="bg-gray-100 dark:bg-gray-900 shadow-md sticky top-0 z-50">
+        <header className={`bg-gray-100/95 dark:bg-gray-900/95 backdrop-blur-md sticky top-0 z-50 animate-fade-in transition-shadow duration-300 ${
+            scrolled ? 'shadow-xl' : 'shadow-md'
+        }`}>
             <nav className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
                 <div className="flex-shrink-0">
-                    <NavLink to="/" className="flex items-center space-x-2" aria-label="Ir a la página de inicio de Gaddyel">
+                    <NavLink 
+                        to="/" 
+                        onClick={handleLogoClick}
+                        className="flex items-center space-x-2" 
+                        aria-label="Ir a la página de inicio de Gaddyel (volver al top)"
+                    >
                         <img
                             src={logoSrc}
                             alt="Logo de Gaddyel"
@@ -69,6 +99,9 @@ const Navbar = () => {
                         />
                     </NavLink>
                 </div>
+
+                {/* Separador visual sutil */}
+                <div className="hidden md:block h-8 w-px bg-gray-300 dark:bg-gray-700 mx-4"></div>
 
                 {/* Botón del menú de hamburguesa para móviles */}
                 <div className="md:hidden">
@@ -102,10 +135,19 @@ const Navbar = () => {
                 </div>
 
                 {/* Enlaces de navegación para escritorio */}
-                <div className="hidden md:flex items-center space-x-6" role="navigation" aria-label="Menú principal">
+                <div className="hidden md:flex items-center space-x-8" role="navigation" aria-label="Menú principal">
                     {navLinks.map((link) => (
-                        <NavLink key={link.to} to={link.to} className={activeLinkStyle}>
+                        <NavLink 
+                            key={link.to} 
+                            to={link.to} 
+                            className={({ isActive }) => 
+                                `relative text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors duration-300 font-medium ${
+                                    isActive ? 'text-gray-900 dark:text-gray-100' : ''
+                                } group`
+                            }
+                        >
                             {link.label}
+                            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black group-hover:w-full transition-all duration-300"></span>
                         </NavLink>
                     ))}
 
@@ -118,7 +160,7 @@ const Navbar = () => {
                             <>
                                 <button
                                     onClick={toggleUserMenu}
-                                    className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 rounded-lg px-3 py-2"
+                                    className="relative flex items-center space-x-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors duration-300 font-medium group"
                                     aria-label="Menú de usuario"
                                     aria-expanded={isUserMenuOpen}
                                 >
@@ -129,11 +171,12 @@ const Navbar = () => {
                                     <svg className={`w-4 h-4 transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                     </svg>
+                                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black group-hover:w-full transition-all duration-300"></span>
                                 </button>
 
                                 {/* Dropdown de usuario autenticado */}
                                 {isUserMenuOpen && (
-                                    <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2 z-50">
+                                    <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-2 z-50 animate-in fade-in zoom-in">
                                         <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
                                             <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{cliente?.nombre}</p>
                                             <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{cliente?.email}</p>
@@ -160,7 +203,7 @@ const Navbar = () => {
                             <>
                                 <button
                                     onClick={toggleUserMenu}
-                                    className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 rounded-lg px-3 py-2"
+                                    className="relative flex items-center space-x-2 text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100 transition-colors duration-300 font-medium group"
                                     aria-label="Menú de autenticación"
                                     aria-expanded={isUserMenuOpen}
                                 >
@@ -171,11 +214,12 @@ const Navbar = () => {
                                     <svg className={`w-4 h-4 transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                     </svg>
+                                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black group-hover:w-full transition-all duration-300"></span>
                                 </button>
 
                                 {/* Dropdown de invitado */}
                                 {isUserMenuOpen && (
-                                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2 z-50">
+                                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl py-2 z-50 animate-in fade-in zoom-in duration-200 origin-top-right">
                                         <button
                                             onClick={() => {
                                                 navigate('/login');
@@ -205,8 +249,8 @@ const Navbar = () => {
             {/* Menú desplegable para móviles */}
             <div
                 id="mobile-menu"
-                className={`md:hidden absolute w-full bg-gray-100 dark:bg-gray-900 transition-all duration-300 ease-in-out transform ${
-                    isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
+                className={`md:hidden absolute w-full bg-gray-100 dark:bg-gray-900 transition-all duration-300 ease-in-out transform origin-top ${
+                    isOpen ? 'opacity-100 translate-y-0 scale-y-100' : 'opacity-0 -translate-y-2 scale-y-95 pointer-events-none'
                 }`}
                 role="menu"
                 aria-label="Menú móvil"
@@ -216,7 +260,7 @@ const Navbar = () => {
                         <NavLink
                             key={link.to}
                             to={link.to}
-                            className="w-full text-center py-2 text-xl font-bold rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 transform hover:scale-105"
+                            className="w-full text-center py-3 text-lg font-semibold rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 transform hover:translate-x-1 hover:shadow-md"
                             onClick={closeMenu}
                             onKeyDown={(e) => ['Enter', 'Space'].includes(e.key) && closeMenu()}
                             role="menuitem"

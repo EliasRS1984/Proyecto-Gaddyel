@@ -1,0 +1,36 @@
+implementacion mercado pago:
+ROLE: Senior Payment Integration Architect (Mercado Pago Expert)
+Implementa el sistema de cobros de Mercado Pago para mi tienda web (Stack MERN) siguiendo estrictamente la documentación oficial y los estándares de seguridad de 2025.
+
+REGLAS TÉCNICAS MANDATORIAS
+1. Backend (Node.js 22 & Express)
+SDK Oficial: Utiliza la versión más reciente del SDK mercadopago.
+
+Idempotencia: Implementa obligatoriamente el encabezado X-Idempotency-Key en la creación de pagos para evitar cobros duplicados por reintentos de red.
+
+Seguridad de Webhooks: Crea una ruta POST /api/webhooks/mercadopago. Es obligatorio validar la firma x-signature usando la clave secreta para asegurar que la notificación es auténtica antes de actualizar la base de datos.
+
+Flujo Asíncrono: No confíes en las back_urls para lógica crítica de negocio. La actualización del estado del pedido en MongoDB debe ocurrir exclusivamente a través del Webhook.
+
+Consultas Eficientes: Al verificar pedidos para pago, usa .lean() en las consultas de Mongoose para optimizar el uso de memoria.
+
+2. Frontend (React 19)
+Mercado Pago Bricks: Utiliza la solución de "Bricks" para una integración nativa en React, asegurando cumplimiento de PCI-DSS (los datos de tarjeta nunca deben tocar mi servidor).
+
+Anti-Fraude: Integra el script de seguridad oficial https://www.mercadopago.com/v2/security.js para generar y enviar el device_id en cada transacción, mejorando la tasa de aprobación de pagos.
+
+UX Profesional: Implementa estados de carga y manejo de errores específicos de la API de Mercado Pago (ej: fondos insuficientes, tarjeta expirada).
+
+3. Infraestructura y Seguridad
+Secretos: Las credenciales (ACCESS_TOKEN, PUBLIC_KEY, WEBHOOK_SECRET) deben manejarse exclusivamente mediante variables de entorno .env.
+
+HTTPS: Asegura que todas las comunicaciones y el callback del webhook se realicen bajo protocolos SSL/TLS seguros.
+
+TAREAS SOLICITADAS
+Generar el PaymentService.js en el backend para manejar la lógica de preferencias y validación de firmas.
+
+Crear el componente CheckoutButton.jsx en React que inicialice Mercado Pago Bricks y capture el device_id.
+
+Configurar el endpoint de Webhooks con lógica de reintento y validación de firma.
+
+PROPORCIONA EL CÓDIGO REFACTORIZADO Y ROBUSTO AHORA.

@@ -1,18 +1,40 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 
 /**
  * PedidoFallido - Página cuando el pago fue rechazado
+ * 
+ * FLUJO:
+ * 1. Mercado Pago redirige con: /pedido-fallido/:ordenId?status=rejected
+ * 2. Página muestra mensaje de error y opciones
+ * 3. Usuario puede reintentar o volver al carrito
  */
 export const PedidoFallido = () => {
+    const { id: ordenId } = useParams();
+    const [searchParams] = useSearchParams();
     const [orden, setOrden] = useState(null);
 
     useEffect(() => {
-        const lastOrder = localStorage.getItem('ultimaOrden');
+        // Cargar datos de localStorage
+        const lastOrder = localStorage.getItem('lastOrderData');
         if (lastOrder) {
-            setOrden(JSON.parse(lastOrder));
+            try {
+                const orderData = JSON.parse(lastOrder);
+                setOrden(orderData);
+                console.log('📦 [PedidoFallido] Datos de orden cargados:', orderData.orderNumber);
+            } catch (e) {
+                console.error('❌ Error parseando lastOrderData:', e);
+            }
         }
-    }, []);
+
+        // Log de parámetros recibidos
+        console.log('🔍 [PedidoFallido] Parámetros:', {
+            ordenId,
+            status: searchParams.get('status'),
+            payment_id: searchParams.get('payment_id'),
+            status_detail: searchParams.get('status_detail')
+        });
+    }, [ordenId, searchParams]);
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-red-50 to-white flex items-center justify-center px-4 py-8">
@@ -33,11 +55,11 @@ export const PedidoFallido = () => {
                     <div className="bg-gray-50 rounded p-4 mb-6 text-left">
                         <div className="flex justify-between mb-3">
                             <span className="text-gray-600">Número de Orden:</span>
-                            <span className="font-bold">{orden.id}</span>
+                            <span className="font-bold">{orden.orderNumber || ordenId}</span>
                         </div>
                         <div className="flex justify-between mb-3">
                             <span className="text-gray-600">Monto Intentado:</span>
-                            <span className="font-bold text-blue-600">${orden.total?.toFixed(2)}</span>
+                            <span className="font-bold text-blue-600">${orden.total?.toFixed(2) || '0.00'}</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="text-gray-600">Estado:</span>
@@ -60,16 +82,16 @@ export const PedidoFallido = () => {
 
                 <div className="space-y-3">
                     <Link 
-                        to="/checkout"
+                        to={ordenId ? `/checkout` : '/carrito'}
                         className="block w-full bg-blue-600 text-white py-2 rounded font-medium hover:bg-blue-700 transition"
                     >
                         Intentar Nuevamente
                     </Link>
                     <Link 
-                        to="/carrito"
+                        to="/catalogo"
                         className="block w-full bg-gray-200 text-gray-700 py-2 rounded font-medium hover:bg-gray-300 transition"
                     >
-                        Ver Carrito
+                        Ver Catálogo
                     </Link>
                     <Link 
                         to="/"
@@ -80,7 +102,7 @@ export const PedidoFallido = () => {
                 </div>
 
                 <p className="text-xs text-gray-500 mt-6">
-                    Si los problemas persisten, contáctanos a través de WhatsApp. Tu carrito ha sido guardado.
+                    Si los problemas persisten, contáctanos a través de WhatsApp.
                 </p>
             </div>
         </div>

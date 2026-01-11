@@ -9,41 +9,57 @@ import imagenFondo from '../Activos/Imagenes/imagenFondo.jpg';
 export const faqs = [
     {
         question: '¿Cómo funciona el proceso de compra?',
-        answer: 'Es muy simple. Nos solicitas un presupuesto con la cantidad de productos que necesitas. Luego, calculamos el costo de envío (variable según tu ubicación y el método de entrega) y te enviamos el presupuesto final con el total. Para confirmar el pedido e iniciar la producción, solo necesitas abonar el 50% del total. Una vez que los productos estén listos, te enviaremos fotos y podrás pagar el 50% restante para que procedamos al envío.'
+        answer: 'Podés realizar tu compra directamente desde nuestra web a través del carrito Seleccionás los productos, cargás tus datos y finalizás el pago de forma segura mediante Mercado Pago. Una vez confirmado el pago, iniciamos la producción de tu pedido.'
     },
     {
-        question: '¿Cuánto tiempo tardan en confeccionar mi pedido?',
-        answer: 'El plazo máximo para la confección de tu pedido es de 20 días corridos a partir del momento en que se confirma el pago del 50%.'
+        question: '¿Qué medios de pago puedo utilizar?',
+        answer: `Trabajamos con Mercado Pago, lo que te permite pagar con:
+            Dinero en cuenta
+            Tarjetas de crédito y débito
+            Crédito personal de Mercado Pago    
+            Todas las opciones disponibles se muestran al finalizar la compra.`
     },
     {
-        question: '¿Por qué debo pagar un 50% por adelantado?',
-        answer: 'El pago inicial del 50% nos permite congelar los precios pactados para iniciar la producción de tus productos personalizados.'
+        question: '¿Debo pagar el total del pedido al comprar?',
+        answer: `Sí. Con la nueva modalidad, el pago se realiza en su totalidad al confirmar la compra a través de Mercado Pago.
+                Esto nos permite iniciar la confección de tu pedido de forma inmediata.`
     },
     {
-        question: '¿Qué métodos de pago aceptan?',
-        answer: 'Aceptamos varios métodos de pago. Las opciones disponibles se te informarán al momento de solicitar el presupuesto.'
+        question: 'Cuánto tiempo tarda la confección de mi pedido?',
+        answer: `El plazo de confección es de hasta 20 días corridos desde la confirmación del pago.
+                Al tratarse de productos personalizados, cada pedido se realiza a medida.`
     },
     {
         question: '¿Cómo se calcula el costo de envío?',
-        answer: 'El costo de envío es variable y se calcula en base a tu ubicación geográfica y la modalidad de entrega que elijas: envío a domicilio o retiro en la sucursal de Correo Argentino más cercana. Este valor se suma al total del presupuesto de tus productos.'
+        answer: `El costo de envío se calcula automáticamente en el carrito.
+                Este valor se informa antes de finalizar la compra.`
     },
     {
-        question: '¿Qué empresa de envíos utilizan?',
-        answer: 'Trabajamos con Correo Argentino para garantizar que tu pedido llegue a todo el país de forma segura y eficiente.'
+        question: '¿El envío tiene algún beneficio?',
+        answer: `Sí.
+                👉 Si comprás 3 o más productos (iguales o diferentes), el envío es bonificado.`
     },
     {
-        question: '¿Cómo puedo rastrear mi pedido?',
-        answer: 'Una vez que hayas abonado el 50% restante y tu pedido sea despachado, te enviaremos por email el código de seguimiento. Con este código, podrás monitorear la trazabilidad de tu paquete en la página de Correo Argentino hasta que llegue a tu domicilio.'
+        question: 'Cómo puedo seguir mi pedido',
+        answer: `Una vez despachado, te enviaremos por WhatsApp o email el código de seguimiento para que puedas rastrear tu pedido en la página de Correo Argentino hasta su entrega.`
     },
     {
-        question: '¿Qué pasa si mi dirección de envío es incorrecta?',
-        answer: 'Si te das cuenta de que la dirección de envío tiene un error, por favor contáctanos de inmediato. Si el paquete aún no fue despachado, podremos corregirla. Sin embargo, si el pedido ya está en manos de Correo Argentino, es posible que no podamos realizar cambios y la entrega podría verse afectada.'
+        question: '¿Recibo confirmación antes del envío?',
+        answer: `Sí.
+                Cuando tu pedido esté finalizado, te enviaremos fotografías de los productos terminados, para que puedas ver el resultado antes del despacho.`
     },
     {
-        question: '¿Cómo sé que mi pedido está listo para ser enviado?',
-        answer: 'Una vez que hayamos terminado la confección de tus productos, te enviaremos fotografías de los artículos terminados. Esto te dará la seguridad de que están listos y en perfectas condiciones antes de realizar el pago final y proceder con el envío.'
+        question: '¿Qué pasa si cargo mal mis datos de envío?',
+        answer: `Si detectás un error en los datos, contactanos lo antes posible.
+                Si el pedido aún no fue despachado, podremos corregirlos.
+                Una vez entregado al correo, los cambios quedan sujetos a las políticas de Correo Argentino.`
+    },
+    {
+        question: '¿Los productos son personalizados?',
+        answer: `Sí. Todos nuestros productos se confeccionan de manera personalizada para centros de estética y spa, respetando las especificaciones de cada pedido.`
     }
-    
+
+
 ];
 
 // Re-exportamos los productos y activos importados para que estén disponibles

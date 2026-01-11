@@ -1,14 +1,16 @@
 /**
  * checkoutSchema.js
  * 
- * Esquema de validación centralizado para datos de checkout.
- * Usado por:
- * - useCheckoutForm.js (validación en tiempo real)
- * - orderService.js (validación antes de enviar)
- * - Componentes (feedback de errores)
+ * ✅ Esquema de validación centralizado para datos de checkout.
+ * ✅ Usa constantes de validation.js para mantener consistencia
  * 
- * Mantener en UN SOLO LUGAR para evitar inconsistencias.
+ * Usado por:
+ * - useCheckoutState.js (Checkout modular - validación en tiempo real)
+ * - orderService.js (validación antes de enviar)
+ * - Componentes de Checkout (feedback de errores)
  */
+
+import { VALIDATION_RULES, ERROR_MESSAGES } from '../constants/validation';
 
 /**
  * Validadores individuales por campo
@@ -16,48 +18,60 @@
 const validators = {
   nombre: (value) => {
     if (!value || !value.trim()) {
-      return 'El nombre es obligatorio';
+      return ERROR_MESSAGES.NOMBRE_REQUIRED;
     }
-    if (value.trim().length < 2) {
-      return 'El nombre debe tener al menos 2 caracteres';
+    if (value.trim().length < VALIDATION_RULES.NOMBRE_MIN_LENGTH) {
+      return ERROR_MESSAGES.NOMBRE_TOO_SHORT;
     }
-    // Permitir letras (con acentos), espacios, números y guiones (para nombres como "Juan-Pablo" o "María 2da")
-    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-'0-9]+$/.test(value)) {
-      return 'El nombre contiene caracteres no permitidos';
+    if (value.trim().length > VALIDATION_RULES.NOMBRE_MAX_LENGTH) {
+      return ERROR_MESSAGES.NOMBRE_TOO_LONG;
+    }
+    // Permitir letras (con acentos), espacios, números y guiones
+    if (!VALIDATION_RULES.NOMBRE_PATTERN.test(value)) {
+      return ERROR_MESSAGES.NOMBRE_INVALID_CHARS;
     }
     return '';
   },
 
   email: (value) => {
     if (!value || !value.trim()) {
-      return 'El email es obligatorio';
+      return ERROR_MESSAGES.EMAIL_REQUIRED;
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-      return 'Email inválido';
+    if (!VALIDATION_RULES.EMAIL_PATTERN.test(value)) {
+      return ERROR_MESSAGES.EMAIL_INVALID;
+    }
+    if (value.length > VALIDATION_RULES.EMAIL_MAX_LENGTH) {
+      return ERROR_MESSAGES.EMAIL_TOO_LONG;
     }
     return '';
   },
 
   whatsapp: (value) => {
     if (!value) {
-      return 'El WhatsApp es obligatorio';
+      return ERROR_MESSAGES.WHATSAPP_REQUIRED;
     }
-    if (!/^[\d\s\+\-\(\)]+$/.test(value)) {
-      return 'Formato de teléfono inválido';
+    if (!VALIDATION_RULES.WHATSAPP_PATTERN.test(value)) {
+      return ERROR_MESSAGES.WHATSAPP_INVALID_FORMAT;
     }
     const digits = value.replace(/\D/g, '');
-    if (digits.length < 10) {
-      return 'El número debe tener al menos 10 dígitos';
+    if (digits.length < VALIDATION_RULES.WHATSAPP_MIN_DIGITS) {
+      return ERROR_MESSAGES.WHATSAPP_TOO_SHORT;
+    }
+    if (digits.length > VALIDATION_RULES.WHATSAPP_MAX_DIGITS) {
+      return ERROR_MESSAGES.WHATSAPP_TOO_LONG;
     }
     return '';
   },
 
   domicilio: (value) => {
     if (!value || !value.trim()) {
-      return 'El domicilio es obligatorio';
+      return ERROR_MESSAGES.DIRECCION_REQUIRED;
     }
-    if (value.trim().length < 5) {
-      return 'Por favor, ingresa un domicilio completo (mínimo 5 caracteres)';
+    if (value.trim().length < VALIDATION_RULES.DIRECCION_MIN_LENGTH) {
+      return ERROR_MESSAGES.DIRECCION_TOO_SHORT;
+    }
+    if (value.trim().length > VALIDATION_RULES.DIRECCION_MAX_LENGTH) {
+      return ERROR_MESSAGES.DIRECCION_TOO_LONG;
     }
     // Permitir letras, números, espacios, guiones, puntos, comas, º, #
     if (!/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\-.,º#]+$/.test(value)) {
@@ -68,12 +82,15 @@ const validators = {
 
   localidad: (value) => {
     if (!value || !value.trim()) {
-      return 'La localidad es obligatoria';
+      return ERROR_MESSAGES.LOCALIDAD_REQUIRED;
     }
-    if (value.trim().length < 2) {
-      return 'La localidad debe tener al menos 2 caracteres';
+    if (value.trim().length < VALIDATION_RULES.LOCALIDAD_MIN_LENGTH) {
+      return ERROR_MESSAGES.LOCALIDAD_TOO_SHORT;
     }
-    // Permitir letras, números, espacios, guiones y acentos en nombres de ciudades
+    if (value.trim().length > VALIDATION_RULES.LOCALIDAD_MAX_LENGTH) {
+      return ERROR_MESSAGES.LOCALIDAD_TOO_LONG;
+    }
+    // Permitir letras, números, espacios, guiones y acentos
     if (!/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\-.]+$/.test(value)) {
       return 'La localidad contiene caracteres no permitidos';
     }
@@ -82,12 +99,15 @@ const validators = {
 
   provincia: (value) => {
     if (!value || !value.trim()) {
-      return 'La provincia es obligatoria';
+      return ERROR_MESSAGES.PROVINCIA_REQUIRED;
     }
-    if (value.trim().length < 2) {
-      return 'La provincia debe tener al menos 2 caracteres';
+    if (value.trim().length < VALIDATION_RULES.PROVINCIA_MIN_LENGTH) {
+      return ERROR_MESSAGES.PROVINCIA_TOO_SHORT;
     }
-    // Permitir letras, números, espacios, guiones y acentos en nombres de provincias
+    if (value.trim().length > VALIDATION_RULES.PROVINCIA_MAX_LENGTH) {
+      return ERROR_MESSAGES.PROVINCIA_TOO_LONG;
+    }
+    // Permitir letras, números, espacios, guiones y acentos
     if (!/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\-.]+$/.test(value)) {
       return 'La provincia contiene caracteres no permitidos';
     }
@@ -96,20 +116,22 @@ const validators = {
 
   codigoPostal: (value) => {
     if (!value || !value.trim()) {
-      return 'El código postal es obligatorio';
+      return ERROR_MESSAGES.CODIGO_POSTAL_REQUIRED;
     }
     const cleaned = value.replace(/\s/g, '');
-    // Permitir letras y números (4-10 caracteres sin espacios)
-    if (!/^[a-zA-Z0-9]{4,10}$/.test(cleaned)) {
-      return 'Código postal inválido (4-10 caracteres alfanuméricos)';
+    if (cleaned.length < VALIDATION_RULES.CODIGO_POSTAL_MIN_LENGTH || 
+        cleaned.length > VALIDATION_RULES.CODIGO_POSTAL_MAX_LENGTH) {
+      return ERROR_MESSAGES.CODIGO_POSTAL_INVALID;
+    }
+    if (!VALIDATION_RULES.CODIGO_POSTAL_PATTERN.test(cleaned)) {
+      return ERROR_MESSAGES.CODIGO_POSTAL_INVALID;
     }
     return '';
   },
 
   notasAdicionales: (value) => {
-    // Campo opcional, no tiene validación obligatoria
-    if (value && value.length > 500) {
-      return 'Las notas no pueden exceder 500 caracteres';
+    if (value && value.length > VALIDATION_RULES.NOTAS_MAX_LENGTH) {
+      return ERROR_MESSAGES.NOTAS_TOO_LONG;
     }
     return '';
   }
@@ -249,6 +271,7 @@ export const ALL_FIELDS = [...REQUIRED_FIELDS, ...OPTIONAL_FIELDS];
 
 /**
  * Estructura inicial del formulario
+ * Usa valores de VALIDATION_RULES para provincias
  */
 export const INITIAL_FORM_STATE = {
   nombre: '',

@@ -1,26 +1,33 @@
 // src/Servicios/productosService.js
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000/api";
-const API_URL = `${API_BASE}/productos`;
+import { logger } from '../utils/logger';
 
-const isDev = import.meta.env.DEV;
-if (isDev) {
-    console.log("🌐 Frontend Web - API_BASE:", API_BASE);
-}
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000";
+const API_URL = `${API_BASE}/api/productos`;
+
+logger.debug("🌐 Frontend Web - API_BASE:", API_BASE);
 
 /**
- * Obtiene todos los productos con timeout y manejo de errores mejorado
+ * ✅ MEJORADO: Obtiene todos los productos con paginación servidor
+ * Backend ahora retorna: { data: [], pagination: { total, page, limit, pages } }
  */
-export const obtenerProductos = async () => {
+export const obtenerProductos = async (params = {}) => {
     try {
-        if (isDev) {
-            console.log("📤 Fetch: GET /productos");
-        }
+        logger.debug("📤 Fetch: GET /productos", params);
         
         // Crear AbortController para timeout
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 segundos timeout
         
-        const respuesta = await fetch(API_URL, {
+        // Construir query string
+        const queryParams = new URLSearchParams({
+            page: params.page || 1,
+            limit: params.limit || 12,
+            sortBy: params.sortBy || 'createdAt',
+            sortDir: params.sortDir || -1,
+            ...params
+        });
+        
+        const respuesta = await fetch(`${API_URL}?${queryParams.toString()}`, {
             signal: controller.signal,
             headers: { 'Accept': 'application/json' }
         });
@@ -31,11 +38,19 @@ export const obtenerProductos = async () => {
             throw new Error(`Error ${respuesta.status} al obtener productos`);
         }
         
-        const data = await respuesta.json();
-        if (isDev) {
-            console.log("✅ Productos cargados:", data.length, "items");
-        }
-        return data;
+        const resultado = await respuesta.json();
+        
+        // ✅ Backend retorna { data, pagination }
+        const productos = resultado.data || resultado; // Backwards compatibility
+        
+        logger.debug("✅ Productos cargados:", productos.length, "items");
+        logger.debug("📊 Paginación:", resultado.pagination);
+        
+        // Retornar estructura compatible con frontend
+        return {
+            productos,
+            pagination: resultado.pagination || null
+        };
     } catch (error) {
         if (error.name === 'AbortError') {
             console.error("❌ Error: Timeout en solicitud de productos");
