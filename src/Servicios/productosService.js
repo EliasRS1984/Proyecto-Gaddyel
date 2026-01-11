@@ -1,7 +1,7 @@
 // src/Servicios/productosService.js
 import { logger } from '../utils/logger';
 
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000";
+const API_BASE = import.meta.env.VITE_API_BASE || "https://gaddyel-backend.onrender.com";
 const API_URL = `${API_BASE}/api/productos`;
 
 logger.debug("🌐 Frontend Web - API_BASE:", API_BASE);

@@ -9,7 +9,8 @@ const API_URL = `${API_BASE}/api/carousel`;
 const carouselService = {
     getCarouselImages: async () => {
         try {
-            const response = await axios.get(`${API_URL}/carousel/public`);
+            // Endpoint correcto: /api/carousel/public
+            const response = await axios.get(`${API_URL}/public`);
             return response.data.data;
         } catch (error) {
             console.error('Error al obtener imágenes del carrusel:', error);

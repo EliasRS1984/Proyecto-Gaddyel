@@ -19,7 +19,7 @@
  * - No se manejan datos de tarjeta (PCI-DSS compliance)
  */
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000';
+const API_BASE = import.meta.env.VITE_API_BASE || 'https://gaddyel-backend.onrender.com';
 
 /**
  * Obtener token JWT del cliente autenticado
