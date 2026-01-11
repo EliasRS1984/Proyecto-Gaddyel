@@ -11,7 +11,7 @@ import axios from 'axios';
  */
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutos por defecto
-const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5000').replace(/\/api$/, '');
+const API_BASE = (import.meta.env.VITE_API_BASE || 'https://gaddyel-backend.onrender.com').replace(/\/api$/, '');
 const cache = new Map();
 
 function useFetchWithCache(urlPath, options = {}) {
