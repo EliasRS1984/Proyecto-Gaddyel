@@ -40,14 +40,6 @@ function useFetchWithCache(urlPath, options = {}) {
         // Evitar barras dobles innecesarias
         const url = `${API_BASE}/api${cleanPath}`.replace(/\/+/g, '/').replace(':/', '://');
         
-        // DEBUG: Log de URL construida
-        if (cleanPath.includes('productos')) {
-            console.log('🔵 [useFetchWithCache] URL construida:', url);
-            console.log('   API_BASE:', API_BASE);
-            console.log('   urlPath:', urlPath);
-            console.log('   cleanPath:', cleanPath);
-        }
-        
         return url;
     }, [urlPath]);
     
@@ -94,11 +86,6 @@ function useFetchWithCache(urlPath, options = {}) {
                 setLoading(true);
                 setError(null);
 
-                // DEBUG: Log antes de fetch
-                if (fullUrl.includes('productos')) {
-                    console.log('📤 [useFetchWithCache] Iniciando fetch:', fullUrl);
-                }
-
                 // Crear AbortController para cancelar requests
                 abortControllerRef.current = new AbortController();
 
@@ -107,11 +94,6 @@ function useFetchWithCache(urlPath, options = {}) {
                     signal: abortControllerRef.current.signal,
                     timeout: 10000 // 10 segundos timeout
                 });
-
-                // DEBUG: Log respuesta
-                if (fullUrl.includes('productos')) {
-                    console.log('✅ [useFetchWithCache] Respuesta recibida:', response.data);
-                }
 
                 // Guardar en caché
                 cache.set(cacheKey, {
@@ -124,11 +106,6 @@ function useFetchWithCache(urlPath, options = {}) {
                 setData(response.data);
                 setError(null);
             } catch (err) {
-                // DEBUG: Log error
-                if (fullUrl.includes('productos')) {
-                    console.log('❌ [useFetchWithCache] Error en fetch:', err.message, err.response?.status, err.response?.data);
-                }
-
                 // Ignorar errores de cancelación
                 if (err.name === 'AbortError') {
                     return;
