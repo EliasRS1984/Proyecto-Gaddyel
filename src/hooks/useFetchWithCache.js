@@ -37,7 +37,8 @@ function useFetchWithCache(urlPath, options = {}) {
         const cleanPath = urlPath.startsWith('/api') ? urlPath.replace('/api', '') : urlPath;
         
         // Forzamos una sola estructura: BASE + /api + RUTA
-        const url = `${API_BASE}/api${cleanPath}`.replace(/\/+/g, '/').replace('http:/', 'http://');
+        // Evitar barras dobles innecesarias
+        const url = `${API_BASE}/api${cleanPath}`.replace(/\/+/g, '/').replace(':/', '://');
         
         // DEBUG: Log de URL construida
         if (cleanPath.includes('productos')) {
