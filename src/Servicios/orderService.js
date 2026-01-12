@@ -151,6 +151,12 @@ export const createOrder = async (checkoutData, cartItems, options = {}) => {
 
     const backendResponse = await response.json();
 
+    // ✅ DEBUG: Mostrar respuesta RAW del backend
+    console.log('🔍 [orderService] RESPUESTA RAW DEL BACKEND:', backendResponse);
+    console.log('   - checkoutUrl presente:', !!backendResponse.checkoutUrl);
+    console.log('   - preferenceId presente:', !!backendResponse.preferenceId);
+    console.log('   - sandboxCheckoutUrl presente:', !!backendResponse.sandboxCheckoutUrl);
+
     if (isDev) {
       logger.success('✅ orderService: Orden creada exitosamente');
       logger.debug('  Backend response:', backendResponse);

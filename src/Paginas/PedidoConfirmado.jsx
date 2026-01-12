@@ -253,6 +253,60 @@ const PedidoConfirmado = () => {
                             </div>
                         )}
 
+                        {/* Detalles de Pago */}
+                        {orden.payment && orden.payment.mercadoPago && (
+                            <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-5 mb-6">
+                                <div className="flex items-start mb-3">
+                                    <svg className="w-6 h-6 text-purple-600 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"/>
+                                    </svg>
+                                    <div className="flex-1">
+                                        <h3 className="font-bold text-purple-900 mb-3">Detalles de Pago</h3>
+                                        <div className="space-y-2 bg-white rounded p-3 text-sm">
+                                            {orden.payment.mercadoPago.paymentId && (
+                                                <div className="flex justify-between">
+                                                    <span className="text-gray-600">ID Transacción:</span>
+                                                    <span className="font-mono font-semibold text-purple-700">{orden.payment.mercadoPago.paymentId}</span>
+                                                </div>
+                                            )}
+                                            {orden.payment.mercadoPago.status && (
+                                                <div className="flex justify-between">
+                                                    <span className="text-gray-600">Estado:</span>
+                                                    <span className={`font-semibold ${orden.payment.mercadoPago.status === 'approved' ? 'text-green-600' : 'text-orange-600'}`}>
+                                                        {orden.payment.mercadoPago.status === 'approved' ? '✓ Aprobado' : orden.payment.mercadoPago.status.charAt(0).toUpperCase() + orden.payment.mercadoPago.status.slice(1)}
+                                                    </span>
+                                                </div>
+                                            )}
+                                            {orden.payment.mercadoPago.paymentMethod && (
+                                                <div className="flex justify-between">
+                                                    <span className="text-gray-600">Método:</span>
+                                                    <span className="font-semibold text-gray-800">{orden.payment.mercadoPago.paymentMethod.toUpperCase()}</span>
+                                                </div>
+                                            )}
+                                            {orden.payment.mercadoPago.transactionAmount && (
+                                                <div className="flex justify-between">
+                                                    <span className="text-gray-600">Monto:</span>
+                                                    <span className="font-semibold text-green-600">${(orden.payment.mercadoPago.transactionAmount).toFixed(2)}</span>
+                                                </div>
+                                            )}
+                                            {orden.payment.mercadoPago.installments && orden.payment.mercadoPago.installments > 1 && (
+                                                <div className="flex justify-between">
+                                                    <span className="text-gray-600">Cuotas:</span>
+                                                    <span className="font-semibold text-gray-800">{orden.payment.mercadoPago.installments}x</span>
+                                                </div>
+                                            )}
+                                            {orden.payment.mercadoPago.createdAt && (
+                                                <div className="flex justify-between">
+                                                    <span className="text-gray-600">Fecha:</span>
+                                                    <span className="font-semibold text-gray-800">{formatearFecha(orden.payment.mercadoPago.createdAt)}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         {/* Confirmación por email */}
                         <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
                             <div className="flex items-start">

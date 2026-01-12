@@ -203,14 +203,18 @@ export const useCheckoutState = () => {
 
             logger.success('[Checkout] Orden creada', resultado.ordenId);
             
-            // ✅ DEBUG: Mostrar qué se va a guardar
+            // ✅ DEBUG DETALLADO: Mostrar TODA la respuesta del backend
+            console.log('🔍 [Checkout] RESPUESTA COMPLETA DEL BACKEND:', resultado);
             console.log('💾 [Checkout] Datos a guardar en orderStorage:', {
                 ordenId: resultado.ordenId,
                 total: resultado.total,
                 subtotal: resultado.subtotal,
                 costoEnvio: resultado.costoEnvio,
                 itemsCount: resultado.items?.length || 0,
-                hasCheckoutUrl: !!resultado.checkoutUrl
+                hasCheckoutUrl: !!resultado.checkoutUrl,
+                checkoutUrl: resultado.checkoutUrl || 'UNDEFINED ❌',
+                preferenceId: resultado.preferenceId || 'UNDEFINED ❌',
+                sandboxCheckoutUrl: resultado.sandboxCheckoutUrl || 'UNDEFINED ❌'
             });
 
             // ✅ IMPORTANTE: Guardar datos de la orden en localStorage para PedidoConfirmado
@@ -223,10 +227,12 @@ export const useCheckoutState = () => {
 
             // Redireccionar según resultado
             if (resultado.checkoutUrl) {
-                // Mercado Pago: Redirige a pagar
+                // ✅ Mercado Pago: Redirige a pagar
+                console.log('✅ REDIRIGIENDO A MERCADO PAGO:', resultado.checkoutUrl);
                 window.location.href = resultado.checkoutUrl;
             } else {
-                // Sin Mercado Pago: Ir directamente a confirmación
+                // ❌ Sin Mercado Pago: Ir directamente a confirmación
+                console.warn('⚠️ SIN CHECKOUT URL - Ir a confirmación (checkoutUrl undefined)');
                 navigate(`/pedido-confirmado/${resultado.ordenId}`);
             }
 
