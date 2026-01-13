@@ -242,24 +242,6 @@ button:hover {
     color: #fff;
 }
 
-/* ✅ NAVBAR MOBILE MENU - Solución para NavLink en dark mode */
-/* Problema: Tailwind @layer base aplica color inherited a <a> */
-/* NavLink renderiza <a> dentro de dark:bg-gray-950 = texto no visible */
-/* Solución: Regla específica para <a> dentro de #mobile-menu */
-#mobile-menu a {
-    color: #ffffff !important; /* Blanco en todas las condiciones */
-}
-
-#mobile-menu a:hover {
-    color: #ffffff !important;
-}
-
-@media (prefers-color-scheme: dark) {
-    #mobile-menu a {
-        color: #ffffff !important;
-    }
-}
-
 /* ESTILOS PARA TARJETAS DE PRODUCTOS */
 /* Asegurar que line-clamp funcione correctamente */
 .line-clamp-2 {

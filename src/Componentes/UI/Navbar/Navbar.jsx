@@ -260,16 +260,13 @@ const Navbar = () => {
                         <NavLink
                             key={link.to}
                             to={link.to}
-                            // ✅ SOLUCIÓN DEFINITIVA: 
-                            // Problema: Tailwind @layer base define color para <a> = inherited
-                            // El NavLink renderiza <a> y hereda color gris del contenedor
-                            // Solución: Usar bg-clip-text + gradiente O aplicar color explícito con selectores
-                            className={({ isActive }) => {
-                                const baseClasses = "w-full block text-center py-3 text-lg font-semibold rounded-lg no-underline hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200";
-                                const textClasses = "text-white";
-                                const hoverClasses = isActive ? "bg-purple-100 dark:bg-purple-900" : "";
-                                return `${baseClasses} ${textClasses} ${hoverClasses}`;
-                            }}
+                            // ✅ FLUJO: Clases Tailwind dark: para manejar light/dark correctamente
+                            // Light mode: text-gray-900 (oscuro) sobre bg-gray-100 (claro) = contraste 9:1
+                            // Dark mode: dark:text-white (blanco) sobre dark:bg-gray-950 (oscuro) = contraste 14:1
+                            // isActive: Usar border-bottom en lugar de background para no afectar legibilidad
+                            className={({ isActive }) => `w-full block text-center py-3 text-lg font-semibold rounded-lg no-underline text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 ${
+                                isActive ? 'border-b-4 border-purple-500 dark:border-purple-400 font-bold' : ''
+                            }`}
                             onClick={closeMenu}
                             onKeyDown={(e) => ['Enter', 'Space'].includes(e.key) && closeMenu()}
                             role="menuitem"
