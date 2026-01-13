@@ -217,6 +217,35 @@ export const CheckoutForm = ({
                 </div>
             </div>
 
+            {/* Información de Pago - Mercado Pago */}
+            <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                    <svg className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"/>
+                    </svg>
+                    <div className="flex-1">
+                        <h3 className="font-bold text-blue-900 mb-1">Pago Seguro con Mercado Pago</h3>
+                        <p className="text-sm text-blue-800 mb-2">
+                            Al confirmar tu pedido serás redirigido a Mercado Pago para completar el pago de forma segura.
+                        </p>
+                        <ul className="text-xs text-blue-700 space-y-1">
+                            <li className="flex items-center gap-2">
+                                <span className="text-green-600">✓</span>
+                                <span>Tarjetas de crédito y débito</span>
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <span className="text-green-600">✓</span>
+                                <span>Dinero en cuenta de Mercado Pago</span>
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <span className="text-green-600">✓</span>
+                                <span>Hasta 12 cuotas sin interés</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
             {/* Botón de envío */}
             <button
                 type="submit"
