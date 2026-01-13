@@ -249,7 +249,7 @@ const Navbar = () => {
             {/* Menú desplegable para móviles */}
             <div
                 id="mobile-menu"
-                className={`md:hidden absolute w-full bg-gray-100 dark:bg-gray-950 transition-all duration-300 ease-in-out transform origin-top shadow-2xl ${
+                className={`md:hidden absolute w-full bg-white transition-all duration-300 ease-in-out transform origin-top shadow-2xl ${
                     isOpen ? 'opacity-100 translate-y-0 scale-y-100' : 'opacity-0 -translate-y-2 scale-y-95 pointer-events-none'
                 }`}
                 role="menu"
@@ -260,12 +260,11 @@ const Navbar = () => {
                         <NavLink
                             key={link.to}
                             to={link.to}
-                            // ✅ FLUJO: Clases Tailwind dark: para manejar light/dark correctamente
-                            // Light mode: text-gray-900 (oscuro) sobre bg-gray-100 (claro) = contraste 9:1
-                            // Dark mode: dark:text-white (blanco) sobre dark:bg-gray-950 (oscuro) = contraste 14:1
-                            // isActive: Usar border-bottom en lugar de background para no afectar legibilidad
-                            className={({ isActive }) => `w-full block text-center py-3 text-lg font-semibold rounded-lg no-underline text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 ${
-                                isActive ? 'border-b-4 border-purple-500 dark:border-purple-400 font-bold' : ''
+                            // ✅ NAVBAR SIEMPRE BLANCO: text-gray-900 sobre bg-white
+                            // NO cambia con dark mode del navegador
+                            // Indicador activo: cambio sutil de fondo gris sin subrayado
+                            className={({ isActive }) => `w-full block text-center py-3 text-lg font-semibold rounded-lg no-underline text-gray-900 hover:bg-gray-100 transition-all duration-200 ${
+                                isActive ? 'bg-gray-200 font-bold' : ''
                             }`}
                             onClick={closeMenu}
                             onKeyDown={(e) => ['Enter', 'Space'].includes(e.key) && closeMenu()}
@@ -276,21 +275,21 @@ const Navbar = () => {
                     ))}
 
                     {/* Separador */}
-                    <div className="w-full border-t border-gray-300 dark:border-gray-700 my-2"></div>
+                    <div className="w-full border-t border-gray-300 my-2"></div>
 
                     {/* Opciones de autenticación en móvil */}
                     {isAuthenticated ? (
                         <>
                             <div className="w-full text-center py-2 px-4">
-                                <p className="text-sm font-semibold text-gray-900 dark:text-white">{cliente?.nombre}</p>
-                                <p className="text-xs text-gray-500 dark:text-gray-300">{cliente?.email}</p>
+                                <p className="text-sm font-semibold text-gray-900">{cliente?.nombre}</p>
+                                <p className="text-xs text-gray-500">{cliente?.email}</p>
                             </div>
                             <button
                                 onClick={() => {
                                     navigate('/perfil');
                                     closeMenu();
                                 }}
-                                className="w-full text-center py-2 text-lg font-bold rounded-lg text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
+                                className="w-full text-center py-2 text-lg font-bold rounded-lg text-gray-900 hover:bg-gray-100"
                             >
                                 Mi Perfil
                             </button>
@@ -299,7 +298,7 @@ const Navbar = () => {
                                     handleLogout();
                                     closeMenu();
                                 }}
-                                className="w-full text-center py-2 text-lg font-bold rounded-lg text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900"
+                                className="w-full text-center py-2 text-lg font-bold rounded-lg text-red-600 hover:bg-red-50"
                             >
                                 Cerrar Sesión
                             </button>
@@ -311,7 +310,7 @@ const Navbar = () => {
                                     navigate('/login');
                                     closeMenu();
                                 }}
-                                className="w-full text-center py-2 text-lg font-bold rounded-lg text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
+                                className="w-full text-center py-2 text-lg font-bold rounded-lg text-gray-900 hover:bg-gray-100"
                             >
                                 Iniciar Sesión
                             </button>
@@ -320,7 +319,7 @@ const Navbar = () => {
                                     navigate('/registro');
                                     closeMenu();
                                 }}
-                                className="w-full text-center py-2 text-lg font-bold rounded-lg text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
+                                className="w-full text-center py-2 text-lg font-bold rounded-lg text-gray-900 hover:bg-gray-100"
                             >
                                 Registrarse
                             </button>
