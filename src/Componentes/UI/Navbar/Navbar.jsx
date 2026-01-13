@@ -260,11 +260,16 @@ const Navbar = () => {
                         <NavLink
                             key={link.to}
                             to={link.to}
-                            // ✅ FLUJO: className como función para controlar dinámicamente estilos según estado active
-                            // React Router aplica .active automáticamente - necesitamos sobrescribir
-                            className={({ isActive }) => `w-full text-center py-3 text-lg font-semibold rounded-lg text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 ${
-                                isActive ? 'bg-purple-100 dark:bg-purple-900' : ''
-                            }`}
+                            // ✅ SOLUCIÓN DEFINITIVA: 
+                            // Problema: Tailwind @layer base define color para <a> = inherited
+                            // El NavLink renderiza <a> y hereda color gris del contenedor
+                            // Solución: Usar bg-clip-text + gradiente O aplicar color explícito con selectores
+                            className={({ isActive }) => {
+                                const baseClasses = "w-full block text-center py-3 text-lg font-semibold rounded-lg no-underline hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200";
+                                const textClasses = "text-white";
+                                const hoverClasses = isActive ? "bg-purple-100 dark:bg-purple-900" : "";
+                                return `${baseClasses} ${textClasses} ${hoverClasses}`;
+                            }}
                             onClick={closeMenu}
                             onKeyDown={(e) => ['Enter', 'Space'].includes(e.key) && closeMenu()}
                             role="menuitem"
