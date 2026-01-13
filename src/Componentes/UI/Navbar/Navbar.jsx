@@ -260,7 +260,7 @@ const Navbar = () => {
                         <NavLink
                             key={link.to}
                             to={link.to}
-                            className="w-full text-center py-3 text-lg font-semibold rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 transform hover:translate-x-1 hover:shadow-md"
+                            className="w-full text-center py-3 text-lg font-semibold rounded-lg text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 transform hover:translate-x-1 hover:shadow-md"
                             onClick={closeMenu}
                             onKeyDown={(e) => ['Enter', 'Space'].includes(e.key) && closeMenu()}
                             role="menuitem"
@@ -284,7 +284,7 @@ const Navbar = () => {
                                     navigate('/perfil');
                                     closeMenu();
                                 }}
-                                className="w-full text-center py-2 text-lg font-bold rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700"
+                                className="w-full text-center py-2 text-lg font-bold rounded-lg text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700"
                             >
                                 Mi Perfil
                             </button>
@@ -305,7 +305,7 @@ const Navbar = () => {
                                     navigate('/login');
                                     closeMenu();
                                 }}
-                                className="w-full text-center py-2 text-lg font-bold rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700"
+                                className="w-full text-center py-2 text-lg font-bold rounded-lg text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700"
                             >
                                 Iniciar Sesión
                             </button>
@@ -314,7 +314,7 @@ const Navbar = () => {
                                     navigate('/registro');
                                     closeMenu();
                                 }}
-                                className="w-full text-center py-2 text-lg font-bold rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700"
+                                className="w-full text-center py-2 text-lg font-bold rounded-lg text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700"
                             >
                                 Registrarse
                             </button>

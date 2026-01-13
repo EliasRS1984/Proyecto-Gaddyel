@@ -248,7 +248,7 @@ const Inicio = () => {
                             <ImageOptimizer 
                                 src={LogoGaddyel} 
                                 alt="Logo Gaddyel - Blanquería personalizada premium" 
-                                className="mx-auto h-40 md:h-64 lg:h-80 mb-4"
+                                className="mx-auto w-40 h-40 sm:w-48 sm:h-48 md:h-64 md:w-64 lg:h-80 lg:w-80 mb-4 object-contain"
                                 width={320}
                                 height={320}
                                 priority={true}
