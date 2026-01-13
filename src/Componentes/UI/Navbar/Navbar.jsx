@@ -249,7 +249,7 @@ const Navbar = () => {
             {/* Menú desplegable para móviles */}
             <div
                 id="mobile-menu"
-                className={`md:hidden absolute w-full bg-gray-100 dark:bg-gray-900 transition-all duration-300 ease-in-out transform origin-top ${
+                className={`md:hidden absolute w-full bg-gray-100 dark:bg-gray-800 transition-all duration-300 ease-in-out transform origin-top shadow-2xl ${
                     isOpen ? 'opacity-100 translate-y-0 scale-y-100' : 'opacity-0 -translate-y-2 scale-y-95 pointer-events-none'
                 }`}
                 role="menu"
@@ -260,7 +260,7 @@ const Navbar = () => {
                         <NavLink
                             key={link.to}
                             to={link.to}
-                            className="w-full text-center py-3 text-lg font-semibold rounded-lg text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 transform hover:translate-x-1 hover:shadow-md"
+                            className="w-full text-center py-3 text-lg font-semibold rounded-lg text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 transform hover:translate-x-1 hover:shadow-md"
                             onClick={closeMenu}
                             onKeyDown={(e) => ['Enter', 'Space'].includes(e.key) && closeMenu()}
                             role="menuitem"
@@ -276,15 +276,15 @@ const Navbar = () => {
                     {isAuthenticated ? (
                         <>
                             <div className="w-full text-center py-2 px-4">
-                                <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{cliente?.nombre}</p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">{cliente?.email}</p>
+                                <p className="text-sm font-semibold text-gray-900 dark:text-white">{cliente?.nombre}</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-300">{cliente?.email}</p>
                             </div>
                             <button
                                 onClick={() => {
                                     navigate('/perfil');
                                     closeMenu();
                                 }}
-                                className="w-full text-center py-2 text-lg font-bold rounded-lg text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700"
+                                className="w-full text-center py-2 text-lg font-bold rounded-lg text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
                             >
                                 Mi Perfil
                             </button>
@@ -305,7 +305,7 @@ const Navbar = () => {
                                     navigate('/login');
                                     closeMenu();
                                 }}
-                                className="w-full text-center py-2 text-lg font-bold rounded-lg text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700"
+                                className="w-full text-center py-2 text-lg font-bold rounded-lg text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
                             >
                                 Iniciar Sesión
                             </button>
@@ -314,7 +314,7 @@ const Navbar = () => {
                                     navigate('/registro');
                                     closeMenu();
                                 }}
-                                className="w-full text-center py-2 text-lg font-bold rounded-lg text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700"
+                                className="w-full text-center py-2 text-lg font-bold rounded-lg text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
                             >
                                 Registrarse
                             </button>

@@ -242,19 +242,6 @@ button:hover {
     color: #fff;
 }
 
-/* NAVBAR - REGLAS GLOBALES PROPIAS */
-/* Los botones en navbar mantienen su color gris original sin cambiar a blanco */
-header button,
-nav button {
-    color: inherit;
-    transition: color 0.3s ease;
-}
-
-header button:hover,
-nav button:hover {
-    color: inherit;
-}
-
 /* ESTILOS PARA TARJETAS DE PRODUCTOS */
 /* Asegurar que line-clamp funcione correctamente */
 .line-clamp-2 {
