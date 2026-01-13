@@ -260,7 +260,11 @@ const Navbar = () => {
                         <NavLink
                             key={link.to}
                             to={link.to}
-                            className="w-full text-center py-3 text-lg font-semibold rounded-lg text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 transform hover:translate-x-1 hover:shadow-md"
+                            // ✅ FLUJO: className como función para controlar dinámicamente estilos según estado active
+                            // React Router aplica .active automáticamente - necesitamos sobrescribir
+                            className={({ isActive }) => `w-full text-center py-3 text-lg font-semibold rounded-lg text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 ${
+                                isActive ? 'bg-purple-100 dark:bg-purple-900' : ''
+                            }`}
                             onClick={closeMenu}
                             onKeyDown={(e) => ['Enter', 'Space'].includes(e.key) && closeMenu()}
                             role="menuitem"
