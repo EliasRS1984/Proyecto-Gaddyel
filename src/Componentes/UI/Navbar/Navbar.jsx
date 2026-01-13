@@ -249,7 +249,7 @@ const Navbar = () => {
             {/* Menú desplegable para móviles */}
             <div
                 id="mobile-menu"
-                className={`md:hidden absolute w-full bg-gray-100 dark:bg-gray-800 transition-all duration-300 ease-in-out transform origin-top shadow-2xl ${
+                className={`md:hidden absolute w-full bg-gray-100 dark:bg-gray-950 transition-all duration-300 ease-in-out transform origin-top shadow-2xl ${
                     isOpen ? 'opacity-100 translate-y-0 scale-y-100' : 'opacity-0 -translate-y-2 scale-y-95 pointer-events-none'
                 }`}
                 role="menu"
