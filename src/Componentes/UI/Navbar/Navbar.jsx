@@ -108,7 +108,7 @@ const Navbar = () => {
                     <button
                         onClick={toggleMenu}
                         onKeyDown={(e) => ['Enter', 'Space'].includes(e.key) && toggleMenu()}
-                        className="text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="text-gray-900 dark:text-white focus:outline-none active:scale-95 transition-transform"
                         aria-label="Menú de navegación"
                         aria-expanded={isOpen}
                         aria-controls="mobile-menu"
