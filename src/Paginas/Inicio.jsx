@@ -123,7 +123,7 @@ const Inicio = () => {
             try {
                 setCargando(true);
                 setError(null);
-                
+
                 // ✅ PERFORMANCE: Promise.all para peticiones paralelas
                 // Ahorra ~50% del tiempo vs peticiones secuenciales
                 const [resultadoProductos, imagenes] = await Promise.all([
@@ -136,15 +136,15 @@ const Inicio = () => {
                 const productos = Array.isArray(resultadoProductos?.productos)
                     ? resultadoProductos.productos
                     : Array.isArray(resultadoProductos?.data)
-                    ? resultadoProductos.data
-                    : Array.isArray(resultadoProductos)
-                    ? resultadoProductos
-                    : [];
+                        ? resultadoProductos.data
+                        : Array.isArray(resultadoProductos)
+                            ? resultadoProductos
+                            : [];
 
                 const destacados = productos
                     .filter(p => p && p.destacado === true)
                     .slice(0, 3);
-                
+
                 setProductosDestacados(destacados);
                 // ✅ VALIDACIÓN: Asegurar que imagenes sea array
                 setCarouselImages(Array.isArray(imagenes) ? imagenes : []);
@@ -154,8 +154,8 @@ const Inicio = () => {
                 const mensajeError = err.message.includes('timeout')
                     ? 'La conexión tardó demasiado. Por favor, intenta de nuevo.'
                     : err.message.includes('Network')
-                    ? 'Sin conexión a internet. Verifica tu red.'
-                    : 'No se pudieron cargar los datos. Intenta de nuevo.';
+                        ? 'Sin conexión a internet. Verifica tu red.'
+                        : 'No se pudieron cargar los datos. Intenta de nuevo.';
                 setError(mensajeError);
             } finally {
                 setCargando(false);
@@ -172,7 +172,7 @@ const Inicio = () => {
 
     const [showAllFaqs, setShowAllFaqs] = useState(false);
     const initialFaqCount = 3;
-    
+
     // ✅ PERFORMANCE: useMemo para evitar cálculo en cada render
     // ¿Por qué? faqsToShow solo debe recalcularse cuando showAllFaqs cambia
     // ¿Por qué no incluir faqs? Es constante importada, nunca cambia
@@ -185,16 +185,16 @@ const Inicio = () => {
             {/* SEO 2025: Metadatos completos con Schema.org, Open Graph y Twitter Cards */}
             <Helmet>
                 <title>Gaddyel - Blanquería Personalizada Premium | Estética & Spa</title>
-                <meta 
-                    name="description" 
-                    content="Blanquería personalizada de lujo para spas, centros de estética y hoteles. Toallas, batas y textiles bordados con tu logo. Calidad profesional que define tu marca." 
+                <meta
+                    name="description"
+                    content="Blanquería personalizada de lujo para spas, centros de estética y hoteles. Toallas, batas y textiles bordados con tu logo. Calidad profesional que define tu marca."
                 />
-                <meta 
-                    name="keywords" 
-                    content="blanquería personalizada, toallas bordadas, batas spa, textiles hoteles, productos estética, blanquería lujo" 
+                <meta
+                    name="keywords"
+                    content="blanquería personalizada, toallas bordadas, batas spa, textiles hoteles, productos estética, blanquería lujo"
                 />
                 <link rel="canonical" href={`${window.location.origin}/`} />
-                
+
                 {/* Open Graph */}
                 <meta property="og:type" content="website" />
                 <meta property="og:url" content={`${window.location.origin}/`} />
@@ -202,12 +202,12 @@ const Inicio = () => {
                 <meta property="og:description" content="Transforma tu espacio con textiles personalizados de alta calidad. Ideal para spas, estética y hospitalidad." />
                 <meta property="og:site_name" content="Gaddyel" />
                 <meta property="og:locale" content="es_AR" />
-                
+
                 {/* Twitter Cards */}
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content="Gaddyel - Blanquería Personalizada Premium" />
                 <meta name="twitter:description" content="Blanquería de lujo para profesionales de la estética y hospitalidad." />
-                
+
                 {/* Schema.org - LocalBusiness */}
                 <script type="application/ld+json">
                     {JSON.stringify({
@@ -241,65 +241,60 @@ const Inicio = () => {
 
                     {/* Hero Section - Contenido principal */}
                     <main>
-                        <section 
+                        <section
                             className="min-h-screen flex items-center justify-center flex-col text-center p-4 md:p-8 bg-white rounded-b-2xl shadow-xl my-24"
                             aria-label="Presentación principal de Gaddyel"
                         >
-                            <ImageOptimizer 
-                                src={LogoGaddyel} 
-                                alt="Logo Gaddyel - Blanquería personalizada premium" 
+                            <ImageOptimizer
+                                src={LogoGaddyel}
+                                alt="Logo Gaddyel - Blanquería personalizada premium"
                                 className="mx-auto w-40 h-40 sm:w-48 sm:h-48 md:h-64 md:w-64 lg:h-80 lg:w-80 mb-4 object-contain"
                                 width={320}
                                 height={320}
                                 priority={true}
                             />
-                        <h1 className="italic text-3xl md:text-5xl lg:text-6xl font-extrabold text-indigo-800 mb-8 leading-tight max-w-4xl mx-auto">
-                            <span className="block text-gray-800">Blanquería Personalizada con Distinción</span>
-                        </h1>
+                            <h1 className="italic text-3xl md:text-5xl lg:text-6xl font-extrabold text-indigo-800 mb-8 leading-tight max-w-4xl mx-auto">
+                                <span className="block text-gray-800">Blanquería Personalizada con Distinción</span>
+                            </h1>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center max-w-5xl h-full mx-auto mb-12">
-                            <ScrollReveal>
-                                <article className="text-left p-6 bg-gray-50 rounded-lg shadow-md">
-                                    <h3 className="text-2xl font-bold text-gray-800 mb-4">Nuestra Esencia en Gaddyel</h3>
-                                    <p className="text-gray-700 leading-relaxed mb-4">
-                                        En Gaddyel, nos dedicamos a transformar el textil en una expresión de identidad y confort.
-                                        Fusionamos diseño exclusivo y la más alta calidad en blanquería personalizada, ideal para
-                                        spas, centros de estética, hoteles y cabañas que buscan dejar una impresión memorable.
-                                    </p>
-                                    <p className="text-gray-700 leading-relaxed">
-                                        Cada pieza es confeccionada pensando en la durabilidad, la suavidad al tacto y la capacidad
-                                        de realzar el ambiente profesional. Desde toallas bordadas hasta batas con tu logo,
-                                        garantizamos un producto que habla por sí mismo y eleva la experiencia de tus clientes.
-                                        Descubre la diferencia Gaddyel, donde la personalización se une a la excelencia.
-                                    </p>
-                                </article>
-                            </ScrollReveal>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center max-w-5xl h-full mx-auto mb-12">
+                                <ScrollReveal>
+                                    <article className="text-left p-6 bg-gray-50 rounded-lg shadow-md border-t-4 border-indigo-600">
+                                        <h3 className="text-2xl font-bold text-gray-800 mb-4">La Estrategia detrás del Confort</h3>
+                                        <p className="text-gray-700 leading-relaxed mb-4">
+                                            En Gaddyel, no solo personalizamos textiles; **diseñamos embajadores silenciosos para tu negocio**. Entendemos que en un spa, hotel o clínica, el tacto de una bata o la distinción de un logo bordado son las herramientas de marketing más poderosas para fidelizar a tus clientes.
+                                        </p>
+                                        <p className="text-gray-700 leading-relaxed">
+                                            Nuestra blanquería de alta gama fusiona durabilidad extrema con una suavidad que cautiva. Al elegir Gaddyel, no solo adquieres equipamiento profesional, estás invirtiendo en un **sello de identidad** que eleva la percepción de tu servicio y garantiza que tu marca sea la protagonista en la memoria de quien la visita.
+                                        </p>
+                                    </article>
+                                </ScrollReveal>
 
-                            <ScrollReveal>
-                                <div className="flex justify-center items-center h-full">
-                                    <ImageOptimizer 
-                                        src={ImagenArticulo} 
-                                        alt="Blanquería personalizada Gaddyel - Toallas y batas bordadas de alta calidad" 
-                                        className="w-full h-auto max-w-lg rounded-lg shadow-xl object-contain"
-                                        width={512}
-                                        height={512}
-                                        loading="lazy"
-                                    />
-                                </div>
-                            </ScrollReveal>
-                        </div>
+                                <ScrollReveal>
+                                    <div className="flex justify-center items-center h-full">
+                                        <ImageOptimizer
+                                            src={ImagenArticulo}
+                                            alt="Blanquería personalizada Gaddyel - Toallas y batas bordadas de alta calidad"
+                                            className="w-full h-auto max-w-lg rounded-lg shadow-xl object-contain"
+                                            width={512}
+                                            height={512}
+                                            loading="lazy"
+                                        />
+                                    </div>
+                                </ScrollReveal>
+                            </div>
 
-                                <CTAButton to="/catalogo">
-                                    Explorar Catálogo
-                                </CTAButton>
-                            </section>
-                        </main>
+                            <CTAButton to="/catalogo">
+                                Explorar Catálogo
+                            </CTAButton>
+                        </section>
+                    </main>
 
-                        {/* Carrusel */}
-                        <section 
-                            className="min-h-screen flex flex-col items-center justify-center p-4 md:p-8 bg-gray-50 rounded-2xl my-72 shadow-xl"
-                            aria-label="Galería de productos destacados"
-                        >
+                    {/* Carrusel */}
+                    <section
+                        className="min-h-screen flex flex-col items-center justify-center p-4 md:p-8 bg-gray-50 rounded-2xl my-72 shadow-xl"
+                        aria-label="Galería de productos destacados"
+                    >
                         <div className="flex flex-col items-center w-full">
                             <h2 className="italic text-3xl md:text-4xl font-bold text-center text-gray-800 mb-6 md:mb-8 shrink-0">
                                 Nuestros Destacados
@@ -318,7 +313,7 @@ const Inicio = () => {
 
 
                     {/* Productos destacados dinámicos */}
-                    <section 
+                    <section
                         className="min-h-screen flex items-center justify-center flex-col p-4 md:p-8 bg-white rounded-2xl my-72 shadow-xl"
                         aria-label="Productos destacados de Gaddyel"
                     >
@@ -356,7 +351,7 @@ const Inicio = () => {
                     </section>
 
                     {/* Preguntas frecuentes */}
-                    <section 
+                    <section
                         className="bg-gray-50 py-16 px-4 sm:px-6 rounded-xl my-72 shadow-xl"
                         aria-label="Preguntas frecuentes sobre Gaddyel"
                     >
@@ -385,34 +380,34 @@ const Inicio = () => {
                     </section>
 
                     {/* CTA final */}
-                    <section 
+                    <section
                         className="min-h-screen flex items-center justify-center flex-col text-center bg-blue-100 p-12 rounded-xl my-72 shadow-xl"
                         aria-label="Llamado a la acción - Contacto"
                     >
-    <ScrollReveal>
-        <h2 className="text-4xl md:text-5xl font-bold text-blue-800 mb-6">
-            Tu imagen también define cómo te eligen.
-        </h2>
-    </ScrollReveal>
+                        <ScrollReveal>
+                            <h2 className="text-4xl md:text-5xl font-bold text-blue-800 mb-6">
+                                Tu imagen también define cómo te eligen.
+                            </h2>
+                        </ScrollReveal>
 
-    <ScrollReveal>
-        <p className="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto mb-4">
-            La blanquería personalizada no es un detalle decorativo.
-            Es una herramienta que refuerza tu identidad profesional en cada experiencia del cliente.
-        </p>
-    </ScrollReveal>
+                        <ScrollReveal>
+                            <p className="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto mb-4">
+                                La blanquería personalizada no es un detalle decorativo.
+                                Es una herramienta que refuerza tu identidad profesional en cada experiencia del cliente.
+                            </p>
+                        </ScrollReveal>
 
-    <ScrollReveal>
-        <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto mb-8">
-            Si tu centro cuida cada tratamiento, cada protocolo y cada resultado,
-            tu imagen debería comunicar el mismo nivel.
-        </p>
-    </ScrollReveal>
+                        <ScrollReveal>
+                            <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto mb-8">
+                                Si tu centro cuida cada tratamiento, cada protocolo y cada resultado,
+                                tu imagen debería comunicar el mismo nivel.
+                            </p>
+                        </ScrollReveal>
 
-    <CTAButton to="/contacto">
-        Quiero potenciar mi imagen
-    </CTAButton>
-</section>
+                        <CTAButton to="/contacto">
+                            Quiero potenciar mi imagen
+                        </CTAButton>
+                    </section>
 
                 </div>
             </div>

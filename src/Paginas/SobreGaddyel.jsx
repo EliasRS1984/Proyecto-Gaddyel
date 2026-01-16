@@ -21,46 +21,46 @@ const SobreGaddyel = () => {
                 Gaddyel
               </h1>
               <p className="text-xl text-gray-600 font-medium max-w-2xl mx-auto">
-                En el mundo de la estética y el cuidado personal, los detalles definen la excelencia.
+                Donde tu marca se vuelve inolvidable a través de los detalles que definen la excelencia.
               </p>
             </section>
           </ScrollReveal>
 
-          {/* SECCIÓN 1: La Base de la Excelencia */}
+          {/* SECCIÓN 1: Más que productos, Soluciones */}
           <ScrollReveal>
             <section className="mb-16 p-8 md:p-10 rounded-lg bg-gray-50 border border-gray-200">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 border-l-4 border-purple-500 pl-6">
-                Productos Indispensables para un Tratamiento de Distinción
+                Más que productos, creamos Herramientas de Fidelización
               </h2>
               <p className="text-lg text-gray-700 leading-relaxed">
-                Cada producto Gaddyel está formulado para ser un pilar en tu práctica diaria. Entendemos que en el salón, clínica o spa, cada paso del tratamiento debe ser impecable. Por eso, nuestros productos no son un simple complemento, son <span className="font-semibold text-gray-900">herramientas de precisión</span> diseñadas para maximizar la eficacia y el resultado de cada sesión. Desde la preparación de la piel hasta el cuidado post-tratamiento, nuestra línea asegura que tu trabajo sea consistente, confiable y, sobre todo, <span className="font-semibold text-gray-900">excepcional</span>.
+                En el mundo de la estética, la excelencia no solo se siente, se recuerda. En Gaddyel, entendemos que tu negocio no solo vende tratamientos; vende experiencias. Por eso, nuestros productos son <span className="font-semibold text-gray-900">herramientas de marketing sensorial</span> diseñadas para que cada sesión sea impecable y tu marca sea la única que el cliente quiera recordar.
               </p>
             </section>
           </ScrollReveal>
 
-          {/* SECCIÓN 2: Un Sello de Distinción */}
+          {/* SECCIÓN 2: Elevando tu Marca */}
           <ScrollReveal>
             <section className="mb-16 p-8 md:p-10 rounded-lg bg-white border border-gray-200">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 border-l-4 border-purple-500 pl-6">
-                Un Sello de Distinción y Profesionalismo
+                Eleva la Percepción de tu Negocio
               </h2>
               <p className="text-lg text-gray-700 leading-relaxed">
-                La elección de tus productos dice mucho sobre la calidad de tu servicio. Al integrar los productos Gaddyel en tu cabina, no solo estás utilizando ingredientes de alta calidad, estás elevando la percepción de tu marca. Nuestros empaques elegantes y la reputación de nuestra marca se convierten en un <span className="font-semibold text-gray-900">sello de distinción</span> que tus clientes notarán y apreciarán. Es un reflejo de tu compromiso con la calidad y la innovación en tu campo.
+                La elección de tus insumos es la carta de presentación de tu profesionalismo. Al integrar Gaddyel en tu cabina, transformas un servicio estándar en una experiencia de lujo. No se trata solo de alta calidad; se trata de <span className="font-semibold text-gray-900">posicionar tu marca</span> ante los ojos del cliente. Cada detalle personalizado es un sello de distinción que comunica compromiso, innovación y exclusividad.
               </p>
             </section>
           </ScrollReveal>
 
-          {/* SECCIÓN 3: Publicidad a Través de la Excelencia */}
+          {/* SECCIÓN 3: El Poder del Marketing Sensorial */}
           <ScrollReveal>
             <section className="mb-16 p-8 md:p-10 rounded-lg bg-gray-50 border border-gray-200">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 border-l-4 border-purple-500 pl-6">
-                Tu Mejor Publicidad: Los Resultados y la Experiencia
+                Convierte cada Sesión en una Acción de Marketing
               </h2>
               <p className="text-lg text-gray-700 leading-relaxed mb-6">
-                En un mercado saturado, la publicidad más efectiva es el boca a boca. Cuando tus clientes ven y sienten los resultados superiores de un tratamiento con productos Gaddyel, se convierten en tus embajadores de marca más fieles. Ellos no solo regresarán, sino que recomendarán tus servicios a sus conocidos, creando un <span className="font-semibold text-gray-900">ciclo de crecimiento orgánico y confiable</span>. Cada tratamiento exitoso con un producto Gaddyel es una inversión en la reputación y el crecimiento sostenible de tu negocio.
+                Sabemos que la publicidad más poderosa es la que tus clientes llevan consigo. Muy pocos comprenden que un detalle personalizado es una <span className="font-semibold text-gray-900">acción de marketing de alto impacto</span>. Cuando un cliente siente la distinción de Gaddyel, no solo regresa: se convierte en un embajador fiel que recomienda tu éxito de manera orgánica y constante.
               </p>
               <blockquote className="pl-6 border-l-4 border-gray-300 italic text-gray-600">
-                "En Gaddyel, creemos que la calidad de un producto es la mejor herramienta de marketing. Permítenos ser parte de tu historia de éxito."
+                "En Gaddyel, no solo fabricamos productos; diseñamos el éxito de tu marca a través de la excelencia. Permítenos ser el aliado estratégico de tu historia."
               </blockquote>
             </section>
           </ScrollReveal>
@@ -69,13 +69,13 @@ const SobreGaddyel = () => {
           <ScrollReveal>
             <footer className="text-center py-12">
               <p className="text-gray-700 text-lg mb-8 max-w-2xl mx-auto">
-                Explora nuestra línea de productos y descubre cómo Gaddyel puede transformar tu práctica profesional.
+                Descubre cómo Gaddyel puede transformar tu práctica profesional en una herramienta de marketing imparable.
               </p>
               <NavLink
                 to="/catalogo"
-                className="inter font-bold bg-purple-500 hover:bg-purple-700 text-black hover:text-white font-bold py-3 px-6 rounded-full transition-colors duration-300 hover:scale-105"
+                className="inter font-bold bg-purple-500 hover:bg-purple-700 text-black hover:text-white py-3 px-8 rounded-full transition-all duration-300 hover:scale-105 inline-block"
               >
-                Ver Catálogo
+                Explorar Soluciones
               </NavLink>
             </footer>
           </ScrollReveal>

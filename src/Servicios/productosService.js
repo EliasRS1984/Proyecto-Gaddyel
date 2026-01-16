@@ -7,16 +7,92 @@ const API_URL = `${API_BASE}/api/productos`;
 logger.debug("🌐 Frontend Web - API_BASE:", API_BASE);
 
 /**
+ * ✅ Reintentos con backoff exponencial para manejar Cold Start de Render
+ * 
+ * FLUJO:
+ * - Reintento 1: Falla inmediatamente
+ * - Espera 1s → Reintento 2
+ * - Espera 2s → Reintento 3
+ * - Espera 4s → Reintento 4 (máximo)
+ * 
+ * Esto da tiempo a Render (~20-30s) para despertar del Cold Start
+ */
+async function fetchWithRetry(url, options = {}, maxRetries = 3) {
+    const { timeout = 8000, ...fetchOptions } = options;
+    let lastError;
+
+    for (let attempt = 1; attempt <= maxRetries + 1; attempt++) {
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+            const response = await fetch(url, {
+                ...fetchOptions,
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+
+            // ✅ Éxito
+            if (response.ok) {
+                return response;
+            }
+
+            // ⚠️ Cold Start (503 Service Unavailable)
+            if (response.status === 503) {
+                lastError = new Error(`Server unavailable (Cold Start)`);
+                if (attempt <= maxRetries) {
+                    const delay = Math.min(1000 * Math.pow(2, attempt - 1), 8000);
+                    logger.warn(
+                        `[productosService] 503 - Reintentando en ${delay}ms ` +
+                        `(intento ${attempt}/${maxRetries + 1})`
+                    );
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    continue;
+                }
+                throw lastError;
+            }
+
+            // ❌ Otros errores HTTP
+            throw new Error(`HTTP ${response.status}`);
+
+        } catch (error) {
+            lastError = error;
+
+            // Reintentar solo en errores de red o timeout
+            if (attempt <= maxRetries && (
+                error.name === 'AbortError' || 
+                error.message.includes('Cold Start') ||
+                error.message.includes('Failed to fetch')
+            )) {
+                const delay = Math.min(1000 * Math.pow(2, attempt - 1), 8000);
+                logger.warn(
+                    `[productosService] Error de red - Reintentando en ${delay}ms ` +
+                    `(intento ${attempt}/${maxRetries + 1}): ${error.message}`
+                );
+                await new Promise(resolve => setTimeout(resolve, delay));
+                continue;
+            }
+
+            throw lastError;
+        }
+    }
+
+    throw lastError;
+}
+
+/**
  * ✅ MEJORADO: Obtiene todos los productos con paginación servidor
  * Backend ahora retorna: { data: [], pagination: { total, page, limit, pages } }
+ * 
+ * MANEJO DE COLD START:
+ * - Reintentos automáticos cada 1s, 2s, 4s
+ * - Timeout de 8s por intento
+ * - Máximo 3 reintentos antes de fallar
  */
 export const obtenerProductos = async (params = {}) => {
     try {
         logger.debug("📤 Fetch: GET /productos", params);
-        
-        // Crear AbortController para timeout
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 segundos timeout
         
         // Construir query string
         const queryParams = new URLSearchParams({
@@ -27,12 +103,10 @@ export const obtenerProductos = async (params = {}) => {
             ...params
         });
         
-        const respuesta = await fetch(`${API_URL}?${queryParams.toString()}`, {
-            signal: controller.signal,
-            headers: { 'Accept': 'application/json' }
-        });
-        
-        clearTimeout(timeoutId);
+        const respuesta = await fetchWithRetry(
+            `${API_URL}?${queryParams.toString()}`,
+            { headers: { 'Accept': 'application/json' } }
+        );
         
         if (!respuesta.ok) {
             throw new Error(`Error ${respuesta.status} al obtener productos`);
@@ -62,25 +136,24 @@ export const obtenerProductos = async (params = {}) => {
 };
 
 /**
- * Obtiene un producto por ID
+ * Obtiene un producto por ID (con reintentos automáticos)
  */
 export const obtenerProductoPorId = async (id) => {
     try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000);
+        logger.debug(`📤 Fetch: GET /productos/${id}`);
         
-        const respuesta = await fetch(`${API_URL}/${id}`, {
-            signal: controller.signal,
-            headers: { 'Accept': 'application/json' }
-        });
-        
-        clearTimeout(timeoutId);
+        const respuesta = await fetchWithRetry(
+            `${API_URL}/${id}`,
+            { headers: { 'Accept': 'application/json' } }
+        );
         
         if (!respuesta.ok) {
             throw new Error(`Producto no encontrado`);
         }
         
-        return respuesta.json();
+        const producto = await respuesta.json();
+        logger.debug("✅ Producto cargado:", producto.nombre);
+        return producto;
     } catch (error) {
         if (error.name === 'AbortError') {
             console.error("❌ Error: Timeout en solicitud de producto");
