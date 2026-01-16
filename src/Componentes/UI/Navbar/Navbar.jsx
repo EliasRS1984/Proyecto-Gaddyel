@@ -81,15 +81,14 @@ const Navbar = () => {
     ];
 
     return (
-        <header className={`bg-gray-100/95 dark:bg-gray-900/95 backdrop-blur-md sticky top-0 z-50 animate-fade-in transition-shadow duration-300 ${
-            scrolled ? 'shadow-xl' : 'shadow-md'
-        }`}>
+        <header className={`bg-gray-100/95 dark:bg-gray-900/95 backdrop-blur-md sticky top-0 z-50 animate-fade-in transition-shadow duration-300 ${scrolled ? 'shadow-xl' : 'shadow-md'
+            }`}>
             <nav className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
                 <div className="flex-shrink-0">
-                    <NavLink 
-                        to="/" 
+                    <NavLink
+                        to="/"
                         onClick={handleLogoClick}
-                        className="flex items-center space-x-2" 
+                        className="flex items-center space-x-2"
                         aria-label="Ir a la página de inicio de Gaddyel (volver al top)"
                     >
                         <img
@@ -108,10 +107,10 @@ const Navbar = () => {
                     <button
                         onClick={toggleMenu}
                         onKeyDown={(e) => ['Enter', 'Space'].includes(e.key) && toggleMenu()}
-                        className="text-gray-900 dark:text-white focus:outline-none active:scale-95 transition-transform"
+                        // Eliminamos el conflicto de colores forzando el color del icono
+                        className="relative z-50 p-2 !text-gray-900 dark:!text-white focus:outline-none active:scale-95 transition-all hover:!text-gray-900 dark:hover:!text-white"
                         aria-label="Menú de navegación"
                         aria-expanded={isOpen}
-                        aria-controls="mobile-menu"
                     >
                         <div className="relative h-8 w-8">
                             <svg
@@ -137,12 +136,11 @@ const Navbar = () => {
                 {/* Enlaces de navegación para escritorio */}
                 <div className="hidden md:flex items-center space-x-8" role="navigation" aria-label="Menú principal">
                     {navLinks.map((link) => (
-                        <NavLink 
-                            key={link.to} 
-                            to={link.to} 
-                            className={({ isActive }) => 
-                                `relative text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors duration-300 font-medium ${
-                                    isActive ? 'text-gray-900 dark:text-gray-100' : ''
+                        <NavLink
+                            key={link.to}
+                            to={link.to}
+                            className={({ isActive }) =>
+                                `relative text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors duration-300 font-medium ${isActive ? 'text-gray-900 dark:text-gray-100' : ''
                                 } group`
                             }
                         >
@@ -249,32 +247,27 @@ const Navbar = () => {
             {/* Menú desplegable para móviles */}
             <div
                 id="mobile-menu"
-                className={`md:hidden absolute w-full bg-gray-100 dark:bg-gray-950 transition-all duration-300 ease-in-out transform origin-top shadow-2xl ${
-                    isOpen ? 'opacity-100 translate-y-0 scale-y-100' : 'opacity-0 -translate-y-2 scale-y-95 pointer-events-none'
-                }`}
-                role="menu"
-                aria-label="Menú móvil"
+                className={`md:hidden absolute w-full transition-all duration-300 ease-in-out transform origin-top shadow-2xl ${isOpen ? 'opacity-100 translate-y-0 scale-y-100' : 'opacity-0 -translate-y-2 scale-y-95 pointer-events-none'
+                    } bg-white dark:bg-gray-900`} // Forzamos fondos sólidos
             >
-                <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 flex flex-col items-center">
+                <div className="px-4 pt-5 pb-6 space-y-2 flex flex-col items-center">
                     {navLinks.map((link) => (
                         <NavLink
                             key={link.to}
                             to={link.to}
-                            // ✅ FLUJO: Clases Tailwind dark: para manejar light/dark correctamente
-                            // Light mode: text-gray-900 (oscuro) sobre bg-gray-100 (claro) = contraste 9:1
-                            // Dark mode: dark:text-white (blanco) sobre dark:bg-gray-950 (oscuro) = contraste 14:1
-                            // isActive: Usar border-bottom en lugar de background para no afectar legibilidad
-                            className={({ isActive }) => `w-full block text-center py-3 text-lg font-semibold rounded-lg no-underline text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 ${
-                                isActive ? 'border-b-4 border-purple-500 dark:border-purple-400 font-bold' : ''
-                            }`}
+                            className={({ isActive }) => `
+                                w-full block text-center py-4 text-xl font-medium rounded-xl transition-all duration-200
+                                /* El ! asegura que el color de Tailwind mande sobre el CSS global */
+                                    ${isActive
+                                    ? '!text-purple-600 dark:!text-purple-400 bg-purple-50 dark:bg-purple-900/20'
+                                    : '!text-gray-900 dark:!text-gray-100 hover:!bg-gray-100 dark:hover:!bg-gray-800 hover:!text-gray-900 dark:hover:!text-white'
+                                    }
+                                    `}
                             onClick={closeMenu}
-                            onKeyDown={(e) => ['Enter', 'Space'].includes(e.key) && closeMenu()}
-                            role="menuitem"
                         >
                             {link.label}
                         </NavLink>
                     ))}
-
                     {/* Separador */}
                     <div className="w-full border-t border-gray-300 dark:border-gray-700 my-2"></div>
 
