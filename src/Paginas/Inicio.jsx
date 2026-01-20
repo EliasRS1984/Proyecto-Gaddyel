@@ -259,7 +259,7 @@ const Inicio = () => {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center max-w-5xl h-full mx-auto mb-12">
                                 <ScrollReveal>
-                                    <article className="text-left p-6 bg-gray-50 rounded-lg shadow-md border-t-4 border-indigo-600">
+                                    <article className="text-left p-6 bg-gray-50 rounded-lg shadow-md ">
                                         <h3 className="text-2xl font-bold text-gray-800 mb-4">La Estrategia detrás del Confort</h3>
                                         <p className="text-gray-700 leading-relaxed mb-4">
                                             En Gaddyel, no solo personalizamos textiles; **diseñamos embajadores silenciosos para tu negocio**. Entendemos que en un spa, hotel o clínica, el tacto de una bata o la distinción de un logo bordado son las herramientas de marketing más poderosas para fidelizar a tus clientes.

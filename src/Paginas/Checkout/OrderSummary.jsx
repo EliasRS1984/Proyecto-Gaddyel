@@ -9,7 +9,25 @@ export const OrderSummary = ({ cartItems, total }) => {
     const cantidadSolicitudes = cartItems.reduce((sum, item) => sum + item.cantidad, 0);
     const subtotal = total;
     const costoEnvio = orderService.calculateShipping(cantidadSolicitudes);
-    const totalFinal = subtotal + costoEnvio;
+    const feeMode = (import.meta.env.VITE_MP_FEE_MODE || 'absorb').toLowerCase();
+    const feePercent = Number(import.meta.env.VITE_MP_FEE_PERCENT || 0);
+    const feeFixed = Number(import.meta.env.VITE_MP_FEE_FIXED || 0);
+    const feeLabel = import.meta.env.VITE_MP_FEE_LABEL || 'Recargo Mercado Pago';
+
+    const baseTotal = subtotal + costoEnvio;
+
+    // Vista previa de recargo si el modo es pass_through (el backend valida/corrige)
+    const previewSurcharge = (() => {
+        if (feeMode !== 'pass_through') return 0;
+        const r = isNaN(feePercent) ? 0 : feePercent;
+        const f = isNaN(feeFixed) ? 0 : feeFixed;
+        if (r <= 0 && f <= 0) return 0;
+        const charge = (baseTotal + f) / (1 - r);
+        const surcharge = charge - baseTotal;
+        return Math.round(Math.max(0, surcharge));
+    })();
+
+    const totalFinal = baseTotal + previewSurcharge;
 
     return (
         <div className="bg-gray-50 p-6 rounded-lg">
@@ -50,6 +68,14 @@ export const OrderSummary = ({ cartItems, total }) => {
                         )}
                     </span>
                 </div>
+
+                {/* Recargo por Mercado Pago (si aplica) */}
+                {previewSurcharge > 0 && (
+                    <div className="flex justify-between">
+                        <span className="text-gray-600">{feeLabel}</span>
+                        <span className="font-medium">${previewSurcharge.toLocaleString()}</span>
+                    </div>
+                )}
 
                 {cantidadSolicitudes < 3 && costoEnvio > 0 && (
                     <p className="text-xs text-gray-500 italic">
