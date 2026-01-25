@@ -4,7 +4,10 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 const getFullUrl = (url) => {
     if (url.startsWith('http')) return url;
     const API_BASE = import.meta.env.VITE_API_BASE || "https://gaddyel-backend.onrender.com";
-    return `${API_BASE}/api${url.startsWith('/api') ? url : '/api' + url}`;
+    // Si URL ya empieza con /api, no duplicar
+    // Si URL no tiene /api, agregarlo
+    const path = url.startsWith('/api') ? url : '/api/' + url;
+    return `${API_BASE}${path}`;
 };
 
 /**
