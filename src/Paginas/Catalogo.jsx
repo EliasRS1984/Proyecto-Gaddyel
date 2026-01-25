@@ -59,7 +59,7 @@ const Catalogo = () => {
         sentinelRef,
         reset
     } = useInfiniteScroll(
-        '/productos',
+        'productos', // URL relativa (sin /api/)
         {
             limit: itemsPerPage,
             params: {

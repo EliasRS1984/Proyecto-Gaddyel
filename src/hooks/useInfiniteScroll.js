@@ -1,5 +1,12 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 
+// Asegurarse de que la URL sea completa
+const getFullUrl = (url) => {
+    if (url.startsWith('http')) return url;
+    const API_BASE = import.meta.env.VITE_API_BASE || "https://gaddyel-backend.onrender.com";
+    return `${API_BASE}/api${url.startsWith('/api') ? url : '/api' + url}`;
+};
+
 /**
  * Hook: useInfiniteScroll
  * 
@@ -34,6 +41,7 @@ export const useInfiniteScroll = (url, config = {}) => {
     const sentinelRef = useRef(null);
     const isLoadingRef = useRef(false);
     const observerRef = useRef(null);
+    const failedAttemptsRef = useRef(0); // Contador de intentos fallidos
 
     // ✅ HELPER: Fetch datos de una página específica
     const fetchPage = useCallback(async (pageNum) => {
@@ -51,7 +59,7 @@ export const useInfiniteScroll = (url, config = {}) => {
                 limit: config.limit || 12
             });
 
-            const fullUrl = `${url}?${params.toString()}`;
+            const fullUrl = `${getFullUrl(url)}?${params.toString()}`;
             
             const response = await fetch(fullUrl, {
                 method: 'GET',
@@ -82,10 +90,19 @@ export const useInfiniteScroll = (url, config = {}) => {
             setTotalPages(pagination.pages || 1);
             setHasMore(pageNum < (pagination.pages || 1));
             setError(null);
+            failedAttemptsRef.current = 0; // Reset contador de fallos
 
         } catch (err) {
             console.error('Error fetching infinite scroll data:', err);
-            setError(err.message);
+            failedAttemptsRef.current += 1;
+            
+            // Detener después de 3 intentos fallidos
+            if (failedAttemptsRef.current >= 3) {
+                setError(`Error cargando productos: ${err.message}. Por favor recarga la página.`);
+                setHasMore(false); // Detener intentos de cargar más
+            } else {
+                setError(err.message);
+            }
         } finally {
             setLoading(false);
             isLoadingRef.current = false;
