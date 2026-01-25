@@ -90,8 +90,18 @@ export const useInfiniteScroll = (url, config = {}) => {
             }
 
             // Actualizar metadata de paginación
-            setTotalPages(pagination.pages || 1);
-            setHasMore(pageNum < (pagination.pages || 1));
+            const totalPagesFromAPI = pagination.pages || 1;
+            setTotalPages(totalPagesFromAPI);
+            
+            // CORREGIR: hasMore debe ser true si aún hay más páginas por cargar
+            // Si currentPage (1-indexed) < totalPages, significa hay más páginas
+            // EJEMPLO: si totalPages=5, podemos cargar páginas 1,2,3,4,5
+            // cuando currentPage=5, no hay más (5 no es < 5)
+            const morePages = pageNum < totalPagesFromAPI;
+            setHasMore(morePages);
+            
+            console.log(`📄 Página ${pageNum}/${totalPagesFromAPI} cargada. Items: ${newData.length}, hasMore: ${morePages}`);
+            
             setError(null);
             failedAttemptsRef.current = 0; // Reset contador de fallos
 
@@ -114,8 +124,22 @@ export const useInfiniteScroll = (url, config = {}) => {
 
     // ✅ SETUP: Intersection Observer para detectar scroll al final
     useEffect(() => {
-        // Si no hay más datos o está cargando, no observar
-        if (!hasMore || loading || !sentinelRef.current) return;
+        // Siempre observar si hay sentinel (incluso si loading=true)
+        // Solo evitar si hasMore=false
+        if (!sentinelRef.current) {
+            console.log('❌ Sentinel ref no existe aún');
+            return;
+        }
+
+        if (!hasMore) {
+            console.log('✅ No hay más páginas, desconectar observer');
+            if (observerRef.current) {
+                observerRef.current.disconnect();
+            }
+            return;
+        }
+
+        console.log('👁️ Configurando Intersection Observer...');
 
         // Crear observer con margen de 500px antes de llegar al final
         const observerOptions = {
@@ -126,14 +150,22 @@ export const useInfiniteScroll = (url, config = {}) => {
 
         observerRef.current = new IntersectionObserver(entries => {
             entries.forEach(entry => {
+                console.log('🔍 Sentinel detectado:', {
+                    isIntersecting: entry.isIntersecting,
+                    isLoading: isLoadingRef.current,
+                    hasMore: hasMore
+                });
+                
                 // Si el sentinel entra en viewport, cargar siguiente página
                 if (entry.isIntersecting && hasMore && !isLoadingRef.current) {
+                    console.log('📥 Cargando página siguiente...');
                     setCurrentPage(prev => prev + 1);
                 }
             });
         }, observerOptions);
 
         observerRef.current.observe(sentinelRef.current);
+        console.log('👀 Observer iniciado');
 
         // Cleanup
         return () => {
@@ -141,10 +173,11 @@ export const useInfiniteScroll = (url, config = {}) => {
                 observerRef.current.disconnect();
             }
         };
-    }, [hasMore, loading]);
+    }, [hasMore]);
 
     // ✅ TRIGGER: Cargar nueva página cuando currentPage cambia
     useEffect(() => {
+        console.log(`📤 Fetcheando página ${currentPage}...`);
         fetchPage(currentPage);
     }, [currentPage, fetchPage]);
 
