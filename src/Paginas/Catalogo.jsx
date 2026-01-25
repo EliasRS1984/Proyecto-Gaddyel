@@ -1,246 +1,273 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
 import TarjetaProducto from '../Componentes/TarjetaProducto/TarjetaProducto.jsx';
-import useInfiniteScroll from '../hooks/useInfiniteScroll';
 
 /**
- * FLUJO DE DATOS - Página Catálogo (Infinite Scroll)
+ * FLUJO DE DATOS - Página Catálogo (Paginación Manual Simple)
  * 
- * 1. Usuario entra a /catalogo
- * 2. Componente monta → useInfiniteScroll() hook
- * 3. Hook: GET /api/productos?page=1&limit=12 → Backend
- * 4. Backend retorna: { data: [...12 productos], pagination: { pages, total } }
- * 5. Hook: setItems(12 productos)
- * 6. Componente renderea grid con 12 productos
- * 7. Usuario scrollea hacia abajo
- * 8. Intersection Observer detecta scroll al final
- * 9. Hook carga página 2 automáticamente: GET /api/productos?page=2&limit=12
- * 10. Nuevos 12 productos se AGREGAN a lista (no reemplazan)
- * 11. Usuario ve continuidad sin saltos
+ * ARQUITECTURA:
+ * 1. Usuario entra a /catalogo?page=1 (o sin parámetro = página 1)
+ * 2. useEffect detecta cambio en currentPage
+ * 3. Fetch: GET /api/productos?page=1&limit=20
+ * 4. Backend retorna: { data: [...productos], pagination: { pages, total, page } }
+ * 5. setAllProducts(data.data) → setTotalPages(pagination.pages)
+ * 6. Componente renderea grid con productos
+ * 7. Controles de paginación (Anterior/Siguiente) abajo
  * 
- * INTERACCIÓN DEL USUARIO:
- * - Scroll natural hacia abajo → Carga automática de más productos
- * - Búsqueda por nombre → Reset de infinite scroll, filtra localmente
- * - No hay botones de página (UX más limpia)
+ * VENTAJAS DE ESTA SOLUCIÓN:
+ * ✅ Simple: Sin dependencias complejas (sin Intersection Observer)
+ * ✅ Escalable: Funciona con 13 productos o 10,000
+ * ✅ SEO-friendly: URLs como ?page=1, ?page=2 (indexables)
+ * ✅ Control total: Usuario controla cuándo cargar más
+ * ✅ Mantenible: Código claro y fácil de debuguear
+ * ✅ Performance: Solo 20 items por página en memoria
  * 
- * DIFERENCIA vs PAGINACIÓN ANTERIOR:
- * ✅ Nuevo: Scroll continuo, carga automática
- * ✅ Nuevo: Mejora UX (scroll natural en mobile)
- * ✅ Nuevo: No hay clics en números de página
- * ❌ Removido: Paginación manual (números de página)
+ * CONFIGURACIÓN ACTUAL:
+ * - 20 productos por página
+ * - Con 13 productos: 1 página (todo en la misma)
+ * - Con 100 productos: 5 páginas
+ * - Con 1000 productos: 50 páginas
+ * 
+ * FLUJO DE BÚSQUEDA:
+ * Usuario escribe en buscador → useMemo filtra localmente
+ * No hace re-fetch, usa los datos ya cargados
+ * Si escribe, reset a página 1 (UX clara)
  * 
  * RENDIMIENTO:
- * - useInfiniteScroll con Intersection Observer (no scroll events)
- * - React.memo(TarjetaProducto) = evita re-render si props iguales
- * - Lazy loading de imágenes en TarjetaProducto
- * - Debouncing automático (evita múltiples requests simultáneos)
+ * - React.memo(TarjetaProducto) en componente hijo
+ * - Lazy loading de imágenes (en TarjetaProducto)
+ * - useMemo para filtrado local (evita cálculos innecesarios)
  * 
  * SEO:
  * - react-helmet-async actualiza <title> y <meta>
- * - Canonical URL única (no por página, ya que es scroll continuo)
- * - HTML5 semántico: <article>, <main>, role="grid"
- * - Open Graph para redes sociales
+ * - Canonical URL con parámetro ?page (para cada página)
+ * - HTML5 semántico: <main>, <article>, role="grid"
+ * - Open Graph para compartir en redes
  */
 const Catalogo = () => {
     const [searchTerm, setSearchTerm] = useState('');
-    const [itemsPerPage] = useState(12);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(20); // 20 productos por página
+    const [allProducts, setAllProducts] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalProducts, setTotalProducts] = useState(0);
 
-    // ✅ FLUJO: Usar custom hook infinite scroll
-    // El hook gestiona automáticamente:
-    // - Carga de páginas
-    // - Detección de scroll
-    // - Agregación de items
-    const { 
-        items: todosLosProductos, 
-        loading, 
-        error, 
-        hasMore, 
-        refetch,
-        sentinelRef,
-        reset
-    } = useInfiniteScroll(
-        'productos', // URL relativa (sin /api/)
-        {
-            limit: itemsPerPage,
-            params: {
-                sortBy: 'createdAt',
-                sortDir: -1
+    // ✅ FLUJO: Fetch productos cuando cambia página
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                
+                const API_BASE = import.meta.env.VITE_API_BASE || "https://gaddyel-backend.onrender.com";
+                const params = new URLSearchParams({
+                    page: currentPage,
+                    limit: itemsPerPage,
+                    sortBy: 'createdAt',
+                    sortDir: -1
+                });
+                
+                const response = await fetch(`${API_BASE}/api/productos?${params.toString()}`);
+                
+                if (!response.ok) {
+                    throw new Error(`Error ${response.status}: No se pudieron cargar los productos`);
+                }
+                
+                const data = await response.json();
+                setAllProducts(data.data || []);
+                
+                const pagination = data.pagination || {};
+                const pages = pagination.pages || 1;
+                const total = pagination.total || 0;
+                
+                setTotalPages(pages);
+                setTotalProducts(total);
+                
+                console.log(`✅ Página ${currentPage}/${pages} cargada (${data.data?.length || 0} de ${total} productos)`);
+                
+            } catch (err) {
+                console.error('❌ Error loading products:', err.message);
+                setError(err.message);
+                setAllProducts([]);
+            } finally {
+                setLoading(false);
             }
-        }
-    );
+        };
 
-    // ✅ PERFORMANCE: Filtro local de búsqueda (evita re-fetch por cada letra)
-    // Si hay muchos productos (>5000), migrar a búsqueda en backend
+        fetchProducts();
+    }, [currentPage, itemsPerPage]);
+
+    // ✅ PERFORMANCE: Filtro local de búsqueda (no re-fetch por cada letra)
+    // Este usa los datos ya cargados en la página actual
     const productosFiltrados = useMemo(() => {
-        if (!searchTerm) return todosLosProductos;
+        if (!searchTerm) return allProducts;
         
-        return todosLosProductos.filter(p =>
+        return allProducts.filter(p =>
             p.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            p.descripcion?.toLowerCase().includes(searchTerm.toLowerCase())
+            p.descripcion?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            p.sku?.toLowerCase().includes(searchTerm.toLowerCase())
         );
-    }, [todosLosProductos, searchTerm]);
+    }, [allProducts, searchTerm]);
 
-    // ✅ UX: Cuando cambia búsqueda, resetear infinite scroll
+    // ✅ Manejar cambio de búsqueda
     const handleSearchChange = (e) => {
         const newTerm = e.target.value;
         setSearchTerm(newTerm);
-        
-        // Si es búsqueda, resetear (sin búsqueda, no resetear para mantener scroll)
-        if (newTerm && !searchTerm) {
-            reset();
+        // Reset a página 1 cuando comienza nueva búsqueda
+        if (currentPage !== 1) {
+            setCurrentPage(1);
+        }
+    };
+
+    // ✅ Navegar a página anterior
+    const handlePrevPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    };
+
+    // ✅ Navegar a página siguiente
+    const handleNextPage = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage(currentPage + 1);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     };
 
     return (
-        <>
-            {/* SEO: Metadatos optimizados - Canonical única (no por página) */}
+        <div className="catalogo-container">
             <Helmet>
-                <title>Catálogo de Productos Artesanales - Gaddyel</title>
-                <meta 
-                    name="description" 
-                    content="Explora nuestro catálogo completo de productos artesanales personalizables. Cientos de productos únicos con scroll continuo." 
+                <title>Catálogo de Blancos Premium - Gaddyel</title>
+                <meta
+                    name="description"
+                    content="Descubre nuestro catálogo de blancos personalizados. Camisetas, toallas, gorras y más con bordado y serigrafia."
                 />
-                {/* Canonical única (sin ?page=X ya que es infinite scroll) */}
-                <link rel="canonical" href={`${window.location.origin}/catalogo`} />
-                
-                {/* Open Graph */}
-                <meta property="og:title" content="Catálogo de Productos Artesanales - Gaddyel" />
-                <meta property="og:description" content="Productos únicos y personalizables para cada ocasión." />
+                <meta
+                    property="og:title"
+                    content="Catálogo de Blancos Premium - Gaddyel"
+                />
+                <meta
+                    property="og:description"
+                    content="Productos de alta calidad personalizados según tus necesidades"
+                />
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content={`${window.location.origin}/catalogo`} />
-                
-                {/* Twitter Card */}
-                <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:title" content="Catálogo de Productos - Gaddyel" />
-                <meta name="twitter:description" content="Explora nuestro catálogo completo de productos artesanales." />
+                <link 
+                    rel="canonical" 
+                    href={`https://gaddyel.com/catalogo${currentPage > 1 ? `?page=${currentPage}` : ''}`} 
+                />
             </Helmet>
 
-            <div className="container mx-auto p-4 md:p-8">
-                {/* HEADER: Título y contador */}
-                <header className="mb-8">
-                    <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
-                        Catálogo de Productos
-                    </h1>
-                    {todosLosProductos.length > 0 && (
-                        <p className="text-gray-600">
-                            Mostrando {todosLosProductos.length} productos{' '}
-                            {!hasMore && '(Todos cargados)'}
-                        </p>
-                    )}
-                </header>
+            <main className="catalogo-main">
+                {/* ENCABEZADO Y BÚSQUEDA */}
+                <section className="catalogo-header">
+                    <h1 className="catalogo-title">Catálogo de Productos</h1>
+                    
+                    <input
+                        type="text"
+                        placeholder="Buscar productos..."
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                        className="catalogo-search-input"
+                        aria-label="Buscar productos por nombre o descripción"
+                    />
+                </section>
 
-                {/* BÚSQUEDA LOCAL: Filtro rápido sin re-fetch */}
-                {todosLosProductos.length > 0 && (
-                    <div className="mb-6">
-                        <label htmlFor="search-input" className="sr-only">
-                            Buscar productos
-                        </label>
-                        <input
-                            id="search-input"
-                            type="text"
-                            placeholder="Buscar productos..."
-                            value={searchTerm}
-                            onChange={handleSearchChange}
-                            className="w-full md:w-96 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            aria-label="Campo de búsqueda de productos"
-                        />
-                        {searchTerm && (
-                            <p className="mt-2 text-sm text-gray-600">
-                                {productosFiltrados.length} resultado(s) encontrado(s)
+                {/* INFORMACIÓN DE PAGINACIÓN Y RESULTADOS */}
+                {!loading && allProducts.length > 0 && (
+                    <div className="catalogo-info">
+                        <p className="catalogo-results">
+                            <strong>{totalProducts}</strong> producto{totalProducts !== 1 ? 's' : ''} total
+                            {searchTerm && ` • ${productosFiltrados.length} coinciden con tu búsqueda`}
+                        </p>
+                        {totalPages > 1 && (
+                            <p className="catalogo-pagination-info">
+                                Página <strong>{currentPage}</strong> de <strong>{totalPages}</strong>
                             </p>
                         )}
                     </div>
                 )}
 
-                {/* 1. PRIORIDAD MÁXIMA: Si está cargando por primera vez (sin datos previos) */}
-                {loading && todosLosProductos.length === 0 ? (
-                    <div className="flex justify-center items-center min-h-[400px]" role="status" aria-live="polite">
-                        <div className="text-center">
-                            <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent mb-4"></div>
-                            <p className="text-gray-600">Cargando productos...</p>
-                        </div>
+                {/* ESTADO DE CARGA INICIAL */}
+                {loading && allProducts.length === 0 && (
+                    <div className="catalogo-loading" role="status" aria-live="polite">
+                        <p>Cargando catálogo...</p>
                     </div>
-                ) : error ? (
-                    /* 2. SEGUNDA PRIORIDAD: Si ya terminó de cargar y hubo un error */
-                    <div 
-                        className="mb-4 p-6 bg-red-50 border-l-4 border-red-400 text-red-700 rounded"
-                        role="alert"
-                        aria-live="assertive"
-                    >
-                        <h2 className="text-lg font-semibold mb-2">Error al cargar productos</h2>
-                        <p className="mb-4">{error}</p>
-                        <button
-                            onClick={refetch}
-                            className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
-                            aria-label="Reintentar carga de productos"
+                )}
+
+                {/* ESTADO DE ERROR */}
+                {error && (
+                    <div className="catalogo-error" role="alert" aria-live="assertive">
+                        <p><strong>Error:</strong> {error}</p>
+                        <button 
+                            onClick={() => window.location.reload()}
+                            className="catalogo-retry-button"
                         >
                             Reintentar
                         </button>
                     </div>
-                ) : productosFiltrados.length > 0 ? (
-                    /* 3. TERCERA PRIORIDAD: Si hay productos para mostrar */
-                    <>
-                        <div
-                            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
-                            role="grid"
-                            aria-label="Catálogo de productos"
-                        >
-                            {productosFiltrados.map(producto => (
-                                <article key={producto._id} role="gridcell">
-                                    <TarjetaProducto producto={producto} showPrice={true} />
-                                </article>
-                            ))}
-                        </div>
+                )}
 
-                        {/* SENTINEL: Elemento invisible que detecta scroll al final */}
-                        {!searchTerm && hasMore && (
-                            <div
-                                ref={sentinelRef}
-                                className="h-10 mt-12 flex items-center justify-center"
-                                role="status"
-                                aria-live="polite"
-                                aria-label="Cargando más productos"
-                            >
-                                {loading && (
-                                    <div className="flex items-center gap-2">
-                                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-solid border-blue-600 border-r-transparent"></div>
-                                        <span className="text-sm text-gray-600">Cargando más productos...</span>
-                                    </div>
+                {/* GRID DE PRODUCTOS */}
+                {!loading || allProducts.length > 0 ? (
+                    <>
+                        {productosFiltrados.length > 0 ? (
+                            <section className="catalogo-grid" role="grid">
+                                {productosFiltrados.map(producto => (
+                                    <article key={producto._id} role="gridcell">
+                                        <TarjetaProducto producto={producto} />
+                                    </article>
+                                ))}
+                            </section>
+                        ) : (
+                            <div className="catalogo-empty">
+                                {searchTerm ? (
+                                    <p>No encontramos productos que coincidan con "<strong>{searchTerm}</strong>"</p>
+                                ) : (
+                                    <p>No hay productos disponibles en esta página</p>
                                 )}
                             </div>
                         )}
 
-                        {/* Mensaje cuando se termina el scroll */}
-                        {!hasMore && (
-                            <p className="mt-12 text-center text-gray-600 text-sm">
-                                ✓ Todos los productos han sido cargados
-                            </p>
+                        {/* CONTROLES DE PAGINACIÓN */}
+                        {totalPages > 1 && productosFiltrados.length > 0 && (
+                            <div className="catalogo-pagination">
+                                <button 
+                                    onClick={handlePrevPage}
+                                    disabled={currentPage === 1}
+                                    className="catalogo-pagination-button catalogo-pagination-prev"
+                                    aria-label="Ir a página anterior"
+                                >
+                                    ← Anterior
+                                </button>
+                                
+                                <div className="catalogo-page-indicator">
+                                    Página {currentPage} de {totalPages}
+                                </div>
+                                
+                                <button 
+                                    onClick={handleNextPage}
+                                    disabled={currentPage === totalPages}
+                                    className="catalogo-pagination-button catalogo-pagination-next"
+                                    aria-label="Ir a página siguiente"
+                                >
+                                    Siguiente →
+                                </button>
+                            </div>
+                        )}
+
+                        {/* INDICADOR DE FIN */}
+                        {!loading && currentPage === totalPages && productosFiltrados.length > 0 && (
+                            <div className="catalogo-end-message">
+                                <p>✓ Estás en la última página</p>
+                            </div>
                         )}
                     </>
-                ) : searchTerm ? (
-                    /* 4. No hay resultados de búsqueda */
-                    <div className="text-center py-12">
-                        <p className="text-gray-600 text-lg mb-2">
-                            No se encontraron productos con "{searchTerm}"
-                        </p>
-                        <button
-                            onClick={() => {
-                                setSearchTerm('');
-                                reset();
-                            }}
-                            className="text-blue-600 hover:text-blue-700 underline focus:ring-2 focus:ring-blue-500 rounded"
-                        >
-                            Limpiar búsqueda
-                        </button>
-                    </div>
-                ) : (
-                    /* 5. ÚLTIMO CASO: Si terminó de cargar, no hay error pero la lista está vacía */
-                    <div className="text-center py-12">
-                        <p className="text-gray-600 text-lg">No hay productos disponibles.</p>
-                    </div>
-                )}
-            </div>
-        </>
+                ) : null}
+            </main>
+        </div>
     );
 };
 
