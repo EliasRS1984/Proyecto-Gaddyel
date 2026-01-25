@@ -45,8 +45,10 @@ export const useInfiniteScroll = (url, config = {}) => {
     const isLoadingRef = useRef(false);
     const observerRef = useRef(null);
     const failedAttemptsRef = useRef(0); // Contador de intentos fallidos
+    const configRef = useRef(config); // Mantener referencia estable de config
+    const urlRef = useRef(url); // Mantener referencia estable de url
 
-    // ✅ HELPER: Fetch datos de una página específica
+    // ✅ HELPER: Fetch datos de una página específica (SIN dependencias de config/url)
     const fetchPage = useCallback(async (pageNum) => {
         // Evitar requests duplicados
         if (isLoadingRef.current) return;
@@ -55,20 +57,22 @@ export const useInfiniteScroll = (url, config = {}) => {
             isLoadingRef.current = true;
             setLoading(true);
 
-            // Construir URL con parámetros
+            // Construir URL con parámetros (usar refs para evitar re-crear función)
             const params = new URLSearchParams({
-                ...(config.params || {}),
+                ...(configRef.current.params || {}),
                 page: pageNum,
-                limit: config.limit || 12
+                limit: configRef.current.limit || 12
             });
 
-            const fullUrl = `${getFullUrl(url)}?${params.toString()}`;
+            const fullUrl = `${getFullUrl(urlRef.current)}?${params.toString()}`;
+            
+            console.log(`🌐 GET ${fullUrl}`);
             
             const response = await fetch(fullUrl, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    ...(config.headers || {})
+                    ...(configRef.current.headers || {})
                 }
             });
 
@@ -94,9 +98,6 @@ export const useInfiniteScroll = (url, config = {}) => {
             setTotalPages(totalPagesFromAPI);
             
             // CORREGIR: hasMore debe ser true si aún hay más páginas por cargar
-            // Si currentPage (1-indexed) < totalPages, significa hay más páginas
-            // EJEMPLO: si totalPages=5, podemos cargar páginas 1,2,3,4,5
-            // cuando currentPage=5, no hay más (5 no es < 5)
             const morePages = pageNum < totalPagesFromAPI;
             setHasMore(morePages);
             
@@ -120,7 +121,7 @@ export const useInfiniteScroll = (url, config = {}) => {
             setLoading(false);
             isLoadingRef.current = false;
         }
-    }, [url, config]);
+    }, []); // SIN dependencias - usar refs en su lugar
 
     // ✅ SETUP: Intersection Observer para detectar scroll al final
     useEffect(() => {
@@ -175,7 +176,19 @@ export const useInfiniteScroll = (url, config = {}) => {
         };
     }, [hasMore]);
 
-    // ✅ TRIGGER: Cargar nueva página cuando currentPage cambia
+    // ✅ EFFECT: Actualizar refs cuando config/url cambian
+    useEffect(() => {
+        configRef.current = config;
+        urlRef.current = url;
+    }, [url, config]);
+
+    // ✅ EFFECT: Cargar primera página al montar
+    useEffect(() => {
+        console.log('🚀 Hook montado, cargando página 1...');
+        setCurrentPage(1);
+    }, []);
+
+    // ✅ EFFECT: Cargar página cuando currentPage cambia
     useEffect(() => {
         console.log(`📤 Fetcheando página ${currentPage}...`);
         fetchPage(currentPage);
