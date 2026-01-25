@@ -44,20 +44,30 @@ export const useInfiniteScroll = (url, config = {}) => {
             isLoadingRef.current = true;
             setLoading(true);
 
-            // Importar dinámicamente para evitar circular dependency
-            const api = (await import('../api/axios')).default;
+            // Construir URL con parámetros
+            const params = new URLSearchParams({
+                ...(config.params || {}),
+                page: pageNum,
+                limit: config.limit || 12
+            });
 
-            const response = await api.get(url, {
-                ...config,
-                params: {
-                    ...(config.params || {}),
-                    page: pageNum,
-                    limit: config.limit || 12
+            const fullUrl = `${url}?${params.toString()}`;
+            
+            const response = await fetch(fullUrl, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(config.headers || {})
                 }
             });
 
-            const newData = response.data?.data || [];
-            const pagination = response.data?.pagination || {};
+            if (!response.ok) {
+                throw new Error(`API error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            const newData = data?.data || [];
+            const pagination = data?.pagination || {};
 
             // Agregar nuevos items a la lista existente (NO reemplazar)
             if (pageNum === 1) {
