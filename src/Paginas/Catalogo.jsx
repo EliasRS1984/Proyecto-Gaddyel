@@ -160,30 +160,32 @@ const Catalogo = () => {
                 />
             </Helmet>
 
-            <main className="catalogo-main">
+            <main className="container mx-auto px-4 py-8 md:px-8">
                 {/* ENCABEZADO Y BÚSQUEDA */}
-                <section className="catalogo-header">
-                    <h1 className="catalogo-title">Catálogo de Productos</h1>
+                <section className="mb-8">
+                    <h1 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900">
+                        Catálogo de Productos
+                    </h1>
                     
                     <input
                         type="text"
                         placeholder="Buscar productos..."
                         value={searchTerm}
                         onChange={handleSearchChange}
-                        className="catalogo-search-input"
+                        className="w-full md:w-96 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
                         aria-label="Buscar productos por nombre o descripción"
                     />
                 </section>
 
                 {/* INFORMACIÓN DE PAGINACIÓN Y RESULTADOS */}
                 {!loading && allProducts.length > 0 && (
-                    <div className="catalogo-info">
-                        <p className="catalogo-results">
-                            <strong>{totalProducts}</strong> producto{totalProducts !== 1 ? 's' : ''} total
+                    <div className="mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+                        <p className="text-gray-700">
+                            <strong className="text-lg">{totalProducts}</strong> producto{totalProducts !== 1 ? 's' : ''} total
                             {searchTerm && ` • ${productosFiltrados.length} coinciden con tu búsqueda`}
                         </p>
                         {totalPages > 1 && (
-                            <p className="catalogo-pagination-info">
+                            <p className="text-gray-600">
                                 Página <strong>{currentPage}</strong> de <strong>{totalPages}</strong>
                             </p>
                         )}
@@ -192,29 +194,35 @@ const Catalogo = () => {
 
                 {/* ESTADO DE CARGA INICIAL */}
                 {loading && allProducts.length === 0 && (
-                    <div className="catalogo-loading" role="status" aria-live="polite">
-                        <p>Cargando catálogo...</p>
+                    <div className="flex justify-center items-center min-h-96" role="status" aria-live="polite">
+                        <div className="text-center">
+                            <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600 mb-4"></div>
+                            <p className="text-gray-600 text-lg">Cargando catálogo...</p>
+                        </div>
                     </div>
                 )}
 
                 {/* ESTADO DE ERROR */}
                 {error && (
-                    <div className="catalogo-error" role="alert" aria-live="assertive">
-                        <p><strong>Error:</strong> {error}</p>
+                    <div className="mb-6 p-6 bg-red-50 border-l-4 border-red-500 rounded-lg" role="alert" aria-live="assertive">
+                        <p className="text-red-800 font-semibold mb-4"><strong>Error:</strong> {error}</p>
                         <button 
                             onClick={() => window.location.reload()}
-                            className="catalogo-retry-button"
+                            className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                         >
                             Reintentar
                         </button>
                     </div>
                 )}
 
-                {/* GRID DE PRODUCTOS */}
+                {/* GRID DE PRODUCTOS - 4 COLUMNAS POR FILA */}
                 {!loading || allProducts.length > 0 ? (
                     <>
                         {productosFiltrados.length > 0 ? (
-                            <section className="catalogo-grid" role="grid">
+                            <section 
+                                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8" 
+                                role="grid"
+                            >
                                 {productosFiltrados.map(producto => (
                                     <article key={producto._id} role="gridcell">
                                         <TarjetaProducto producto={producto} />
@@ -222,35 +230,39 @@ const Catalogo = () => {
                                 ))}
                             </section>
                         ) : (
-                            <div className="catalogo-empty">
+                            <div className="text-center py-16">
                                 {searchTerm ? (
-                                    <p>No encontramos productos que coincidan con "<strong>{searchTerm}</strong>"</p>
+                                    <p className="text-gray-600 text-lg">
+                                        No encontramos productos que coincidan con "<strong>{searchTerm}</strong>"
+                                    </p>
                                 ) : (
-                                    <p>No hay productos disponibles en esta página</p>
+                                    <p className="text-gray-600 text-lg">No hay productos disponibles en esta página</p>
                                 )}
                             </div>
                         )}
 
                         {/* CONTROLES DE PAGINACIÓN */}
                         {totalPages > 1 && productosFiltrados.length > 0 && (
-                            <div className="catalogo-pagination">
+                            <div className="flex items-center justify-center gap-4 py-8 border-t border-gray-200">
                                 <button 
                                     onClick={handlePrevPage}
                                     disabled={currentPage === 1}
-                                    className="catalogo-pagination-button catalogo-pagination-prev"
+                                    className="px-6 py-2 border-2 border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                     aria-label="Ir a página anterior"
                                 >
                                     ← Anterior
                                 </button>
                                 
-                                <div className="catalogo-page-indicator">
-                                    Página {currentPage} de {totalPages}
+                                <div className="px-6 py-2 bg-blue-50 rounded-lg border border-blue-200">
+                                    <span className="text-gray-700 font-semibold">
+                                        Página {currentPage} de {totalPages}
+                                    </span>
                                 </div>
                                 
                                 <button 
                                     onClick={handleNextPage}
                                     disabled={currentPage === totalPages}
-                                    className="catalogo-pagination-button catalogo-pagination-next"
+                                    className="px-6 py-2 border-2 border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                     aria-label="Ir a página siguiente"
                                 >
                                     Siguiente →
@@ -260,7 +272,7 @@ const Catalogo = () => {
 
                         {/* INDICADOR DE FIN */}
                         {!loading && currentPage === totalPages && productosFiltrados.length > 0 && (
-                            <div className="catalogo-end-message">
+                            <div className="text-center py-8 text-gray-500">
                                 <p>✓ Estás en la última página</p>
                             </div>
                         )}
