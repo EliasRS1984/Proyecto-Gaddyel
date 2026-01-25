@@ -1,134 +1,107 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
 import TarjetaProducto from '../Componentes/TarjetaProducto/TarjetaProducto.jsx';
-import useFetchWithCache from '../hooks/useFetchWithCache';
+import useInfiniteScroll from '../hooks/useInfiniteScroll';
 
 /**
- * FLUJO DE DATOS - Página Catálogo
+ * FLUJO DE DATOS - Página Catálogo (Infinite Scroll)
  * 
  * 1. Usuario entra a /catalogo
- * 2. Componente monta → useFetchWithCache() hook
+ * 2. Componente monta → useInfiniteScroll() hook
  * 3. Hook: GET /api/productos?page=1&limit=12 → Backend
- * 4. Backend retorna: { data: [...productos], pagination: { page, pages, total } }
- * 5. Hook: setData(resultado) + Guarda en caché (5 min)
- * 6. Componente re-renderea con datos
- * 7. TarjetaProducto mapea y renderea cada producto
- * 8. Usuario ve: Grid de productos con paginación
+ * 4. Backend retorna: { data: [...12 productos], pagination: { pages, total } }
+ * 5. Hook: setItems(12 productos)
+ * 6. Componente renderea grid con 12 productos
+ * 7. Usuario scrollea hacia abajo
+ * 8. Intersection Observer detecta scroll al final
+ * 9. Hook carga página 2 automáticamente: GET /api/productos?page=2&limit=12
+ * 10. Nuevos 12 productos se AGREGAN a lista (no reemplazan)
+ * 11. Usuario ve continuidad sin saltos
  * 
  * INTERACCIÓN DEL USUARIO:
- * - Click siguiente/anterior → updatePage → Scroll al tope
- * - Click número página → setCurrentPage → Re-fetch datos
- * - Búsqueda por nombre → updateSearchTerm → Filtro local
+ * - Scroll natural hacia abajo → Carga automática de más productos
+ * - Búsqueda por nombre → Reset de infinite scroll, filtra localmente
+ * - No hay botones de página (UX más limpia)
  * 
- * Cada cambio de página → Nuevo GET /api/productos?page=X → Re-fetch datos
+ * DIFERENCIA vs PAGINACIÓN ANTERIOR:
+ * ✅ Nuevo: Scroll continuo, carga automática
+ * ✅ Nuevo: Mejora UX (scroll natural en mobile)
+ * ✅ Nuevo: No hay clics en números de página
+ * ❌ Removido: Paginación manual (números de página)
  * 
  * RENDIMIENTO:
- * - useFetchWithCache con caché de 5 minutos
+ * - useInfiniteScroll con Intersection Observer (no scroll events)
  * - React.memo(TarjetaProducto) = evita re-render si props iguales
  * - Lazy loading de imágenes en TarjetaProducto
- * - keepPreviousData = true (muestra datos anteriores mientras carga)
+ * - Debouncing automático (evita múltiples requests simultáneos)
  * 
  * SEO:
  * - react-helmet-async actualiza <title> y <meta>
- * - Canonical URL para evitar contenido duplicado
- * - HTML5 semántico: <article>, <nav>, role="grid"
+ * - Canonical URL única (no por página, ya que es scroll continuo)
+ * - HTML5 semántico: <article>, <main>, role="grid"
  * - Open Graph para redes sociales
  */
 const Catalogo = () => {
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(12);
     const [searchTerm, setSearchTerm] = useState('');
-    const catalogoRef = useRef(null);
+    const [itemsPerPage] = useState(12);
 
-    // ✅ FLUJO: Usar custom hook con caché (5 minutos)
-    // ¿Por qué keepPreviousData? Muestra productos anteriores mientras carga nuevos (mejor UX)
-    const { data: resultado, loading, error, refetch } = useFetchWithCache(
+    // ✅ FLUJO: Usar custom hook infinite scroll
+    // El hook gestiona automáticamente:
+    // - Carga de páginas
+    // - Detección de scroll
+    // - Agregación de items
+    const { 
+        items: todosLosProductos, 
+        loading, 
+        error, 
+        hasMore, 
+        refetch,
+        sentinelRef,
+        reset
+    } = useInfiniteScroll(
         '/productos',
         {
+            limit: itemsPerPage,
             params: {
-                page: currentPage,
-                limit: itemsPerPage,
                 sortBy: 'createdAt',
                 sortDir: -1
-            },
-            cacheDuration: 5 * 60 * 1000, // 5 minutos
-            keepPreviousData: true // Mantener datos previos mientras carga
+            }
         }
     );
 
-    const productos = resultado?.data || [];
-    const pagination = resultado?.pagination || {};
-
     // ✅ PERFORMANCE: Filtro local de búsqueda (evita re-fetch por cada letra)
-    // Si hay muchos productos (>1000), migrar a búsqueda en backend
-    const productosFiltrados = searchTerm
-        ? productos.filter(p =>
+    // Si hay muchos productos (>5000), migrar a búsqueda en backend
+    const productosFiltrados = useMemo(() => {
+        if (!searchTerm) return todosLosProductos;
+        
+        return todosLosProductos.filter(p =>
             p.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             p.descripcion?.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-        : productos;
+        );
+    }, [todosLosProductos, searchTerm]);
 
-    // ✅ UX: Scroll al tope al cambiar página
-    // ¿Por qué? Usuario debe ver inicio de resultados nuevos
-    useEffect(() => {
-        if (catalogoRef.current && currentPage > 1) {
-            catalogoRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // ✅ UX: Cuando cambia búsqueda, resetear infinite scroll
+    const handleSearchChange = (e) => {
+        const newTerm = e.target.value;
+        setSearchTerm(newTerm);
+        
+        // Si es búsqueda, resetear (sin búsqueda, no resetear para mantener scroll)
+        if (newTerm && !searchTerm) {
+            reset();
         }
-    }, [currentPage]);
-
-    // ✅ HELPER: Cambiar página con validación
-    const handlePageChange = (newPage) => {
-        if (newPage >= 1 && newPage <= pagination.pages) {
-            setCurrentPage(newPage);
-        }
-    };
-
-    // ✅ HELPER: Generar array de números de página
-    // Muestra: [1] ... [4] [5] [6] ... [10]
-    const getPageNumbers = () => {
-        const pages = [];
-        const totalPages = pagination.pages || 1;
-        const currentPageNum = currentPage;
-
-        if (totalPages <= 7) {
-            // Mostrar todas las páginas si son pocas
-            for (let i = 1; i <= totalPages; i++) {
-                pages.push(i);
-            }
-        } else {
-            // Mostrar: primera, últimas 2 de cada lado, y última
-            pages.push(1);
-
-            if (currentPageNum > 3) {
-                pages.push('...');
-            }
-
-            for (let i = Math.max(2, currentPageNum - 1); i <= Math.min(totalPages - 1, currentPageNum + 1); i++) {
-                pages.push(i);
-            }
-
-            if (currentPageNum < totalPages - 2) {
-                pages.push('...');
-            }
-
-            if (totalPages > 1) {
-                pages.push(totalPages);
-            }
-        }
-
-        return pages;
     };
 
     return (
         <>
-            {/* SEO: Metadatos optimizados con canonical y Open Graph */}
+            {/* SEO: Metadatos optimizados - Canonical única (no por página) */}
             <Helmet>
-                <title>{`Catálogo de Productos Artesanales - Gaddyel | Página ${currentPage}`}</title>
+                <title>Catálogo de Productos Artesanales - Gaddyel</title>
                 <meta 
                     name="description" 
-                    content={`Explora nuestro catálogo completo de productos artesanales personalizables. ${pagination.total || ''} productos únicos. Página ${currentPage} de ${pagination.pages || 1}.`} 
+                    content="Explora nuestro catálogo completo de productos artesanales personalizables. Cientos de productos únicos con scroll continuo." 
                 />
-                <link rel="canonical" href={`${window.location.origin}/catalogo?page=${currentPage}`} />
+                {/* Canonical única (sin ?page=X ya que es infinite scroll) */}
+                <link rel="canonical" href={`${window.location.origin}/catalogo`} />
                 
                 {/* Open Graph */}
                 <meta property="og:title" content="Catálogo de Productos Artesanales - Gaddyel" />
@@ -142,21 +115,22 @@ const Catalogo = () => {
                 <meta name="twitter:description" content="Explora nuestro catálogo completo de productos artesanales." />
             </Helmet>
 
-            <div ref={catalogoRef} className="container mx-auto p-4 md:p-8">
+            <div className="container mx-auto p-4 md:p-8">
                 {/* HEADER: Título y contador */}
                 <header className="mb-8">
                     <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
                         Catálogo de Productos
                     </h1>
-                    {pagination.total > 0 && (
+                    {todosLosProductos.length > 0 && (
                         <p className="text-gray-600">
-                            Mostrando {productos.length} de {pagination.total} productos
+                            Mostrando {todosLosProductos.length} productos{' '}
+                            {!hasMore && '(Todos cargados)'}
                         </p>
                     )}
                 </header>
 
                 {/* BÚSQUEDA LOCAL: Filtro rápido sin re-fetch */}
-                {productos.length > 0 && (
+                {todosLosProductos.length > 0 && (
                     <div className="mb-6">
                         <label htmlFor="search-input" className="sr-only">
                             Buscar productos
@@ -166,7 +140,7 @@ const Catalogo = () => {
                             type="text"
                             placeholder="Buscar productos..."
                             value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onChange={handleSearchChange}
                             className="w-full md:w-96 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             aria-label="Campo de búsqueda de productos"
                         />
@@ -179,7 +153,7 @@ const Catalogo = () => {
                 )}
 
                 {/* 1. PRIORIDAD MÁXIMA: Si está cargando por primera vez (sin datos previos) */}
-                {loading && productos.length === 0 ? (
+                {loading && todosLosProductos.length === 0 ? (
                     <div className="flex justify-center items-center min-h-[400px]" role="status" aria-live="polite">
                         <div className="text-center">
                             <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent mb-4"></div>
@@ -206,13 +180,6 @@ const Catalogo = () => {
                 ) : productosFiltrados.length > 0 ? (
                     /* 3. TERCERA PRIORIDAD: Si hay productos para mostrar */
                     <>
-                        {/* Indicador de carga entre páginas */}
-                        {loading && productos.length > 0 && (
-                            <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-700 text-center">
-                                <span className="inline-block animate-pulse">Cargando nueva página...</span>
-                            </div>
-                        )}
-
                         <div
                             className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
                             role="grid"
@@ -225,71 +192,28 @@ const Catalogo = () => {
                             ))}
                         </div>
 
-                        {/* PAGINACIÓN COMPLETA */}
-                        {pagination.pages > 1 && !searchTerm && (
-                            <nav 
-                                className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-3" 
-                                aria-label="Paginación del catálogo"
-                                role="navigation"
+                        {/* SENTINEL: Elemento invisible que detecta scroll al final */}
+                        {!searchTerm && hasMore && (
+                            <div
+                                ref={sentinelRef}
+                                className="h-10 mt-12 flex items-center justify-center"
+                                role="status"
+                                aria-live="polite"
+                                aria-label="Cargando más productos"
                             >
-                                {/* Botón Anterior */}
-                                <button
-                                    onClick={() => handlePageChange(currentPage - 1)}
-                                    disabled={currentPage === 1}
-                                    className="px-5 py-2.5 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all"
-                                    aria-label="Ir a página anterior"
-                                    aria-disabled={currentPage === 1}
-                                >
-                                    ← Anterior
-                                </button>
-
-                                {/* Números de página */}
-                                <div className="flex gap-2 flex-wrap justify-center">
-                                    {getPageNumbers().map((pageNum, idx) => (
-                                        pageNum === '...' ? (
-                                            <span 
-                                                key={`ellipsis-${idx}`} 
-                                                className="px-3 py-2 text-gray-500"
-                                                aria-hidden="true"
-                                            >
-                                                ...
-                                            </span>
-                                        ) : (
-                                            <button
-                                                key={pageNum}
-                                                onClick={() => handlePageChange(pageNum)}
-                                                disabled={currentPage === pageNum}
-                                                className={`px-4 py-2 rounded-lg font-medium transition-all focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                                                    currentPage === pageNum
-                                                        ? 'bg-blue-600 text-white cursor-default'
-                                                        : 'bg-white border border-gray-300 hover:bg-gray-50 text-gray-700'
-                                                }`}
-                                                aria-label={`Ir a página ${pageNum}`}
-                                                aria-current={currentPage === pageNum ? 'page' : undefined}
-                                            >
-                                                {pageNum}
-                                            </button>
-                                        )
-                                    ))}
-                                </div>
-
-                                {/* Botón Siguiente */}
-                                <button
-                                    onClick={() => handlePageChange(currentPage + 1)}
-                                    disabled={currentPage === pagination.pages}
-                                    className="px-5 py-2.5 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all"
-                                    aria-label="Ir a página siguiente"
-                                    aria-disabled={currentPage === pagination.pages}
-                                >
-                                    Siguiente →
-                                </button>
-                            </nav>
+                                {loading && (
+                                    <div className="flex items-center gap-2">
+                                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-solid border-blue-600 border-r-transparent"></div>
+                                        <span className="text-sm text-gray-600">Cargando más productos...</span>
+                                    </div>
+                                )}
+                            </div>
                         )}
 
-                        {/* Info de página actual */}
-                        {pagination.pages > 1 && !searchTerm && (
-                            <p className="mt-4 text-center text-sm text-gray-600">
-                                Página {currentPage} de {pagination.pages}
+                        {/* Mensaje cuando se termina el scroll */}
+                        {!hasMore && (
+                            <p className="mt-12 text-center text-gray-600 text-sm">
+                                ✓ Todos los productos han sido cargados
                             </p>
                         )}
                     </>
@@ -300,7 +224,10 @@ const Catalogo = () => {
                             No se encontraron productos con "{searchTerm}"
                         </p>
                         <button
-                            onClick={() => setSearchTerm('')}
+                            onClick={() => {
+                                setSearchTerm('');
+                                reset();
+                            }}
                             className="text-blue-600 hover:text-blue-700 underline focus:ring-2 focus:ring-blue-500 rounded"
                         >
                             Limpiar búsqueda
