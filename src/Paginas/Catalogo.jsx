@@ -273,7 +273,7 @@ const Catalogo = () => {
                         {/* INDICADOR DE FIN */}
                         {!loading && currentPage === totalPages && productosFiltrados.length > 0 && (
                             <div className="text-center py-8 text-gray-500">
-                                <p>✓ Estás en la última página</p>
+                                <p>¡Fin de catálogo!</p>
                             </div>
                         )}
                     </>

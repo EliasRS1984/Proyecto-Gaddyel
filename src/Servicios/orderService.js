@@ -28,8 +28,9 @@ const normalizeCheckoutData = (checkoutData, cartItems) => {
   
   return {
     items: cartItems.map(item => ({
-      productoId: item._id,        // Backend espera productoId
-      cantidad: item.cantidad,     // cantidad
+      // ✅ Normalizar ID para evitar undefined si viene como id/ID
+      productoId: String(item._id || item.id || item.productoId),
+      cantidad: item.cantidad,
     })),
     
     cliente: {
