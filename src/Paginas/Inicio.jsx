@@ -184,29 +184,24 @@ const Inicio = () => {
         <>
             {/* SEO 2026: Metadatos optimizados para máxima indexación y CTR */}
             <Helmet>
-                <title>Gaddyel - Blancos Personalizados | Bordado, Serigrafía | Envíos Argentina</title>
+                <title>Gaddyel - Blanquería Premium para Spa | Elevamos el ADN de tu Centro de Estética</title>
                 <meta
                     name="description"
-                    content="🔥 Personalización de blancos profesional: camisetas, toallas, gorras, remeras. Bordado y serigrafía de alta calidad. ✅ Envíos a todo el país ✅ Presupuesto sin cargo."
+                    content="🌟 Blanquería personalizada de lujo para spas y centros de estética. Toallas, batas de satén, vinchas con tu logo. Generamos marketing pasivo con productos instagrameables. ✅ Calidad premium ✅ Virrey del Pino, Buenos Aires"
                 />
                 <meta
                     name="keywords"
-                    content="gaddyel, blancos personalizados, camisetas bordadas, toallas personalizadas, gorras serigrafiadas, remeras estampadas, uniformes, merchandising empresarial, regalos corporativos, bordado textil, serigrafía, argentina, buenos aires"
+                    content="gaddyel, blanquería spa, blanquería estética, toallas personalizadas spa, batas satén beauty, vinchas faciales, pads limpieza, kit limpieza facial, textiles spa personalizados, blanquería centros estética, marketing pasivo spa, productos instagrameables, blanquería premium argentina, virrey del pino"
                 />
-                <link rel="canonical" href="https://proyecto-gaddyel.vercel.app/" />
+                <link rel="canonical" href="https://gaddyel.vercel.app/" />
 
-                {/* Open Graph para Facebook/WhatsApp */}
+                {/* Open Graph para Facebook/WhatsApp/Instagram */}
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://proyecto-gaddyel.vercel.app/" />
-                <meta property="og:title" content="Gaddyel - Blancos Personalizados | Bordado y Serigrafía" />
-                <meta property="og:description" content="Especialistas en personalización de camisetas, toallas y gorras. Calidad premium, envíos a todo el país." />
+                <meta property="og:url" content="https://gaddyel.vercel.app/" />
+                <meta property="og:title" content="Gaddyel - Blanquería Premium para Spa y Estética" />
+                <meta property="og:description" content="Elevamos el ADN de tu centro de estética. Toallas, batas y vinchas personalizadas que generan marketing pasivo. Calidad premium." />
                 <meta property="og:site_name" content="Gaddyel" />
                 <meta property="og:locale" content="es_AR" />
-
-                {/* Twitter Cards */}
-                <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:title" content="Gaddyel - Blancos Personalizados" />
-                <meta name="twitter:description" content="Personalización profesional de textiles: bordado y serigrafía de alta calidad." />
 
                 {/* Schema.org JSON-LD - LocalBusiness + Organization */}
                 <script type="application/ld+json">
@@ -215,35 +210,46 @@ const Inicio = () => {
                         '@graph': [
                             {
                                 '@type': 'Organization',
-                                '@id': 'https://proyecto-gaddyel.vercel.app/#organization',
+                                '@id': 'https://gaddyel.vercel.app/#organization',
                                 name: 'Gaddyel',
-                                url: 'https://proyecto-gaddyel.vercel.app/',
+                                url: 'https://gaddyel.vercel.app/',
                                 logo: {
                                     '@type': 'ImageObject',
                                     url: LogoGaddyel
                                 },
-                                description: 'Especialistas en personalización de blancos: camisetas, toallas, gorras con bordado y serigrafía profesional',
+                                description: 'Gaddyel: Elevando el ADN de tu Centro de Estética. Blanquería personalizada premium para spas y centros de estética. Aliados estratégicos en la construcción de tu imagen profesional.',
                                 areaServed: {
                                     '@type': 'Country',
                                     name: 'Argentina'
                                 },
-                                sameAs: []
+                                sameAs: [
+                                    'https://www.instagram.com/gaddyel.oficial/',
+                                    'https://www.facebook.com/gaddyel.gaddyel.184/'
+                                ]
                             },
                             {
                                 '@type': 'LocalBusiness',
-                                '@id': 'https://proyecto-gaddyel.vercel.app/#localbusiness',
-                                name: 'Gaddyel - Blancos Personalizados',
-                                description: 'Personalización de textiles con bordado y serigrafía. Camisetas, toallas, gorras, remeras y uniformes empresariales.',
-                                url: 'https://proyecto-gaddyel.vercel.app/',
-                                priceRange: '$$',
+                                '@id': 'https://gaddyel.vercel.app/#localbusiness',
+                                name: 'Gaddyel - Blanquería Premium para Spa y Estética',
+                                description: 'Blanquería personalizada de lujo: toallas, batas de satén, vinchas faciales, pads y kits de limpieza. Productos premium que generan marketing pasivo para tu centro de estética o spa.',
+                                url: 'https://gaddyel.vercel.app/',
+                                priceRange: '$$-$$$',
                                 areaServed: 'Argentina',
+                                address: {
+                                    '@type': 'PostalAddress',
+                                    addressLocality: 'Virrey del Pino',
+                                    addressRegion: 'Buenos Aires',
+                                    addressCountry: 'AR'
+                                },
+                                email: 'gaddyel.gaddyel@gmail.com',
+                                telephone: '+54-9-11-5509-8426',
                                 hasOfferCatalog: {
                                     '@type': 'OfferCatalog',
                                     name: 'Catálogo de Blancos Personalizados',
                                     itemListElement: productosDestacados.slice(0, 5).map((producto, idx) => ({
                                         '@type': 'Offer',
                                         position: idx + 1,
-                                        url: `https://proyecto-gaddyel.vercel.app/catalogo/${producto._id}`,
+                                        url: `https://gaddyel.vercel.app/catalogo/${producto._id}`,
                                         priceCurrency: 'ARS',
                                         availability: 'https://schema.org/InStock',
                                         itemOffered: {
@@ -261,18 +267,18 @@ const Inicio = () => {
                             },
                             {
                                 '@type': 'WebSite',
-                                '@id': 'https://proyecto-gaddyel.vercel.app/#website',
-                                url: 'https://proyecto-gaddyel.vercel.app/',
+                                '@id': 'https://gaddyel.vercel.app/#website',
+                                url: 'https://gaddyel.vercel.app/',
                                 name: 'Gaddyel',
-                                description: 'Blancos personalizados con bordado y serigrafía',
+                                description: 'Blanquería personalizada premium para spa y centros de estética',
                                 publisher: {
-                                    '@id': 'https://proyecto-gaddyel.vercel.app/#organization'
+                                    '@id': 'https://gaddyel.vercel.app/#organization'
                                 },
                                 potentialAction: {
                                     '@type': 'SearchAction',
                                     target: {
                                         '@type': 'EntryPoint',
-                                        urlTemplate: 'https://proyecto-gaddyel.vercel.app/catalogo?buscar={search_term_string}'
+                                        urlTemplate: 'https://gaddyel.vercel.app/catalogo?buscar={search_term_string}'
                                     },
                                     'query-input': 'required name=search_term_string'
                                 }

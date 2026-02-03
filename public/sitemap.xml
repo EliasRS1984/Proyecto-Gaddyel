@@ -7,7 +7,7 @@
     
     <!-- Página principal -->
     <url>
-        <loc>https://proyecto-gaddyel.vercel.app/</loc>
+        <loc>https://gaddyel.vercel.app/</loc>
         <lastmod>2026-02-03</lastmod>
         <changefreq>daily</changefreq>
         <priority>1.0</priority>
@@ -15,7 +15,7 @@
     
     <!-- Catálogo de productos (alta prioridad) -->
     <url>
-        <loc>https://proyecto-gaddyel.vercel.app/catalogo</loc>
+        <loc>https://gaddyel.vercel.app/catalogo</loc>
         <lastmod>2026-02-03</lastmod>
         <changefreq>daily</changefreq>
         <priority>0.9</priority>
@@ -23,7 +23,7 @@
     
     <!-- Sobre Gaddyel -->
     <url>
-        <loc>https://proyecto-gaddyel.vercel.app/sobre-gaddyel</loc>
+        <loc>https://gaddyel.vercel.app/sobre-gaddyel</loc>
         <lastmod>2026-02-03</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
@@ -31,7 +31,7 @@
     
     <!-- Nuestro Proceso -->
     <url>
-        <loc>https://proyecto-gaddyel.vercel.app/nuestro-proceso</loc>
+        <loc>https://gaddyel.vercel.app/nuestro-proceso</loc>
         <lastmod>2026-02-03</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
@@ -39,7 +39,7 @@
     
     <!-- Contacto -->
     <url>
-        <loc>https://proyecto-gaddyel.vercel.app/contacto</loc>
+        <loc>https://gaddyel.vercel.app/contacto</loc>
         <lastmod>2026-02-03</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
@@ -47,7 +47,7 @@
     
     <!-- Términos de Servicio -->
     <url>
-        <loc>https://proyecto-gaddyel.vercel.app/terminos-servicio</loc>
+        <loc>https://gaddyel.vercel.app/terminos-servicio</loc>
         <lastmod>2026-02-03</lastmod>
         <changefreq>yearly</changefreq>
         <priority>0.3</priority>
@@ -55,7 +55,7 @@
     
     <!-- Política de Privacidad -->
     <url>
-        <loc>https://proyecto-gaddyel.vercel.app/politica-privacidad</loc>
+        <loc>https://gaddyel.vercel.app/politica-privacidad</loc>
         <lastmod>2026-02-03</lastmod>
         <changefreq>yearly</changefreq>
         <priority>0.3</priority>

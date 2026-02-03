@@ -12,7 +12,7 @@ Disallow: /pedido-fallido
 Disallow: /admin
 
 # Sitemap para ayudar a los buscadores
-Sitemap: https://proyecto-gaddyel.vercel.app/sitemap.xml
+Sitemap: https://gaddyel.vercel.app/sitemap.xml
 
 # Crawl-delay para evitar sobrecarga del servidor
 Crawl-delay: 1

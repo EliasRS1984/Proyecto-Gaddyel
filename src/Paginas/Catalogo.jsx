@@ -140,41 +140,41 @@ const Catalogo = () => {
     return (
         <div className="catalogo-container">
             <Helmet>
-                <title>{currentPage > 1 ? `Página ${currentPage} - ` : ''}Catálogo de Blancos Personalizados | Gaddyel</title>
+                <title>{currentPage > 1 ? `Página ${currentPage} - ` : ''}Catálogo Blanquería Premium para Spa | Gaddyel</title>
                 <meta
                     name="description"
-                    content={`Explorá nuestro catálogo completo de blancos personalizados: camisetas, toallas, gorras, remeras con bordado y serigrafía. Calidad premium, envíos a todo Argentina${currentPage > 1 ? ` - Página ${currentPage}` : ''}.`}
+                    content={`Explorá nuestro catálogo de blanquería premium para spa y estética: toallas personalizadas, batas de satén, vinchas faciales, pads de limpieza. Productos que elevan el ADN de tu centro${currentPage > 1 ? ` - Página ${currentPage}` : ''}.`}
                 />
                 <meta
                     name="keywords"
-                    content="catálogo blancos, comprar camisetas personalizadas, toallas bordadas precio, gorras serigrafiadas, remeras estampadas, uniformes empresariales, merchandising, gaddyel"
+                    content="catálogo blanquería spa, comprar toallas personalizadas, batas satén precio, vinchas faciales, kit limpieza facial, textiles spa, blanquería estética, gaddyel"
                 />
                 <meta
                     property="og:title"
-                    content={`Catálogo de Blancos Personalizados | Gaddyel${currentPage > 1 ? ` - Página ${currentPage}` : ''}`}
+                    content={`Catálogo Blanquería Premium Spa | Gaddyel${currentPage > 1 ? ` - Página ${currentPage}` : ''}`}
                 />
                 <meta
                     property="og:description"
-                    content="Camisetas, toallas, gorras y más productos personalizables con bordado y serigrafía de alta calidad."
+                    content="Toallas, batas de satén, vinchas y más productos personalizables para tu centro de estética o spa."
                 />
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content={`https://proyecto-gaddyel.vercel.app/catalogo${currentPage > 1 ? `?page=${currentPage}` : ''}`} />
+                <meta property="og:url" content={`https://gaddyel.vercel.app/catalogo${currentPage > 1 ? `?page=${currentPage}` : ''}`} />
                 <link 
                     rel="canonical" 
-                    href={`https://proyecto-gaddyel.vercel.app/catalogo${currentPage > 1 ? `?page=${currentPage}` : ''}`} 
+                    href={`https://gaddyel.vercel.app/catalogo${currentPage > 1 ? `?page=${currentPage}` : ''}`} 
                 />
                 
                 {/* Paginación SEO: Prev/Next para páginas múltiples */}
                 {currentPage > 1 && (
                     <link 
                         rel="prev" 
-                        href={`https://proyecto-gaddyel.vercel.app/catalogo${currentPage === 2 ? '' : `?page=${currentPage - 1}`}`} 
+                        href={`https://gaddyel.vercel.app/catalogo${currentPage === 2 ? '' : `?page=${currentPage - 1}`}`} 
                     />
                 )}
                 {currentPage < Math.ceil(totalProductos / productosPorPagina) && (
                     <link 
                         rel="next" 
-                        href={`https://proyecto-gaddyel.vercel.app/catalogo?page=${currentPage + 1}`} 
+                        href={`https://gaddyel.vercel.app/catalogo?page=${currentPage + 1}`} 
                     />
                 )}
 
@@ -183,13 +183,13 @@ const Catalogo = () => {
                     {JSON.stringify({
                         '@context': 'https://schema.org',
                         '@type': 'ItemList',
-                        name: 'Catálogo de Blancos Personalizados - Gaddyel',
-                        description: 'Productos personalizables: camisetas, toallas, gorras con bordado y serigrafía',
+                        name: 'Catálogo de Blanquería Premium para Spa - Gaddyel',
+                        description: 'Productos personalizables para centros de estética y spa: toallas, batas de satén, vinchas faciales, pads de limpieza',
                         numberOfItems: productosFiltrados.length,
                         itemListElement: productosFiltrados.slice(0, 10).map((producto, idx) => ({
                             '@type': 'ListItem',
                             position: (currentPage - 1) * productosPorPagina + idx + 1,
-                            url: `https://proyecto-gaddyel.vercel.app/catalogo/${producto._id}`,
+                            url: `https://gaddyel.vercel.app/catalogo/${producto._id}`,
                             item: {
                                 '@type': 'Product',
                                 name: producto.nombre,
