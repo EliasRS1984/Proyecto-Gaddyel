@@ -16,7 +16,7 @@ const PedidoConfirmado = React.lazy(() => import('./Paginas/PedidoConfirmado'));
 const PedidoPendiente = React.lazy(() => import('./Paginas/PedidoPendiente'));
 const PedidoFallido = React.lazy(() => import('./Paginas/PedidoFallido'));
 const Login = React.lazy(() => import('./Paginas/Login'));
-const Registro = React.lazy(() => import('./Paginas/Registro'));
+const Registro = React.lazy(() => import('./Paginas/RegistroNuevo'));
 const Perfil = React.lazy(() => import('./Paginas/Perfil'));
 const PoliticaPrivacidad = React.lazy(() => import('./Paginas/PoliticaPrivacidad'));
 const TerminosServicio = React.lazy(() => import('./Paginas/TerminosServicio'));
