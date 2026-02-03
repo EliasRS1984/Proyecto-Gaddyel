@@ -16,7 +16,7 @@
 
 @media (min-width: 1024px) {
     :root {
-        --ui-scale: 0.9; /* ~90% en desktop */
+        --ui-scale: 0.8; /* ~80% en desktop */
     }
 }
 

@@ -140,24 +140,74 @@ const Catalogo = () => {
     return (
         <div className="catalogo-container">
             <Helmet>
-                <title>Catálogo de Blancos Premium - Gaddyel</title>
+                <title>{currentPage > 1 ? `Página ${currentPage} - ` : ''}Catálogo de Blancos Personalizados | Gaddyel</title>
                 <meta
                     name="description"
-                    content="Descubre nuestro catálogo de blancos personalizados. Camisetas, toallas, gorras y más con bordado y serigrafia."
+                    content={`Explorá nuestro catálogo completo de blancos personalizados: camisetas, toallas, gorras, remeras con bordado y serigrafía. Calidad premium, envíos a todo Argentina${currentPage > 1 ? ` - Página ${currentPage}` : ''}.`}
+                />
+                <meta
+                    name="keywords"
+                    content="catálogo blancos, comprar camisetas personalizadas, toallas bordadas precio, gorras serigrafiadas, remeras estampadas, uniformes empresariales, merchandising, gaddyel"
                 />
                 <meta
                     property="og:title"
-                    content="Catálogo de Blancos Premium - Gaddyel"
+                    content={`Catálogo de Blancos Personalizados | Gaddyel${currentPage > 1 ? ` - Página ${currentPage}` : ''}`}
                 />
                 <meta
                     property="og:description"
-                    content="Productos de alta calidad personalizados según tus necesidades"
+                    content="Camisetas, toallas, gorras y más productos personalizables con bordado y serigrafía de alta calidad."
                 />
                 <meta property="og:type" content="website" />
+                <meta property="og:url" content={`https://proyecto-gaddyel.vercel.app/catalogo${currentPage > 1 ? `?page=${currentPage}` : ''}`} />
                 <link 
                     rel="canonical" 
-                    href={`https://gaddyel.com/catalogo${currentPage > 1 ? `?page=${currentPage}` : ''}`} 
+                    href={`https://proyecto-gaddyel.vercel.app/catalogo${currentPage > 1 ? `?page=${currentPage}` : ''}`} 
                 />
+                
+                {/* Paginación SEO: Prev/Next para páginas múltiples */}
+                {currentPage > 1 && (
+                    <link 
+                        rel="prev" 
+                        href={`https://proyecto-gaddyel.vercel.app/catalogo${currentPage === 2 ? '' : `?page=${currentPage - 1}`}`} 
+                    />
+                )}
+                {currentPage < Math.ceil(totalProductos / productosPorPagina) && (
+                    <link 
+                        rel="next" 
+                        href={`https://proyecto-gaddyel.vercel.app/catalogo?page=${currentPage + 1}`} 
+                    />
+                )}
+
+                {/* Schema.org - ItemList para catálogo de productos */}
+                <script type="application/ld+json">
+                    {JSON.stringify({
+                        '@context': 'https://schema.org',
+                        '@type': 'ItemList',
+                        name: 'Catálogo de Blancos Personalizados - Gaddyel',
+                        description: 'Productos personalizables: camisetas, toallas, gorras con bordado y serigrafía',
+                        numberOfItems: productosFiltrados.length,
+                        itemListElement: productosFiltrados.slice(0, 10).map((producto, idx) => ({
+                            '@type': 'ListItem',
+                            position: (currentPage - 1) * productosPorPagina + idx + 1,
+                            url: `https://proyecto-gaddyel.vercel.app/catalogo/${producto._id}`,
+                            item: {
+                                '@type': 'Product',
+                                name: producto.nombre,
+                                description: producto.descripcion || 'Producto personalizable de alta calidad',
+                                image: producto.imagenSrc,
+                                brand: {
+                                    '@type': 'Brand',
+                                    name: 'Gaddyel'
+                                },
+                                offers: {
+                                    '@type': 'Offer',
+                                    priceCurrency: 'ARS',
+                                    availability: 'https://schema.org/InStock'
+                                }
+                            }
+                        }))
+                    })}
+                </script>
             </Helmet>
 
             <main className="container mx-auto px-4 py-8 md:px-8">
