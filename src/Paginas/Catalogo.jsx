@@ -171,7 +171,7 @@ const Catalogo = () => {
                         href={`https://gaddyel.vercel.app/catalogo${currentPage === 2 ? '' : `?page=${currentPage - 1}`}`} 
                     />
                 )}
-                {currentPage < Math.ceil(totalProductos / productosPorPagina) && (
+                {currentPage < totalPages && (
                     <link 
                         rel="next" 
                         href={`https://gaddyel.vercel.app/catalogo?page=${currentPage + 1}`} 
