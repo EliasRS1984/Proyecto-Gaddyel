@@ -188,7 +188,7 @@ const Catalogo = () => {
                         numberOfItems: productosFiltrados.length,
                         itemListElement: productosFiltrados.slice(0, 10).map((producto, idx) => ({
                             '@type': 'ListItem',
-                            position: (currentPage - 1) * productosPorPagina + idx + 1,
+                            position: (currentPage - 1) * itemsPerPage + idx + 1,
                             url: `https://gaddyel.vercel.app/catalogo/${producto._id}`,
                             item: {
                                 '@type': 'Product',
