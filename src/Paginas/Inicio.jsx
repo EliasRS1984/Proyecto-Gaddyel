@@ -330,10 +330,10 @@ const Inicio = () => {
                                     <article className="text-left p-6 bg-gray-50 rounded-lg shadow-md ">
                                         <h3 className="text-2xl font-bold text-gray-800 mb-4">La Estrategia detrás del Confort</h3>
                                         <p className="text-gray-700 leading-relaxed mb-4">
-                                            En Gaddyel, no solo personalizamos textiles; **diseñamos embajadores silenciosos para tu negocio**. Entendemos que en un spa, hotel o clínica, el tacto de una bata o la distinción de un logo bordado son las herramientas de marketing más poderosas para fidelizar a tus clientes.
+                                            En Gaddyel, no solo personalizamos textiles; "diseñamos embajadores silenciosos para tu negocio". Entendemos que en un Spa o Centro de estética, el tacto de una bata o la distinción de un logo bordado son las herramientas de marketing más poderosas para fidelizar a tus clientes.
                                         </p>
                                         <p className="text-gray-700 leading-relaxed">
-                                            Nuestra blanquería de alta gama fusiona durabilidad extrema con una suavidad que cautiva. Al elegir Gaddyel, no solo adquieres equipamiento profesional, estás invirtiendo en un **sello de identidad** que eleva la percepción de tu servicio y garantiza que tu marca sea la protagonista en la memoria de quien la visita.
+                                            Nuestra blanquería de alta gama fusiona durabilidad extrema con una suavidad que cautiva. Al elegir Gaddyel, no solo adquieres equipamiento profesional, estás invirtiendo en un "sello de identidad" que eleva la percepción de tu servicio y garantiza que tu marca sea la protagonista en la memoria de quien la visita.
                                         </p>
                                     </article>
                                 </ScrollReveal>
