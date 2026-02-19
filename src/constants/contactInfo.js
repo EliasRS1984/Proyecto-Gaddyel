@@ -16,7 +16,7 @@ export const CONTACT_INFO = {
     // URL para chat directo (Business Message)
     url: 'https://wa.me/message/NBXNXYM5ZVE7D1',
     // Número en formato E.164 (para schema.org)
-    number: '+5491123456789',
+    number: '+5491155098426',
     // Nombre para mostrar
     label: 'WhatsApp'
   },
@@ -37,8 +37,8 @@ export const CONTACT_INFO = {
   // Email
   email: 'gaddyel.gaddyel@gmail.com',
 
-  // Teléfono principal
-  phone: '+54-9-11-5509-8426',
+  // Teléfono principal (formato E.164 sin guiones para schema.org)
+  phone: '+5491155098426',
 
   // Ubicación
   address: {
