@@ -1,6 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ORGANIZATION } from '../../utils/seoMeta';
+import { ORGANIZATION } from '../utils/seoMeta';
 
 /**
  * 📋 Componente JSON-LD LocalBusiness + ProfessionalService
