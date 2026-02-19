@@ -70,7 +70,8 @@ const TarjetaProducto = React.memo(({ producto, showPrice = true }) => {
             </div>
         </div>
     </div>
-));
+    );
+});
 
 TarjetaProducto.displayName = 'TarjetaProducto';
 
