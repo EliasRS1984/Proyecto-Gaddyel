@@ -46,7 +46,7 @@ export const CONTACT_INFO = {
     city: 'Buenos Aires',
     region: 'Buenos Aires',
     country: 'AR',
-    postalCode: '' // Si conoces el código postal
+    postalCode: '1763' // Si conoces el código postal
   },
 
   // Horarios de atención
