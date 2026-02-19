@@ -26,10 +26,12 @@
  * - envíos a todo Argentina
  */
 
+import { SCHEMA_CONTACT } from '../constants/contactInfo';
+
 const BRAND = 'Gaddyel';
 const DOMAIN = 'https://gaddyel.vercel.app';
-const PHONE = '+5491123456789'; // Reemplazar con número real
-const EMAIL = 'hola@gaddyel.com'; // Reemplazar con email real
+const PHONE = SCHEMA_CONTACT.telephone;
+const EMAIL = SCHEMA_CONTACT.email;
 
 // ✅ Palabras clave maestras agrupadas por intención
 const KEYWORDS = {
@@ -219,11 +221,7 @@ export const ORGANIZATION = {
     streetAddress: 'Argentina', // Actualizar con dirección real
     addressCountry: 'AR'
   },
-  sameAs: [
-    'https://www.instagram.com/gaddyel',
-    'https://www.facebook.com/gaddyel',
-    'https://wa.me/5491123456789'
-  ],
+  sameAs: SCHEMA_CONTACT.sameAs,
   knowsAbout: [
     'Textiles de estética',
     'Bordado personalizado',

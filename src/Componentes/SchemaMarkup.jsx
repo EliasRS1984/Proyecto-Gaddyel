@@ -1,6 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ORGANIZATION } from '../utils/seoMeta';
+import { CONTACT_INFO, SCHEMA_CONTACT } from '../constants/contactInfo';
 
 /**
  * 📋 Componente JSON-LD LocalBusiness + ProfessionalService
@@ -36,8 +36,8 @@ const SchemaMarkup = ({ additionalSchema = null }) => {
     image: 'https://gaddyel.vercel.app/og-home.jpg',
     description: 'Blanquería personalizada premium para centros de estética, spas y gabinetes en Argentina',
     url: 'https://gaddyel.vercel.app',
-    telephone: '+5491123456789', // Reemplazar con número real
-    email: 'hola@gaddyel.com', // Reemplazar con email real
+    telephone: SCHEMA_CONTACT.telephone,
+    email: SCHEMA_CONTACT.email,
     
     // ✅ Servicios que ofrece
     service: [
@@ -95,32 +95,11 @@ const SchemaMarkup = ({ additionalSchema = null }) => {
     ],
 
     // ✅ Redes sociales
-    sameAs: [
-      'https://www.instagram.com/gaddyel',
-      'https://www.facebook.com/gaddyel',
-      'https://wa.me/5491123456789'
-    ],
+    sameAs: SCHEMA_CONTACT.sameAs
 
-    // ✅ Contacto
-    contactPoint: [
-      {
-        '@type': 'ContactPoint',
-        contactType: 'Customer Service',
-        telephone: '+5491123456789',
-        email: 'hola@gaddyel.com',
-        areaServed: 'AR',
-        availableLanguage: ['es-AR']
-      }
-    ],
-
-    // ✅ Agregación de reseñas (importante para Trust)
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.8',
-      ratingCount: '12',
-      bestRating: '5',
-      worstRating: '1'
-    }
+    // ⚠️ aggregateRating eliminado: No incluir reseñas falsas
+    // Se agregará cuando haya un sistema real de reseñas
+    // ⚠️ contactPoint eliminado: telephone y email ya presentes en nivel raíz
   };
 
   // Schema Organization (para Knowledge Panel)
@@ -132,14 +111,12 @@ const SchemaMarkup = ({ additionalSchema = null }) => {
     url: 'https://gaddyel.vercel.app',
     logo: 'https://gaddyel.vercel.app/logo.jpg',
     description: 'Especialistas en blanquería personalizada para estética y spa',
-    sameAs: [
-      'https://www.instagram.com/gaddyel',
-      'https://www.facebook.com/gaddyel'
-    ],
+    sameAs: SCHEMA_CONTACT.sameAs,
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'Customer Service',
-      telephone: '+5491123456789'
+      telephone: SCHEMA_CONTACT.telephone,
+      email: SCHEMA_CONTACT.email
     }
   };
 
