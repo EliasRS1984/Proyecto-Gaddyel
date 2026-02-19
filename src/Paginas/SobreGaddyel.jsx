@@ -7,8 +7,21 @@ const SobreGaddyel = () => {
   return (
     <>
       <Helmet>
-        <title>Sobre Gaddyel - Nuestra Historia</title>
-        <meta name="description" content="Conoce la historia de Gaddyel, compromiso con la calidad y distinción en blanquería personalizada." />
+        <title>Quiénes Somos | Gaddyel - Blanquería Premium para Profesionales de la Estética</title>
+        <meta 
+          name="description" 
+          content="Gaddyel es tu aliado en elevar la identidad de marca de tu centro estético. Más de X años ofreciendo blanquería personalizada de calidad con atención a detalle." 
+        />
+        <meta
+          name="keywords"
+          content="quiénes somos, blanquería premium, marca estética, personalización textiles, gaddyel"
+        />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href="https://gaddyel.vercel.app/nosotros" />
+        <meta property="og:title" content="Quiénes Somos - Gaddyel Blanquería Personalizada" />
+        <meta property="og:description" content="La historia detrás de Gaddyel: pasión por la calidad y el detalle." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://gaddyel.vercel.app/nosotros" />
       </Helmet>
 
       <div className="w-full min-h-screen bg-white font-sans">

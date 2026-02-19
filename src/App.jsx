@@ -29,6 +29,7 @@ import CartIcon from './Componentes/CartIcon';
 import Navbar from './Componentes/UI/Navbar/Navbar';
 import ProtectedRoute from './Componentes/ProtectedRoute';
 import LoadingScreen from './Componentes/LoadingScreen';
+import SchemaMarkup from './Componentes/SchemaMarkup';
 import { CartProvider } from './Context/CartContext';
 import { AuthProvider } from './Context/AuthContext';
 import { OrderProvider } from './Context/OrderContext';
@@ -36,6 +37,7 @@ import { OrderProvider } from './Context/OrderContext';
 const App = () => {
     return (
         <HelmetProvider>
+            <SchemaMarkup />
             <AuthProvider>
                 <CartProvider>
                     <OrderProvider>

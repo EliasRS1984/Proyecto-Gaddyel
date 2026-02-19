@@ -1,4 +1,5 @@
 import React from 'react';
+import { Helmet } from 'react-helmet-async';
 import ScrollReveal from  '../Componentes/Layout/ScrollReveal/ScrollReveal.jsx'
 
 const procesos = [
@@ -31,18 +32,36 @@ const procesos = [
 
 const NuestroProceso = () => {
     return (
-        <section className="bg-gray-100 py-16 rounded-xl my-16 shadow-xl">
-            <div className="container mx-auto px-4 text-center">
-                <ScrollReveal>
-                    <h2 className="italic text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-                        Nuestro Proceso de Creación
-                    </h2>
-                </ScrollReveal>
-                <ScrollReveal>
-                    <p className="text-lg text-gray-600 mb-12 max-w-3xl mx-auto">
-                        Cada pieza que creamos es el resultado de un proceso meticuloso, donde la calidad y la atención al detalle son nuestra máxima prioridad.
-                    </p>
-                </ScrollReveal>
+        <>
+            <Helmet>
+                <title>Nuestro Proceso de Personalización | Gaddyel Blanquería</title>
+                <meta 
+                    name="description" 
+                    content="Conocé cómo llevamos a cabo la personalización de tu blanquería: desde el diseño hasta la entrega. Proceso transparente y garantizado."
+                />
+                <meta
+                    name="keywords"
+                    content="proceso personalización, bordado, diseño textiles, garantía, gaddyel"
+                />
+                <meta name="robots" content="index, follow" />
+                <link rel="canonical" href="https://gaddyel.vercel.app/proceso" />
+                <meta property="og:title" content="Nuestro Proceso - Gaddyel" />
+                <meta property="og:description" content="Pasos claros para tu proyecto personalizado." />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content="https://gaddyel.vercel.app/proceso" />
+            </Helmet>
+            <section className="bg-gray-100 py-16 rounded-xl my-16 shadow-xl">
+                <div className="container mx-auto px-4 text-center">
+                    <ScrollReveal>
+                        <h1 className="italic text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+                            Nuestro Proceso de Creación
+                        </h1>
+                    </ScrollReveal>
+                    <ScrollReveal>
+                        <p className="text-lg text-gray-600 mb-12 max-w-3xl mx-auto">
+                            Cada pieza que creamos es el resultado de un proceso meticuloso, donde la calidad y la atención al detalle son nuestra máxima prioridad.
+                        </p>
+                    </ScrollReveal>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {procesos.map((proceso, index) => (
@@ -50,7 +69,7 @@ const NuestroProceso = () => {
                             <div className="bg-white p-6 rounded-2xl shadow-lg transition-transform transform hover:scale-105 duration-300">
                                 <img 
                                     src={proceso.image} 
-                                    alt={proceso.title} 
+                                    alt={`Paso ${index + 1}: ${proceso.title} - Proceso de personalización Gaddyel`}
                                     className="w-full h-48 object-cover rounded-xl mb-4" 
                                 />
                                 <h3 className="text-xl font-bold text-gray-800 mb-2">
@@ -65,6 +84,7 @@ const NuestroProceso = () => {
                 </div>
             </div>
         </section>
+        </>
     );
 };
 

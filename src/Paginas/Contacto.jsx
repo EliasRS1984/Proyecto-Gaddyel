@@ -10,8 +10,21 @@ const Contacto = () => {
     return (
         <>
             <Helmet>
-                <title>Contacto - Gaddyel | Solicita una Cotización</title>
-                <meta name="description" content="Contáctanos para obtener presupuestos o hacer consultas sobre nuestra blanquería personalizada para spas, hoteles y estéticas. ¡Te ayudamos a encontrar la solución perfecta!" />
+                <title>Contactar Gaddyel | Personalización de Blanquería para Estética y Spa</title>
+                <meta 
+                    name="description" 
+                    content="Contactanos para conocer nuestras opciones de personalización. Asesoramiento gratuito sobre bordado de logos, mínimos y envíos a todo Argentina."
+                />
+                <meta
+                    name="keywords"
+                    content="contactar gaddyel, asesor personalización, bordado logos, blanquería personalizada, consulta gratis"
+                />
+                <meta name="robots" content="index, follow" />
+                <link rel="canonical" href="https://gaddyel.vercel.app/contacto" />
+                <meta property="og:title" content="Contacto - Gaddyel Blanquería Personalizada" />
+                <meta property="og:description" content="Estamos aquí para ayudarte. Consulta sin cargo sobre tu proyecto de personalización." />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content="https://gaddyel.vercel.app/contacto" />
             </Helmet>
             <div className="w-full min-h-screen bg-gray-50 flex items-center justify-center p-4">
                 <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12 w-full max-w-2xl text-center">
@@ -31,7 +44,7 @@ const Contacto = () => {
                             rel="noopener noreferrer"
                             className="flex flex-col items-center p-6 bg-green-100 text-green-700 rounded-xl shadow-md transition-transform transform hover:scale-105 hover:bg-green-200 duration-300"
                         >
-                            <img src={whatsappIcono} alt="Ícono de WhatsApp" className="w-12 h-12 mb-2" />
+                            <img src={whatsappIcono} alt="Contacta a Gaddyel por WhatsApp para consultas de personalización" className="w-12 h-12 mb-2" />
                             <span className="font-bold text-lg mt-2">WhatsApp</span>
                             <span className="text-sm text-center">Envía un mensaje rápido.</span>
                         </a>
@@ -43,7 +56,7 @@ const Contacto = () => {
                             rel="noopener noreferrer"
                             className="flex flex-col items-center p-6 bg-pink-100 text-pink-600 rounded-xl shadow-md transition-transform transform hover:scale-105 hover:bg-pink-200 duration-300"
                         >
-                            <img src={instagramIcono} alt="Ícono de Instagram" className="w-12 h-12 mb-2" />
+                            <img src={instagramIcono} alt="Síguenos en Instagram - Gaddyel blanquería personalizada" className="w-12 h-12 mb-2" />
                             <span className="font-bold text-lg mt-2">Instagram</span>
                             <span className="text-sm text-center">Síguenos y descubre nuestros diseños.</span>
                         </a>
@@ -55,7 +68,7 @@ const Contacto = () => {
                             rel="noopener noreferrer"
                             className="flex flex-col items-center p-6 bg-blue-100 text-blue-600 rounded-xl shadow-md transition-transform transform hover:scale-105 hover:bg-blue-200 duration-300"
                         >
-                            <img src={facebookIcono} alt="Ícono de Facebook" className="w-12 h-12 mb-2" />
+                            <img src={facebookIcono} alt="Visita nuestra página de Facebook - Gaddyel" className="w-12 h-12 mb-2" />
                             <span className="font-bold text-lg mt-2">Facebook</span>
                             <span className="text-sm text-center">Descubre nuestra comunidad y novedades.</span>
                         </a>

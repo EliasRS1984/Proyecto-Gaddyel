@@ -14,19 +14,23 @@ import ImageOptimizer from '../ImageOptimizer.jsx';
  * @prop {Object} producto - Datos del producto
  * @prop {Boolean} showPrice - Mostrar precio (default: true)
  */
-const TarjetaProducto = React.memo(({ producto, showPrice = true }) => (
-    <div className="flex flex-col h-full bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-xl hover:scale-105 transition-all duration-300">
-        {/* IMAGEN - Contenedor cuadrado aspect-ratio */}
-        <div className="w-full aspect-square bg-gray-100 overflow-hidden flex items-center justify-center">
-            <ImageOptimizer
-                src={producto.imagenSrc}
-                alt={producto.nombre}
-                width={400}
-                height={400}
-                className="w-full h-full object-cover"
-                loading="lazy"
-            />
-        </div>
+const TarjetaProducto = React.memo(({ producto, showPrice = true }) => {
+    // ✅ ALT TEXT OPTIMIZADO SEO: Incluye palabras clave y describe el producto
+    const altText = `${producto.nombre} personalizado con logo para centros de estética - Gaddyel`;
+    
+    return (
+        <div className="flex flex-col h-full bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-xl hover:scale-105 transition-all duration-300">
+            {/* IMAGEN - Contenedor cuadrado aspect-ratio */}
+            <div className="w-full aspect-square bg-gray-100 overflow-hidden flex items-center justify-center">
+                <ImageOptimizer
+                    src={producto.imagenSrc}
+                    alt={altText}
+                    width={400}
+                    height={400}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                />
+            </div>
 
         {/* CONTENIDO - Flex column para alinear botón abajo */}
         <div className="flex flex-col flex-grow p-5">
@@ -34,11 +38,11 @@ const TarjetaProducto = React.memo(({ producto, showPrice = true }) => (
             <NavLink
                 to={`/catalogo/${producto._id}`}
                 className="block mb-2 hover:text-blue-600 transition-colors"
-                aria-label={`Ver detalles de ${producto.nombre}`}
+                aria-label={`Ver detalles de ${producto.nombre} personalizado`}
             >
-                <h3 className="text-lg font-semibold text-gray-800 line-clamp-2">
+                <h2 className="text-lg font-semibold text-gray-800 line-clamp-2">
                     {producto.nombre}
-                </h3>
+                </h2>
             </NavLink>
 
             {/* DESCRIPCIÓN */}

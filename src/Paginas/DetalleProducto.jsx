@@ -71,32 +71,43 @@ const DetalleProducto = () => {
     return (
         <>
             <Helmet>
-                <title>{`${nombre} - ${categoria} | Gaddyel`}</title>
+                <title>{`${nombre} Personalizado | ${categoria} con Logo Bordado | Gaddyel`}</title>
                 <meta
                     name="description"
-                    content={`${descripcionCompleta.substring(0, 160)}... Compra ${nombre} en Gaddyel.`}
+                    content={`${descripcionCompleta.substring(0, 145)}... Personalizado con logo bordado. Desde 12 unidades. Envíos a Argentina.`}
                 />
+                <meta
+                    name="keywords"
+                    content={`${nombre}, ${categoria} personalizado, bordado logo, estética spa, gaddyel`}
+                />
+                <meta name="robots" content="index, follow" />
+                <link rel="canonical" href={`https://gaddyel.vercel.app/catalogo/${id}`} />
+                
                 {/* ✅ Open Graph para redes sociales */}
-                <meta property="og:title" content={`${nombre} - Gaddyel`} />
-                <meta property="og:description" content={`${descripcionCompleta.substring(0, 160)}...`} />
+                <meta property="og:title" content={`${nombre} Personalizado | Gaddyel`} />
+                <meta property="og:description" content={`${descripcionCompleta.substring(0, 145)}... Personalizable con logo bordado.`} />
                 <meta property="og:type" content="product" />
                 <meta property="og:image" content={imagenes[0]?.src || productoData.imagenSrc} />
+                <meta property="og:url" content={`https://gaddyel.vercel.app/catalogo/${id}`} />
+                <meta property="og:site_name" content="Gaddyel" />
+                <meta property="og:locale" content="es_AR" />
                 
-                {/* ✅ Schema.org Product */}
+                {/* ✅ Schema.org Product Schema Optimizado */}
                 <script type="application/ld+json">
                     {JSON.stringify({
                         "@context": "https://schema.org/",
                         "@type": "Product",
+                        "@id": `https://gaddyel.vercel.app/catalogo/${id}`,
                         "name": nombre,
                         "description": descripcionCompleta,
-                        "image": imagenes.map(img => img.src),
+                        "image": imagenes.map(img => img.src || img),
                         "brand": {
                             "@type": "Brand",
                             "name": "Gaddyel"
                         },
                         "offers": {
                             "@type": "Offer",
-                            "url": `https://gaddyel.com/catalogo/${id}`,
+                            "url": `https://gaddyel.vercel.app/catalogo/${id}`,
                             "priceCurrency": "ARS",
                             "price": precio.toString(),
                             "availability": "https://schema.org/InStock"

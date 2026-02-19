@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { LogoGaddyel, imagenFondo, faqs } from '../Datos/datos.js';
+import { seoMeta } from '../utils/seoMeta';
 import { obtenerProductos } from '../Servicios/productosService.js';
 import carouselService from '../Servicios/carouselService.js';
 import Carrusel from '../Componentes/UI/Carrusel/Carrusel.jsx';
@@ -184,108 +185,31 @@ const Inicio = () => {
         <>
             {/* SEO 2026: Metadatos optimizados para máxima indexación y CTR */}
             <Helmet>
-                <title>Gaddyel - Blanquería Premium para Spa | Elevamos el ADN de tu Centro de Estética</title>
+                {/* ✅ Metadatos dinámicos optimizados para SEO Nicho */}
+                <title>Vinchas y Batas Personalizadas para Estética y Spa | Gaddyel Blanquería</title>
                 <meta
                     name="description"
-                    content="🌟 Blanquería personalizada de lujo para spas y centros de estética. Toallas, batas de satén, vinchas con tu logo. Generamos marketing pasivo con productos instagrameables. ✅ Calidad premium ✅ Virrey del Pino, Buenos Aires"
+                    content="Potenciá la imagen de tu centro de estética con blanquería personalizada de alta calidad. Vinchas, batas y toallas con tu logo bordado. Pedidos desde 12 unidades. Envíos a todo el país."
                 />
                 <meta
                     name="keywords"
-                    content="gaddyel, blanquería spa, blanquería estética, toallas personalizadas spa, batas satén beauty, vinchas faciales, pads limpieza, kit limpieza facial, textiles spa personalizados, blanquería centros estética, marketing pasivo spa, productos instagrameables, blanquería premium argentina, virrey del pino"
+                    content="vinchas personalizadas, batas con logo, toallas bordadas, blanquería estética, insumos textiles spa, personalización bordado, gaddyel"
                 />
+                <meta name="author" content="Gaddyel" />
+                <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
                 <link rel="canonical" href="https://gaddyel.vercel.app/" />
 
-                {/* Open Graph para Facebook/WhatsApp/Instagram */}
+                {/* ✅ Open Graph para redes sociales */}
                 <meta property="og:type" content="website" />
                 <meta property="og:url" content="https://gaddyel.vercel.app/" />
-                <meta property="og:title" content="Gaddyel - Blanquería Premium para Spa y Estética" />
-                <meta property="og:description" content="Elevamos el ADN de tu centro de estética. Toallas, batas y vinchas personalizadas que generan marketing pasivo. Calidad premium." />
+                <meta property="og:title" content="Vinchas y Batas Personalizadas para Estética y Spa | Gaddyel" />
+                <meta
+                    property="og:description"
+                    content="Blanquería de lujo personalizada con bordado industrial. Vinchas, batas y toallas para spa, estética y gabinetes. Desde 12 unidades. Envíos a Argentina."
+                />
                 <meta property="og:site_name" content="Gaddyel" />
                 <meta property="og:locale" content="es_AR" />
-
-                {/* Schema.org JSON-LD - LocalBusiness + Organization */}
-                <script type="application/ld+json">
-                    {JSON.stringify({
-                        '@context': 'https://schema.org',
-                        '@graph': [
-                            {
-                                '@type': 'Organization',
-                                '@id': 'https://gaddyel.vercel.app/#organization',
-                                name: 'Gaddyel',
-                                url: 'https://gaddyel.vercel.app/',
-                                logo: {
-                                    '@type': 'ImageObject',
-                                    url: LogoGaddyel
-                                },
-                                description: 'Gaddyel: Elevando el ADN de tu Centro de Estética. Blanquería personalizada premium para spas y centros de estética. Aliados estratégicos en la construcción de tu imagen profesional.',
-                                areaServed: {
-                                    '@type': 'Country',
-                                    name: 'Argentina'
-                                },
-                                sameAs: [
-                                    'https://www.instagram.com/gaddyel.oficial/',
-                                    'https://www.facebook.com/gaddyel.gaddyel.184/'
-                                ]
-                            },
-                            {
-                                '@type': 'LocalBusiness',
-                                '@id': 'https://gaddyel.vercel.app/#localbusiness',
-                                name: 'Gaddyel - Blanquería Premium para Spa y Estética',
-                                description: 'Blanquería personalizada de lujo: toallas, batas de satén, vinchas faciales, pads y kits de limpieza. Productos premium que generan marketing pasivo para tu centro de estética o spa.',
-                                url: 'https://gaddyel.vercel.app/',
-                                priceRange: '$$-$$$',
-                                areaServed: 'Argentina',
-                                address: {
-                                    '@type': 'PostalAddress',
-                                    addressLocality: 'Virrey del Pino',
-                                    addressRegion: 'Buenos Aires',
-                                    addressCountry: 'AR'
-                                },
-                                email: 'gaddyel.gaddyel@gmail.com',
-                                telephone: '+54-9-11-5509-8426',
-                                hasOfferCatalog: {
-                                    '@type': 'OfferCatalog',
-                                    name: 'Catálogo de Blancos Personalizados',
-                                    itemListElement: productosDestacados.slice(0, 5).map((producto, idx) => ({
-                                        '@type': 'Offer',
-                                        position: idx + 1,
-                                        url: `https://gaddyel.vercel.app/catalogo/${producto._id}`,
-                                        priceCurrency: 'ARS',
-                                        availability: 'https://schema.org/InStock',
-                                        itemOffered: {
-                                            '@type': 'Product',
-                                            name: producto.nombre,
-                                            description: producto.descripcion || 'Producto personalizable de alta calidad',
-                                            image: producto.imagenSrc,
-                                            brand: {
-                                                '@type': 'Brand',
-                                                name: 'Gaddyel'
-                                            }
-                                        }
-                                    }))
-                                }
-                            },
-                            {
-                                '@type': 'WebSite',
-                                '@id': 'https://gaddyel.vercel.app/#website',
-                                url: 'https://gaddyel.vercel.app/',
-                                name: 'Gaddyel',
-                                description: 'Blanquería personalizada premium para spa y centros de estética',
-                                publisher: {
-                                    '@id': 'https://gaddyel.vercel.app/#organization'
-                                },
-                                potentialAction: {
-                                    '@type': 'SearchAction',
-                                    target: {
-                                        '@type': 'EntryPoint',
-                                        urlTemplate: 'https://gaddyel.vercel.app/catalogo?buscar={search_term_string}'
-                                    },
-                                    'query-input': 'required name=search_term_string'
-                                }
-                            }
-                        ]
-                    })}
-                </script>
+                <meta property="og:image" content="https://gaddyel.vercel.app/og-home.jpg" />
 
                 {/* Schema.org - FAQPage para preguntas frecuentes */}
                 <script type="application/ld+json">

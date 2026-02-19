@@ -140,22 +140,24 @@ const Catalogo = () => {
     return (
         <div className="catalogo-container">
             <Helmet>
-                <title>{currentPage > 1 ? `Página ${currentPage} - ` : ''}Catálogo Blanquería Premium para Spa | Gaddyel</title>
+                <title>{currentPage > 1 ? `Página ${currentPage} - ` : ''}Catálogo de Blanquería Personalizada | Vinchas, Batas y Toallas | Gaddyel</title>
                 <meta
                     name="description"
-                    content={`Explorá nuestro catálogo de blanquería premium para spa y estética: toallas personalizadas, batas de satén, vinchas faciales, pads de limpieza. Productos que elevan el ADN de tu centro${currentPage > 1 ? ` - Página ${currentPage}` : ''}.`}
+                    content={`Explore nuestro catálogo completo: vinchas para tratamientos faciales, batas bordadas con logo para spa, toallas personalizadas y más. Entrega a nivel nacional. Personalización con mínimos bajos${currentPage > 1 ? ` - Página ${currentPage}` : ''}.`}
                 />
                 <meta
                     name="keywords"
-                    content="catálogo blanquería spa, comprar toallas personalizadas, batas satén precio, vinchas faciales, kit limpieza facial, textiles spa, blanquería estética, gaddyel"
+                    content="catálogo blanquería, vinchas spa, batas personalizadas, toallas bordadas, productos estética, personalización industrial, gaddyel"
                 />
+                <meta name="robots" content="index, follow" />
+                <link rel="canonical" href={`https://gaddyel.vercel.app/catalogo${currentPage > 1 ? `?page=${currentPage}` : ''}`} />
                 <meta
                     property="og:title"
-                    content={`Catálogo Blanquería Premium Spa | Gaddyel${currentPage > 1 ? ` - Página ${currentPage}` : ''}`}
+                    content={`Catálogo Completo - Blanquería Personalizada Gaddyel${currentPage > 1 ? ` - Página ${currentPage}` : ''}`}
                 />
                 <meta
                     property="og:description"
-                    content="Toallas, batas de satén, vinchas y más productos personalizables para tu centro de estética o spa."
+                    content="Descubra productos premium con personalización industrial. Mínimo 12 unidades. Envíos a Argentina."
                 />
                 <meta property="og:type" content="website" />
                 <meta property="og:url" content={`https://gaddyel.vercel.app/catalogo${currentPage > 1 ? `?page=${currentPage}` : ''}`} />
