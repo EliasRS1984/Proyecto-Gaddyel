@@ -197,14 +197,21 @@ const Catalogo = () => {
                                 name: producto.nombre,
                                 description: producto.descripcion || 'Producto personalizable de alta calidad',
                                 image: producto.imagenSrc,
+                                sku: producto.sku || producto._id,
                                 brand: {
                                     '@type': 'Brand',
                                     name: 'Gaddyel'
                                 },
                                 offers: {
                                     '@type': 'Offer',
+                                    url: `https://gaddyel.vercel.app/catalogo/${producto._id}`,
                                     priceCurrency: 'ARS',
-                                    availability: 'https://schema.org/InStock'
+                                    price: producto.precio,
+                                    availability: producto.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+                                    seller: {
+                                        '@type': 'Organization',
+                                        name: 'Gaddyel'
+                                    }
                                 }
                             }
                         }))
