@@ -7,6 +7,7 @@ import { obtenerProductos } from '../Servicios/productosService.js';
 import carouselService from '../Servicios/carouselService.js';
 import Carrusel from '../Componentes/UI/Carrusel/Carrusel.jsx';
 import ScrollReveal from '../Componentes/Layout/ScrollReveal/ScrollReveal.jsx';
+import FaqItem from '../Componentes/FaqItem';
 import ImagenArticulo from '../Activos/Imagenes/imagen-articulo/imagen-articulo.jpg';
 import TarjetaProducto from '../Componentes/TarjetaProducto/TarjetaProducto.jsx';
 import ImageOptimizer from '../Componentes/ImageOptimizer.jsx';
@@ -26,53 +27,6 @@ const CTAButton = React.memo(({ to, children }) => (
     </NavLink>
 ));
 CTAButton.displayName = 'CTAButton';
-
-/**
- * FaqItem - Componente de pregunta frecuente con acordeón
- * 
- * FLUJO:
- * - Usuario hace click en pregunta → toggle isOpen
- * - Si abierta: muestra respuesta con animación
- * - Accesibilidad: aria-expanded, aria-controls
- * 
- * @prop {string} question - Texto de la pregunta
- * @prop {string} answer - Texto de la respuesta
- */
-const FaqItem = React.memo(({ question, answer }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const id = `faq-${question.replace(/\s+/g, '-')}`;
-
-    return (
-        <div className="border-b border-gray-200">
-            <button
-                className="w-full flex justify-between items-center py-4 px-6 text-left focus:outline-none transition-colors duration-300"
-                onClick={() => setIsOpen(!isOpen)}
-                aria-expanded={isOpen}
-                aria-controls={id}
-            >
-                <span className="text-lg font-semibold text-gray-800">{question}</span>
-                <svg
-                    className={`w-6 h-6 transform transition-transform duration-300 ${isOpen ? 'rotate-180 text-blue-600' : 'text-gray-500'}`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                </svg>
-            </button>
-            {isOpen && (
-                <div
-                    id={id}
-                    className="px-6 pb-4 text-gray-600 leading-relaxed transition-all duration-500 ease-in-out"
-                >
-                    {answer}
-                </div>
-            )}
-        </div>
-    );
-});
-FaqItem.displayName = 'FaqItem';
 
 /**
  * FLUJO DE DATOS - Página Inicio

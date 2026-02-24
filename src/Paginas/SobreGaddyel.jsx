@@ -2,8 +2,24 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import ScrollReveal from '../Componentes/Layout/ScrollReveal/ScrollReveal';
 import { NavLink } from 'react-router-dom';
+import FaqItem from '../Componentes/FaqItem';
+import { faqs } from '../Datos/datos';
 
 const SobreGaddyel = () => {
+  // Schema FAQPage para SEO usando las preguntas reales del sitio
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqs.map(faq => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.answer
+      }
+    }))
+  };
+
   return (
     <>
       <Helmet>
@@ -22,6 +38,11 @@ const SobreGaddyel = () => {
         <meta property="og:description" content="La historia detrás de Gaddyel: pasión por la calidad y el detalle." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://gaddyel.vercel.app/nosotros" />
+        
+        {/* FAQPage Schema para SEO */}
+        <script type="application/ld+json">
+          {JSON.stringify(faqSchema)}
+        </script>
       </Helmet>
 
       <div className="w-full min-h-screen bg-white font-sans">
@@ -75,6 +96,24 @@ const SobreGaddyel = () => {
               <blockquote className="pl-6 border-l-4 border-gray-300 italic text-gray-600">
                 "En Gaddyel, no solo fabricamos productos; diseñamos el éxito de tu marca a través de la excelencia. Permítenos ser el aliado estratégico de tu historia."
               </blockquote>
+            </section>
+          </ScrollReveal>
+
+          {/* SECCIÓN 4: Preguntas Frecuentes */}
+          <ScrollReveal>
+            <section className="mb-16" aria-label="Preguntas frecuentes sobre Gaddyel">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">
+                Preguntas Frecuentes
+              </h2>
+              <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+                {faqs.map((faq, index) => (
+                  <FaqItem 
+                    key={index} 
+                    question={faq.question} 
+                    answer={faq.answer} 
+                  />
+                ))}
+              </div>
             </section>
           </ScrollReveal>
 

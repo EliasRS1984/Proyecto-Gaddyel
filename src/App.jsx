@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 // ✅ Code Splitting: Carga diferida de TODAS las rutas (incluyendo Inicio)
 // OPTIMIZACIÓN: Bundle inicial reducido de 595KB a ~150KB
@@ -80,6 +81,7 @@ const App = () => {
                                 </main>
                                 <PieDePagina />
                                 <Analytics />
+                                <SpeedInsights />
                             </div>
                         </Router>
                     </OrderProvider>
