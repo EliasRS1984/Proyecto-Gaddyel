@@ -5,7 +5,33 @@ import React, { useState, useEffect, useRef } from 'react';
  * Incluye: barra de progreso, swipe gestures, autoplay inteligente, zoom hover, overlay gradiente
  * @param {Array<Object>} imagenes - Array de objetos con src, alt, y caption opcional
  * @param {number} [intervalo=5000] - Tiempo entre cambios automáticos
+ * 
+ * OPTIMIZACIÓN CLOUDINARY:
+ * Las imágenes de Cloudinary se transforman automáticamente para servir
+ * WebP/AVIF según el navegador del usuario, reduciendo el peso hasta 75%
  */
+
+/**
+ * Transforma URL de Cloudinary para optimizar formato y calidad automáticamente
+ * - f_auto: Sirve WebP en Chrome/Edge, AVIF si soporta, JPG/PNG como fallback
+ * - q_auto: Ajusta calidad según contenido de imagen (texto vs foto)
+ * @param {string} url - URL original de Cloudinary
+ * @returns {string} URL optimizada con transformaciones
+ */
+const optimizarUrlCloudinary = (url) => {
+    if (!url?.includes('cloudinary.com')) return url;
+    
+    // Si ya tiene transformaciones, no duplicar
+    if (url.includes('q_auto') && url.includes('f_auto')) return url;
+    
+    // Insertar transformaciones después de /upload/
+    const partes = url.split('/upload/');
+    if (partes.length === 2) {
+        return `${partes[0]}/upload/q_auto,f_auto/${partes[1]}`;
+    }
+    return url;
+};
+
 const Carrusel = ({ imagenes, intervalo = 5000 }) => {
     const [diapositivaActual, setDiapositivaActual] = useState(0);
     const [pausado, setPausado] = useState(false);
@@ -114,9 +140,9 @@ const Carrusel = ({ imagenes, intervalo = 5000 }) => {
             >
                 {imagenes.map((imagen, index) => (
                     <div key={imagen.src} className="w-full h-full flex-shrink-0 relative overflow-hidden">
-                        {/* Imagen con zoom en hover */}
+                        {/* Imagen con zoom en hover - URL optimizada para WebP/AVIF */}
                         <img
-                            src={imagen.src}
+                            src={optimizarUrlCloudinary(imagen.src)}
                             alt={imagen.alt}
                             className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
                             loading={index === diapositivaActual || index === diapositivaActual + 1 ? "eager" : "lazy"}
