@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
 import ScrollReveal from '../Componentes/Layout/ScrollReveal/ScrollReveal';
 import { NavLink } from 'react-router-dom';
@@ -6,6 +6,15 @@ import FaqItem from '../Componentes/FaqItem';
 import { faqs } from '../Datos/datos';
 
 const SobreGaddyel = () => {
+  // Estado para controlar cuántas preguntas mostrar
+  const [showAllFaqs, setShowAllFaqs] = useState(false);
+  const initialFaqCount = 3;
+
+  // Calcular FAQs a mostrar (3 inicialmente, todas si showAllFaqs es true)
+  const faqsToShow = useMemo(() => {
+    return showAllFaqs ? faqs : faqs.slice(0, initialFaqCount);
+  }, [showAllFaqs]);
+
   // Schema FAQPage para SEO usando las preguntas reales del sitio
   const faqSchema = {
     "@context": "https://schema.org",
@@ -101,18 +110,34 @@ const SobreGaddyel = () => {
 
           {/* SECCIÓN 4: Preguntas Frecuentes */}
           <ScrollReveal>
-            <section className="mb-16" aria-label="Preguntas frecuentes sobre Gaddyel">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">
+            <section 
+              className="bg-gray-50 py-16 px-4 sm:px-6 rounded-xl my-16 shadow-xl" 
+              aria-label="Preguntas frecuentes sobre Gaddyel"
+            >
+              <h2 className="italic text-3xl md:text-4xl font-bold text-center text-gray-800 mb-12">
                 Preguntas Frecuentes
               </h2>
-              <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
-                {faqs.map((faq, index) => (
-                  <FaqItem 
-                    key={index} 
-                    question={faq.question} 
-                    answer={faq.answer} 
-                  />
+              <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                {faqsToShow.map((faq, index) => (
+                  <ScrollReveal key={index}>
+                    <FaqItem 
+                      question={faq.question} 
+                      answer={faq.answer} 
+                    />
+                  </ScrollReveal>
                 ))}
+                {faqs.length > initialFaqCount && (
+                  <div className="text-center mt-8">
+                    <button
+                      onClick={() => setShowAllFaqs(!showAllFaqs)}
+                      className="inter font-bold bg-purple-500 hover:bg-purple-700 text-black hover:text-white font-bold py-3 px-6 rounded-full transition-colors duration-300 hover:scale-105"
+                      aria-expanded={showAllFaqs}
+                      aria-label={showAllFaqs ? 'Ver menos preguntas frecuentes' : 'Ver más preguntas frecuentes'}
+                    >
+                      {showAllFaqs ? 'Ver menos preguntas' : 'Ver más preguntas'}
+                    </button>
+                  </div>
+                )}
               </div>
             </section>
           </ScrollReveal>
