@@ -1,19 +1,111 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
 import CartIcon from '../../CartIcon';
 import LogoGaddyel from '../../../Activos/Imagenes/Logo-Gaddyel.png';
 import { logger } from '../../../utils/logger';
 
+/**
+ * ============================================================================
+ * BARRA DE NAVEGACIÓN PRINCIPAL (Navbar)
+ * ============================================================================
+ * 
+ * ¿QUÉ ES ESTO?
+ * La barra superior que aparece en todas las páginas. Contiene el logo,
+ * los enlaces de navegación, el carrito y el menú de usuario.
+ * 
+ * ¿CÓMO FUNCIONA?
+ * 1. En pantallas grandes: Muestra todos los enlaces en horizontal
+ * 2. En móviles: Muestra un botón de hamburguesa que abre un menú desplegable
+ * 3. El menú de usuario muestra opciones según si está logueado o no
+ * 4. Al hacer scroll, la barra gana más sombra para indicar que "flota"
+ * 
+ * ¿DÓNDE BUSCAR SI HAY PROBLEMAS?
+ * 
+ * → "El menú móvil no se abre/cierra"
+ *   Revisa toggleMenu() y el estado 'isOpen'
+ * 
+ * → "El menú de usuario no funciona"
+ *   Revisa toggleUserMenu() y el estado 'isUserMenuOpen'
+ * 
+ * → "El logo no lleva al inicio"
+ *   Revisa handleLogoClick()
+ * 
+ * → "El carrito no aparece"
+ *   Revisa si CartIcon está importado y renderizado
+ * 
+ * → "Los enlaces no cambian de color cuando estoy en esa página"
+ *   Revisa la clase 'isActive' en los NavLink
+ * 
+ * ARCHIVOS RELACIONADOS:
+ * - hooks/useAuth.js - Maneja el estado de login del usuario
+ * - CartIcon.jsx - Icono del carrito con contador
+ */
+
+// ============================================================================
+// ENLACES DE NAVEGACIÓN
+// ============================================================================
+/**
+ * Lista de páginas que aparecen en el menú.
+ * Si necesitas agregar una nueva página, añádela aquí.
+ * - 'to': La ruta URL (debe coincidir con App.jsx)
+ * - 'label': El texto que se muestra al usuario
+ */
+const ENLACES_NAVEGACION = [
+    { to: '/', label: 'Inicio' },
+    { to: '/catalogo', label: 'Catálogo' },
+    { to: '/nosotros', label: 'Nosotros' },
+    { to: '/contacto', label: 'Contacto' },
+    { to: '/proceso', label: 'Nuestro Proceso' },
+];
+
 const Navbar = () => {
+    // ========================================================================
+    // ESTADOS DEL COMPONENTE
+    // ========================================================================
+    
+    // ¿El menú móvil (hamburguesa) está abierto?
     const [isOpen, setIsOpen] = useState(false);
+    
+    // ¿El menú desplegable de usuario está abierto?
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+    
+    // ¿El usuario ha hecho scroll? (para agregar más sombra)
     const [scrolled, setScrolled] = useState(false);
-    const { isAuthenticated, cliente, cerrarSesion } = useAuth(); // ✅ Usar hook useAuth
+    
+    // Datos de autenticación del usuario
+    const { isAuthenticated, cliente, cerrarSesion } = useAuth();
+    
+    // Para navegar programáticamente a otras páginas
     const navigate = useNavigate();
+    
+    // Referencia al menú de usuario (para detectar clicks fuera)
+    const userMenuRef = useRef(null);
+    
+    // Logo con fallback si no carga
     const logoSrc = LogoGaddyel || 'https://via.placeholder.com/64?text=Logo';
 
-    // Monitorear scroll para sombra dinámica
+    // ========================================================================
+    // FUNCIÓN AUXILIAR: Obtener iniciales del usuario
+    // ========================================================================
+    /**
+     * Convierte "Carlos Martínez" → "CM"
+     * Usa las primeras letras del nombre completo.
+     */
+    const getInitials = (nombre) => {
+        if (!nombre) return 'U';
+        const parts = nombre.trim().split(' ');
+        if (parts.length === 1) return parts[0][0].toUpperCase();
+        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    };
+
+    // ========================================================================
+    // DETECCIÓN DE SCROLL (para sombra dinámica)
+    // ========================================================================
+    /**
+     * Cuando el usuario hace scroll hacia abajo (más de 10px),
+     * la barra de navegación gana más sombra para parecer que "flota".
+     */
     useEffect(() => {
         const handleScroll = () => {
             setScrolled(window.scrollY > 20);
@@ -22,7 +114,32 @@ const Navbar = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    // Monitorear cambios en autenticación
+    // ========================================================================
+    // CERRAR MENÚ AL HACER CLICK FUERA
+    // ========================================================================
+    /**
+     * Si el usuario hace click en cualquier parte fuera del menú de usuario,
+     * el menú se cierra automáticamente.
+     * 
+     * ¿El menú no se cierra al hacer click fuera? Revisa este bloque.
+     */
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+                setIsUserMenuOpen(false);
+            }
+        };
+        
+        if (isUserMenuOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+        
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isUserMenuOpen]);
+
+    // Log para depuración (solo en desarrollo)
     useEffect(() => {
         logger.debug('[Navbar] Estado actualizado:', {
             isAuthenticated,
@@ -30,260 +147,334 @@ const Navbar = () => {
         });
     }, [isAuthenticated, cliente]);
 
-    const toggleMenu = () => {
+    // ========================================================================
+    // FUNCIONES DEL MENÚ MÓVIL (hamburguesa)
+    // ========================================================================
+    
+    /**
+     * Abre o cierra el menú móvil (el de las 3 rayitas).
+     * También cierra el menú de usuario si estaba abierto.
+     */
+    const toggleMenu = useCallback(() => {
         setIsOpen((prev) => !prev);
-    };
+        setIsUserMenuOpen(false); // Cerrar menú de usuario al abrir móvil
+    }, []);
 
-    const closeMenu = () => {
+    /**
+     * Cierra el menú móvil. Se usa cuando el usuario selecciona una opción.
+     */
+    const closeMenu = useCallback(() => {
         setIsOpen(false);
-    };
+    }, []);
 
-    const toggleUserMenu = () => {
+    // ========================================================================
+    // FUNCIONES DEL MENÚ DE USUARIO
+    // ========================================================================
+    
+    /**
+     * Abre o cierra el menú desplegable de "Cuenta" o del nombre del usuario.
+     */
+    const toggleUserMenu = useCallback(() => {
         setIsUserMenuOpen((prev) => !prev);
-    };
+    }, []);
 
-    const closeUserMenu = () => {
+    /**
+     * Cierra el menú de usuario.
+     */
+    const closeUserMenu = useCallback(() => {
         setIsUserMenuOpen(false);
-    };
+    }, []);
 
-    const handleLogout = () => {
+    /**
+     * Cierra la sesión del usuario y lo lleva a la página de inicio.
+     * 
+     * ¿El logout no funciona? Revisa esta función y cerrarSesion() en useAuth.
+     */
+    const handleLogout = useCallback(() => {
         logger.info('[Navbar] Logout iniciado');
         cerrarSesion();
         closeUserMenu();
         navigate('/', { replace: true });
-    };
+    }, [cerrarSesion, closeUserMenu, navigate]);
 
+    // ========================================================================
+    // FUNCIONES DEL LOGO
+    // ========================================================================
+    
+    /**
+     * Hace scroll suave hasta arriba de la página.
+     */
     const handleScrollToTop = useCallback(() => {
-        // ✅ HELPER: Scroll suave al tope de la página
-        // ¿Por qué? Logo debe llevar a inicio Y hacer scroll al top
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }, []);
 
+    /**
+     * Cuando el usuario hace click en el logo:
+     * - Si ya está en la página de inicio: Solo hace scroll arriba
+     * - Si está en otra página: Navega al inicio y luego scroll arriba
+     */
     const handleLogoClick = useCallback((e) => {
-        // ✅ Si ya estamos en inicio, solo hace scroll
-        // Si estamos en otra página, NavLink navega y luego scroll
         if (window.location.pathname === '/') {
             e.preventDefault();
             handleScrollToTop();
         } else {
-            // NavLink se encargará de la navegación
-            // Scroll sucederá en el siguiente render
             setTimeout(handleScrollToTop, 0);
         }
     }, [handleScrollToTop]);
 
-    const navLinks = [
-        { to: '/', label: 'Inicio' },
-        { to: '/catalogo', label: 'Catálogo' },
-        { to: '/nosotros', label: 'Nosotros' },
-        { to: '/contacto', label: 'Contacto' },
-        { to: '/proceso', label: 'Nuestro Proceso' },
-    ];
-
+    // ========================================================================
+    // INTERFAZ VISUAL
+    // ========================================================================
     return (
-        <header className={`bg-gray-100/95 dark:bg-gray-900/95 backdrop-blur-md sticky top-0 z-50 animate-fade-in transition-shadow duration-300 ${scrolled ? 'shadow-xl' : 'shadow-md'
-            }`}>
-            <nav className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
+        <header className={`bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl sticky top-0 z-50 border-b transition-all duration-500 ease-out ${scrolled ? 'border-slate-200/60 dark:border-slate-800/60 shadow-sm' : 'border-transparent'}`}>
+            <nav className={`max-w-7xl mx-auto px-6 lg:px-12 flex justify-between items-center transition-all duration-500 ${scrolled ? 'py-2' : 'py-15'}`}>
+                
+                {/* ------------------------------------------------------------
+                    LOGO
+                    Click lleva al inicio. En desktop tiene efecto hover.
+                ------------------------------------------------------------ */}
                 <div className="flex-shrink-0">
                     <NavLink
                         to="/"
                         onClick={handleLogoClick}
-                        className="flex items-center space-x-2"
+                        className="flex items-center group"
                         aria-label="Ir a la página de inicio de Gaddyel (volver al top)"
                     >
                         <img
                             src={logoSrc}
                             alt="Logo de Gaddyel"
-                            className="h-16 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+                            className="h-14 transition-all duration-700 ease-out group-hover:brightness-110"
                         />
                     </NavLink>
                 </div>
 
-                {/* Separador visual sutil */}
-                <div className="hidden md:block h-8 w-px bg-gray-300 dark:bg-gray-700 mx-4"></div>
-
-                {/* Botón del menú de hamburguesa para móviles */}
-                <div className="md:hidden">
+                {/* ------------------------------------------------------------
+                    BOTÓN HAMBURGUESA (solo móvil)
+                    Abre/cierra el menú desplegable en pantallas pequeñas.
+                    
+                    ¿El ícono no cambia? Revisa las clases de opacity.
+                ------------------------------------------------------------ */}
+                <div className="lg:hidden flex items-center gap-4">
+                    {/* Carrito en móvil */}
+                    <CartIcon />
+                    
                     <button
                         onClick={toggleMenu}
-                        onKeyDown={(e) => ['Enter', 'Space'].includes(e.key) && toggleMenu()}
-                        // Eliminamos el conflicto de colores forzando el color del icono
-                        className="relative z-50 p-2 !text-gray-900 dark:!text-white focus:outline-none active:scale-95 transition-all hover:!text-gray-900 dark:hover:!text-white"
+                        className="relative z-50 p-2 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 focus:outline-none active:scale-95 transition-all duration-300"
                         aria-label="Menú de navegación"
                         aria-expanded={isOpen}
                     >
-                        <div className="relative h-8 w-8">
+                        <div className="relative h-6 w-6">
+                            {/* Ícono hamburguesa (3 líneas) */}
                             <svg
-                                className={`h-8 w-8 absolute transition-opacity duration-200 ${isOpen ? 'opacity-0' : 'opacity-100'}`}
+                                className={`h-6 w-6 absolute transition-all duration-300 ${isOpen ? 'opacity-0 rotate-180' : 'opacity-100 rotate-0'}`}
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
+                                strokeWidth={2}
                             >
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                             </svg>
+                            {/* Ícono X (cerrar) */}
                             <svg
-                                className={`h-8 w-8 absolute transition-opacity duration-200 ${isOpen ? 'opacity-100' : 'opacity-0'}`}
+                                className={`h-6 w-6 absolute transition-all duration-300 ${isOpen ? 'opacity-100 rotate-0' : 'opacity-0 -rotate-180'}`}
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
+                                strokeWidth={2}
                             >
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </div>
                     </button>
                 </div>
 
-                {/* Enlaces de navegación para escritorio */}
-                <div className="hidden md:flex items-center space-x-8" role="navigation" aria-label="Menú principal">
-                    {navLinks.map((link) => (
+                {/* ------------------------------------------------------------
+                    MENÚ DESKTOP (enlaces horizontales)
+                    Solo visible en pantallas medianas y grandes.
+                ------------------------------------------------------------ */}
+                <div className="hidden lg:flex items-center gap-1" role="navigation" aria-label="Menú principal">
+                    {ENLACES_NAVEGACION.map((link) => (
                         <NavLink
                             key={link.to}
                             to={link.to}
                             className={({ isActive }) =>
-                                `relative text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors duration-300 font-medium ${isActive ? 'text-gray-900 dark:text-gray-100' : ''
-                                } group`
+                                `relative px-5 py-2.5 text-[15px] font-medium tracking-tight transition-all duration-500 ease-out group ${isActive ? 'text-slate-900 dark:text-slate-50' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'}`
                             }
                         >
-                            {link.label}
-                            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black group-hover:w-full transition-all duration-300"></span>
+                            {({ isActive }) => (
+                                <>
+                                    {link.label}
+                                    {/* Indicador de página activa: barra inferior con animación */}
+                                    <span className={`absolute left-0 bottom-0 h-[2px] bg-slate-900 dark:bg-slate-100 transition-all duration-500 ease-out ${isActive ? 'w-full' : 'w-0 group-hover:w-full'}`}></span>
+                                </>
+                            )}
                         </NavLink>
                     ))}
 
-                    {/* CartIcon */}
-                    <CartIcon />
+                    {/* Carrito (solo desktop, en móvil está junto al hamburguesa) */}
+                    <div className="ml-4">
+                        <CartIcon />
+                    </div>
 
-                    {/* Menú de usuario */}
-                    <div className="relative">
+                    {/* ------------------------------------------------------------
+                        MENÚ DE USUARIO (desktop)
+                        Muestra avatar con iniciales si está logueado, o "Cuenta" si no.
+                        
+                        ¿No se abre el dropdown? Revisa toggleUserMenu.
+                    ------------------------------------------------------------ */}
+                    <div className="relative ml-6" ref={userMenuRef}>
                         {isAuthenticated ? (
                             <>
+                                {/* Botón con avatar y nombre del usuario */}
                                 <button
                                     onClick={toggleUserMenu}
-                                    className="relative flex items-center space-x-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors duration-300 font-medium group"
+                                    className="relative flex items-center gap-3 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-500 ease-out group"
                                     aria-label="Menú de usuario"
                                     aria-expanded={isUserMenuOpen}
                                 >
-                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                                    {/* Avatar circular con iniciales - diseño más sofisticado */}
+                                    <div className="relative w-10 h-10 rounded-full bg-slate-900 dark:bg-slate-100 flex items-center justify-center text-white dark:text-slate-900 font-semibold text-sm ring-2 ring-slate-200 dark:ring-slate-800 ring-offset-2 ring-offset-white dark:ring-offset-slate-950 transition-all duration-500 group-hover:ring-slate-300 dark:group-hover:ring-slate-700">
+                                        {getInitials(cliente?.nombre)}
+                                    </div>
+                                    <span className="hidden xl:block font-medium text-[15px] tracking-tight">{cliente?.nombre?.split(' ')[0] || 'Usuario'}</span>
+                                    <svg className={`w-4 h-4 transition-transform duration-500 ${isUserMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                                     </svg>
-                                    <span className="font-medium">{cliente?.nombre?.split(' ')[0] || 'Usuario'}</span>
-                                    <svg className={`w-4 h-4 transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black group-hover:w-full transition-all duration-300"></span>
                                 </button>
 
-                                {/* Dropdown de usuario autenticado */}
-                                {isUserMenuOpen && (
-                                    <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-2 z-50 animate-in fade-in zoom-in">
-                                        <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
-                                            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{cliente?.nombre}</p>
-                                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{cliente?.email}</p>
-                                        </div>
-                                        <button
-                                            onClick={() => {
-                                                navigate('/perfil');
-                                                closeUserMenu();
-                                            }}
-                                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                                        >
-                                            Mi Perfil
-                                        </button>
-                                        <button
-                                            onClick={handleLogout}
-                                            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900"
-                                        >
-                                            Cerrar Sesión
-                                        </button>
+                                {/* Dropdown: Usuario autenticado */}
+                                <div className={`absolute right-0 mt-3 w-64 bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200/50 dark:border-slate-800/50 py-3 z-50 transition-all duration-500 ease-out origin-top-right ${isUserMenuOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'}`}>
+                                    <div className="px-5 py-3 border-b border-slate-200/50 dark:border-slate-800/50">
+                                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100 tracking-tight">{cliente?.nombre}</p>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">{cliente?.email}</p>
                                     </div>
-                                )}
+                                    <button
+                                        onClick={() => {
+                                            navigate('/perfil');
+                                            closeUserMenu();
+                                        }}
+                                        className="w-full text-left px-5 py-3 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-all duration-300 flex items-center gap-3 group"
+                                    >
+                                        {/* Icono de perfil */}
+                                        <svg className="w-4 h-4 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                        </svg>
+                                        <span className="font-medium tracking-tight">Mi Perfil</span>
+                                    </button>
+                                    <button
+                                        onClick={handleLogout}
+                                        className="w-full text-left px-5 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all duration-300 flex items-center gap-3 group"
+                                    >
+                                        {/* Icono de logout */}
+                                        <svg className="w-4 h-4 text-red-400 group-hover:text-red-600 dark:group-hover:text-red-300 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                        </svg>
+                                        <span className="font-medium tracking-tight">Cerrar Sesión</span>
+                                    </button>
+                                </div>
                             </>
                         ) : (
                             <>
+                                {/* Botón "Cuenta" para usuarios no logueados */}
                                 <button
                                     onClick={toggleUserMenu}
-                                    className="relative flex items-center space-x-2 text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100 transition-colors duration-300 font-medium group"
+                                    className="relative flex items-center gap-3 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-500 ease-out group"
                                     aria-label="Menú de autenticación"
                                     aria-expanded={isUserMenuOpen}
                                 >
-                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg className="w-9 h-9 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200 transition-colors duration-500" fill="currentColor" viewBox="0 0 20 20">
                                         <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                                     </svg>
-                                    <span className="font-medium">Cuenta</span>
-                                    <svg className={`w-4 h-4 transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                    <span className="hidden xl:block font-medium text-[15px] tracking-tight">Cuenta</span>
+                                    <svg className={`w-4 h-4 transition-transform duration-500 ${isUserMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                                     </svg>
-                                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black group-hover:w-full transition-all duration-300"></span>
                                 </button>
 
-                                {/* Dropdown de invitado */}
-                                {isUserMenuOpen && (
-                                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl py-2 z-50 animate-in fade-in zoom-in duration-200 origin-top-right">
-                                        <button
-                                            onClick={() => {
-                                                navigate('/login');
-                                                closeUserMenu();
-                                            }}
-                                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                                        >
-                                            Iniciar Sesión
-                                        </button>
-                                        <button
-                                            onClick={() => {
-                                                navigate('/registro');
-                                                closeUserMenu();
-                                            }}
-                                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                                        >
-                                            Registrarse
-                                        </button>
-                                    </div>
-                                )}
+                                {/* Dropdown: Usuario no logueado */}
+                                <div className={`absolute right-0 mt-3 w-56 bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200/50 dark:border-slate-800/50 py-2 z-50 transition-all duration-500 ease-out origin-top-right ${isUserMenuOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'}`}>
+                                    <button
+                                        onClick={() => {
+                                            navigate('/login');
+                                            closeUserMenu();
+                                        }}
+                                        className="w-full text-left px-5 py-3 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-all duration-300 flex items-center gap-3 group"
+                                    >
+                                        {/* Icono de login */}
+                                        <svg className="w-4 h-4 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                                        </svg>
+                                        <span className="font-medium tracking-tight">Iniciar Sesión</span>
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            navigate('/registro');
+                                            closeUserMenu();
+                                        }}
+                                        className="w-full text-left px-5 py-3 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-all duration-300 flex items-center gap-3 group"
+                                    >
+                                        {/* Icono de registro */}
+                                        <svg className="w-4 h-4 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                                        </svg>
+                                        <span className="font-medium tracking-tight">Registrarse</span>
+                                    </button>
+                                </div>
                             </>
                         )}
                     </div>
                 </div>
             </nav>
 
-            {/* Menú desplegable para móviles */}
+            {/* ----------------------------------------------------------------
+                MENÚ MÓVIL DESPLEGABLE
+                Aparece cuando el usuario presiona el botón hamburguesa.
+                Se desliza desde arriba con animación.
+                
+                ¿El menú no aparece? Revisa el estado 'isOpen'.
+                ¿Los colores no se ven bien? Revisa las clases con '!' que fuerzan colores.
+            ---------------------------------------------------------------- */}
             <div
                 id="mobile-menu"
-                className={`md:hidden absolute w-full transition-all duration-300 ease-in-out transform origin-top shadow-2xl ${isOpen ? 'opacity-100 translate-y-0 scale-y-100' : 'opacity-0 -translate-y-2 scale-y-95 pointer-events-none'
-                    } bg-white dark:bg-gray-900`} // Forzamos fondos sólidos
+                className={`lg:hidden absolute w-full transition-all duration-500 ease-out transform origin-top bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`}
             >
-                <div className="px-4 pt-5 pb-6 space-y-2 flex flex-col items-center">
-                    {navLinks.map((link) => (
+                <div className="px-6 py-6 space-y-1 flex flex-col">
+                    {/* Enlaces de navegación */}
+                    {ENLACES_NAVEGACION.map((link) => (
                         <NavLink
                             key={link.to}
                             to={link.to}
                             className={({ isActive }) => `
-                                w-full block text-center py-4 text-xl font-medium rounded-xl transition-all duration-200
-                                /* El ! asegura que el color de Tailwind mande sobre el CSS global */
-                                    ${isActive
-                                    ? '!text-purple-600 dark:!text-purple-400 bg-purple-50 dark:bg-purple-900/20'
-                                    : '!text-gray-900 dark:!text-gray-100 hover:!bg-gray-100 dark:hover:!bg-gray-800 hover:!text-gray-900 dark:hover:!text-white'
-                                    }
-                                    `}
+                                relative w-full block text-left px-5 py-4 text-base font-medium tracking-tight rounded-xl transition-all duration-300
+                                ${isActive
+                                    ? '!text-slate-900 dark:!text-slate-50 bg-slate-100 dark:bg-slate-900'
+                                    : '!text-slate-600 dark:!text-slate-400 hover:!bg-slate-50 dark:hover:!bg-slate-900/50 hover:!text-slate-900 dark:hover:!text-slate-100'
+                                }
+                            `}
                             onClick={closeMenu}
                         >
                             {link.label}
                         </NavLink>
                     ))}
+                    
                     {/* Separador */}
-                    <div className="w-full border-t border-gray-300 dark:border-gray-700 my-2"></div>
+                    <div className="w-full border-t border-slate-200 dark:border-slate-800 my-3"></div>
 
-                    {/* Opciones de autenticación en móvil */}
+                    {/* Opciones de usuario en móvil */}
                     {isAuthenticated ? (
                         <>
-                            <div className="w-full text-center py-2 px-4">
-                                <p className="text-sm font-semibold text-gray-900 dark:text-white">{cliente?.nombre}</p>
-                                <p className="text-xs text-gray-500 dark:text-gray-300">{cliente?.email}</p>
+                            {/* Info del usuario */}
+                            <div className="w-full text-left py-3 px-5">
+                                <p className="text-sm font-semibold text-slate-900 dark:text-slate-100 tracking-tight">{cliente?.nombre}</p>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{cliente?.email}</p>
                             </div>
                             <button
                                 onClick={() => {
                                     navigate('/perfil');
                                     closeMenu();
                                 }}
-                                className="w-full text-center py-2 text-lg font-bold rounded-lg text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
+                                className="w-full text-left px-5 py-4 text-base font-medium tracking-tight rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-all duration-300"
                             >
                                 Mi Perfil
                             </button>
@@ -292,7 +483,7 @@ const Navbar = () => {
                                     handleLogout();
                                     closeMenu();
                                 }}
-                                className="w-full text-center py-2 text-lg font-bold rounded-lg text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900"
+                                className="w-full text-left px-5 py-4 text-base font-medium tracking-tight rounded-xl text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all duration-300"
                             >
                                 Cerrar Sesión
                             </button>
@@ -304,7 +495,7 @@ const Navbar = () => {
                                     navigate('/login');
                                     closeMenu();
                                 }}
-                                className="w-full text-center py-2 text-lg font-bold rounded-lg text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
+                                className="w-full text-left px-5 py-4 text-base font-medium tracking-tight rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-all duration-300"
                             >
                                 Iniciar Sesión
                             </button>
@@ -313,7 +504,7 @@ const Navbar = () => {
                                     navigate('/registro');
                                     closeMenu();
                                 }}
-                                className="w-full text-center py-2 text-lg font-bold rounded-lg text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
+                                className="w-full text-left px-5 py-4 text-base font-medium tracking-tight rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-all duration-300"
                             >
                                 Registrarse
                             </button>
@@ -325,4 +516,6 @@ const Navbar = () => {
     );
 };
 
+// Memoizamos el componente para evitar renderizados innecesarios
+// cuando el componente padre se actualiza pero el Navbar no cambió.
 export default React.memo(Navbar);

@@ -24,7 +24,7 @@ const PoliticaPrivacidad = React.lazy(() => import('./Paginas/PoliticaPrivacidad
 const TerminosServicio = React.lazy(() => import('./Paginas/TerminosServicio'));
 
 // Solo componentes críticos del layout se cargan síncronos
-import PieDePagina from './Componentes/Layout/PieDePagina/PieDePagina';
+import Footer from './Componentes/UI/Footer/Footer';
 import ScrollTop from './Componentes/Layout/ScrollTop/ScrollTop';
 import CartIcon from './Componentes/CartIcon';
 import Navbar from './Componentes/UI/Navbar/Navbar';
@@ -48,7 +48,7 @@ const App = () => {
                                 {/* Usar el Navbar component con autenticación */}
                                 <Navbar />
 
-                                <main className="flex-grow pt-20">
+                                <main className="flex-grow">
                                     {/* ✅ Suspense boundary para rutas lazy-loaded */}
                                     <Suspense fallback={<LoadingScreen />}>
                                         <Routes>
@@ -79,7 +79,7 @@ const App = () => {
                                         </Routes>
                                     </Suspense>
                                 </main>
-                                <PieDePagina />
+                                <Footer />
                                 <Analytics />
                                 <SpeedInsights />
                             </div>

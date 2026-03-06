@@ -3,6 +3,7 @@
 // Importamos las URLs de las imágenes y activos para su uso local
 import LogoGaddyel from '../Activos/Imagenes/Logo-Gaddyel.png';
 
+// ✅ Imagen de fondo con efecto parallax - Logo Neon Gaddyel
 import imagenFondo from '../Activos/Imagenes/imagenFondo.jpg';
 
 // Exportamos los datos de las preguntas frecuentes (FAQ)

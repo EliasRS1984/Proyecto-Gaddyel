@@ -7,6 +7,7 @@ import { obtenerProductos } from '../Servicios/productosService.js';
 import carouselService from '../Servicios/carouselService.js';
 import Carrusel from '../Componentes/UI/Carrusel/Carrusel.jsx';
 import ScrollReveal from '../Componentes/Layout/ScrollReveal/ScrollReveal.jsx';
+import ParallaxBackground from '../Componentes/UI/ParallaxBackground/ParallaxBackground.jsx';
 import FaqItem from '../Componentes/FaqItem';
 import ImagenArticulo from '../Activos/Imagenes/imagen-articulo/imagen-articulo.jpg';
 import TarjetaProducto from '../Componentes/TarjetaProducto/TarjetaProducto.jsx';
@@ -15,13 +16,32 @@ import ImageOptimizer from '../Componentes/ImageOptimizer.jsx';
 /**
  * CTAButton - Componente reutilizable para botones de llamada a acción
  * 
+ * DISEÑO:
+ * - Paleta indigo (no purple) según Design System
+ * - Transiciones de 500ms ease-out (profesionales)
+ * - Focus states con ring slate
+ * - Hover scale sutil (105%)
+ * - Typography tracking-tight
+ * 
  * @prop {string} to - Ruta de navegación
  * @prop {string} children - Texto del botón
  */
 const CTAButton = React.memo(({ to, children }) => (
     <NavLink
         to={to}
-        className="inter font-bold bg-purple-500 hover:bg-purple-700 text-black hover:text-white font-bold py-3 px-6 rounded-full transition-colors duration-300 hover:scale-105"
+        className="
+            inline-block
+            font-semibold tracking-tight
+            bg-indigo-600 hover:bg-indigo-700 
+            dark:bg-indigo-500 dark:hover:bg-indigo-600
+            text-white
+            py-3 px-8
+            rounded-full
+            transition-all duration-500 ease-out
+            hover:scale-105
+            focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
+            shadow-lg hover:shadow-xl
+        "
     >
         {children}
     </NavLink>
@@ -139,7 +159,7 @@ const Inicio = () => {
         <>
             {/* SEO 2026: Metadatos optimizados para máxima indexación y CTR */}
             <Helmet>
-                {/* ✅ Metadatos dinámicos optimizados para SEO Nicho */}
+                {/* ✅ SEO: Metadatos optimizados para nicho B2B blanquería personalizada */}
                 <title>Vinchas y Batas Personalizadas para Estética y Spa | Gaddyel Blanquería</title>
                 <meta
                     name="description"
@@ -182,13 +202,28 @@ const Inicio = () => {
                 </script>
             </Helmet>
 
-            <div className="w-full min-h-screen bg-fixed bg-cover bg-center" style={{ backgroundImage: `url(${imagenFondo})` }}>
-                <div className="container mx-auto overflow-hidden">
+            <ParallaxBackground 
+                imageSrc={imagenFondo}
+                parallaxSpeed={-0.1}
+                overlay={false}
+                overlayColor="bg-slate-950/5 dark:bg-slate-950/20"
+                className="w-full"
+            >
+                <div className="container mx-auto pt-0 pb-8">
 
                     {/* Hero Section - Contenido principal */}
                     <main>
                         <section
-                            className="min-h-screen flex items-center justify-center flex-col text-center p-4 md:p-8 bg-white rounded-b-2xl shadow-xl my-24"
+                            className="
+                                flex items-center justify-center flex-col text-center 
+                                p-3 md:p-6 lg:p-8
+                                bg-white/80 dark:bg-slate-900/80
+                                backdrop-blur-xl
+                                border border-slate-200/50 dark:border-slate-800/50
+                                rounded-b-2xl
+                                shadow-xl
+                                mt-12 mb-8
+                            "
                             aria-label="Presentación principal de Gaddyel"
                         >
                             <ImageOptimizer
@@ -199,18 +234,27 @@ const Inicio = () => {
                                 height={320}
                                 priority={true}
                             />
-                            <h1 className="italic text-3xl md:text-5xl lg:text-6xl font-extrabold text-indigo-800 mb-8 leading-tight max-w-4xl mx-auto">
-                                <span className="block text-gray-800">Blanquería Personalizada con Distinción</span>
+                            <h1 className="italic text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-indigo-900 dark:text-indigo-300 mb-16 mt-4 leading-tight max-w-4xl mx-auto">
+                                <span className="block text-slate-800 dark:text-slate-100">Blanquería Personalizada con Distinción</span>
                             </h1>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center max-w-5xl h-full mx-auto mb-12">
                                 <ScrollReveal>
-                                    <article className="text-left p-6 bg-gray-50 rounded-lg shadow-md ">
-                                        <h3 className="text-2xl font-bold text-gray-800 mb-4">La Estrategia detrás del Confort</h3>
-                                        <p className="text-gray-700 leading-relaxed mb-4">
+                                    <article className="
+                                        text-left p-6 lg:p-8
+                                        bg-slate-50/80 dark:bg-slate-800/80
+                                        backdrop-blur-sm
+                                        border border-slate-200/50 dark:border-slate-700/50
+                                        rounded-2xl 
+                                        shadow-lg
+                                        transition-all duration-500 ease-out
+                                        hover:shadow-xl
+                                    ">
+                                        <h3 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-4">La Estrategia detrás del Confort</h3>
+                                        <p className="text-[15px] text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
                                             En Gaddyel, no solo personalizamos textiles; "diseñamos embajadores silenciosos para tu negocio". Entendemos que en un Spa o Centro de estética, el tacto de una bata o la distinción de un logo bordado son las herramientas de marketing más poderosas para fidelizar a tus clientes.
                                         </p>
-                                        <p className="text-gray-700 leading-relaxed">
+                                        <p className="text-[15px] text-slate-700 dark:text-slate-300 leading-relaxed">
                                             Nuestra blanquería de alta gama fusiona durabilidad extrema con una suavidad que cautiva. Al elegir Gaddyel, no solo adquieres equipamiento profesional, estás invirtiendo en un "sello de identidad" que eleva la percepción de tu servicio y garantiza que tu marca sea la protagonista en la memoria de quien la visita.
                                         </p>
                                     </article>
@@ -238,18 +282,27 @@ const Inicio = () => {
 
                     {/* Carrusel */}
                     <section
-                        className="min-h-screen flex flex-col items-center justify-center p-4 md:p-8 bg-gray-50 rounded-2xl my-72 shadow-xl"
+                        className="
+                            flex flex-col items-center justify-center 
+                            p-6 md:p-12 lg:p-16
+                            bg-slate-50/80 dark:bg-slate-900/80
+                            backdrop-blur-xl
+                            border border-slate-200/50 dark:border-slate-800/50
+                            rounded-2xl 
+                            mt-40
+                            shadow-xl
+                        "
                         aria-label="Galería de productos destacados"
                     >
                         <div className="flex flex-col items-center w-full">
-                            <h2 className="italic text-3xl md:text-4xl font-bold text-center text-gray-800 mb-6 md:mb-8 shrink-0">
+                            <h2 className="italic text-3xl md:text-4xl font-bold tracking-tight text-center text-slate-900 dark:text-slate-100 mb-6 md:mb-8 shrink-0">
                                 Nuestros Destacados
                             </h2>
                             <ScrollReveal>
                                 {carouselImages?.length > 0 ? (
                                     <Carrusel imagenes={carouselImages} />
                                 ) : (
-                                    <p className="text-gray-600 text-center">
+                                    <p className="text-slate-600 dark:text-slate-400 text-center">
                                         No hay imágenes para mostrar.
                                     </p>
                                 )}
@@ -260,24 +313,42 @@ const Inicio = () => {
 
                     {/* Productos destacados dinámicos */}
                     <section
-                        className="min-h-screen flex items-center justify-center flex-col p-4 md:p-8 bg-white rounded-2xl my-72 shadow-xl"
+                        className="
+                            flex items-center justify-center flex-col 
+                            p-6 md:p-12 lg:p-16
+                            bg-white/80 dark:bg-slate-900/80
+                            backdrop-blur-xl
+                            border border-slate-200/50 dark:border-slate-800/50
+                            rounded-2xl 
+                            mt-40
+                            shadow-xl
+                        "
                         aria-label="Productos destacados de Gaddyel"
                     >
-                        <h2 className="italic text-3xl md:text-4xl font-bold text-center text-gray-800 mb-8">
+                        <h2 className="italic text-3xl md:text-4xl font-bold tracking-tight text-center text-slate-900 dark:text-slate-100 mb-8">
                             Productos que te Encantarán
                         </h2>
 
                         {cargando ? (
                             <div className="flex flex-col items-center justify-center" role="status" aria-live="polite">
-                                <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-purple-600 border-r-transparent mb-4"></div>
-                                <p className="text-gray-500">Cargando productos destacados...</p>
+                                <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-indigo-600 dark:border-indigo-400 border-r-transparent mb-4"></div>
+                                <p className="text-slate-600 dark:text-slate-400">Cargando productos destacados...</p>
                             </div>
                         ) : error ? (
                             <div className="text-center" role="alert" aria-live="assertive">
-                                <p className="text-red-600 mb-4 font-semibold">{error}</p>
+                                <p className="text-red-600 dark:text-red-400 mb-4 font-semibold">{error}</p>
                                 <button
                                     onClick={handleRetry}
-                                    className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
+                                    className="
+                                        px-6 py-3 
+                                        bg-red-600 hover:bg-red-700 
+                                        dark:bg-red-500 dark:hover:bg-red-600
+                                        text-white 
+                                        rounded-2xl 
+                                        transition-all duration-500 ease-out
+                                        focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2
+                                        shadow-lg hover:shadow-xl
+                                    "
                                     aria-label="Reintentar carga de productos"
                                 >
                                     Reintentar
@@ -292,16 +363,24 @@ const Inicio = () => {
                                 ))}
                             </div>
                         ) : (
-                            <p className="text-gray-600 text-center">No hay productos destacados disponibles.</p>
+                            <p className="text-slate-600 dark:text-slate-400 text-center">No hay productos destacados disponibles.</p>
                         )}
                     </section>
 
                     {/* Preguntas frecuentes */}
                     <section
-                        className="bg-gray-50 py-16 px-4 sm:px-6 rounded-xl my-72 shadow-xl"
+                        className="
+                            bg-slate-50/80 dark:bg-slate-900/80
+                            backdrop-blur-xl
+                            border border-slate-200/50 dark:border-slate-800/50
+                            py-16 px-6 sm:px-12 lg:px-16
+                            rounded-2xl 
+                            mt-40
+                            shadow-xl
+                        "
                         aria-label="Preguntas frecuentes sobre Gaddyel"
                     >
-                        <h2 className="italic text-3xl md:text-4xl font-bold text-center text-gray-800 mb-12">
+                        <h2 className="italic text-3xl md:text-4xl font-bold tracking-tight text-center text-slate-900 dark:text-slate-100 mb-12">
                             Preguntas Frecuentes
                         </h2>
                         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -314,7 +393,18 @@ const Inicio = () => {
                                 <div className="text-center mt-8">
                                     <button
                                         onClick={() => setShowAllFaqs(!showAllFaqs)}
-                                        className="inter font-bold bg-purple-500 hover:bg-purple-700 text-black hover:text-white font-bold py-3 px-6 rounded-full transition-colors duration-300 hover:scale-105"
+                                        className="
+                                            font-semibold tracking-tight
+                                            bg-indigo-600 hover:bg-indigo-700 
+                                            dark:bg-indigo-500 dark:hover:bg-indigo-600
+                                            text-white 
+                                            py-3 px-8 
+                                            rounded-full 
+                                            transition-all duration-500 ease-out
+                                            hover:scale-105
+                                            focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
+                                            shadow-lg hover:shadow-xl
+                                        "
                                         aria-expanded={showAllFaqs}
                                         aria-label={showAllFaqs ? 'Ver menos preguntas frecuentes' : 'Ver más preguntas frecuentes'}
                                     >
@@ -327,24 +417,33 @@ const Inicio = () => {
 
                     {/* CTA final */}
                     <section
-                        className="min-h-screen flex items-center justify-center flex-col text-center bg-blue-100 p-12 rounded-xl my-72 shadow-xl"
+                        className="
+                            flex items-center justify-center flex-col text-center 
+                            bg-white/80 dark:bg-slate-900/80
+                            backdrop-blur-xl
+                            p-12 lg:p-20
+                            border border-slate-200/50 dark:border-slate-800/50
+                            rounded-2xl 
+                            mt-40 mb-8
+                            shadow-xl
+                        "
                         aria-label="Llamado a la acción - Contacto"
                     >
                         <ScrollReveal>
-                            <h2 className="text-4xl md:text-5xl font-bold text-blue-800 mb-6">
+                            <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-indigo-900 dark:text-indigo-300 mb-6">
                                 Tu imagen también define cómo te eligen.
                             </h2>
                         </ScrollReveal>
 
                         <ScrollReveal>
-                            <p className="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto mb-4">
+                            <p className="text-lg md:text-xl text-slate-700 dark:text-slate-300 max-w-3xl mx-auto mb-4 leading-relaxed">
                                 La blanquería personalizada no es un detalle decorativo.
                                 Es una herramienta que refuerza tu identidad profesional en cada experiencia del cliente.
                             </p>
                         </ScrollReveal>
 
                         <ScrollReveal>
-                            <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto mb-8">
+                            <p className="text-base md:text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mb-8 leading-relaxed">
                                 Si tu centro cuida cada tratamiento, cada protocolo y cada resultado,
                                 tu imagen debería comunicar el mismo nivel.
                             </p>
@@ -356,7 +455,7 @@ const Inicio = () => {
                     </section>
 
                 </div>
-            </div>
+            </ParallaxBackground>
         </>
     );
 };
