@@ -44,7 +44,7 @@ const App = () => {
                     <OrderProvider>
                         <Router>
                             <ScrollTop />
-                            <div className="flex flex-col min-h-screen font-sans">
+                            <div className="flex flex-col min-h-screen font-sans bg-white dark:bg-slate-950">
                                 {/* Usar el Navbar component con autenticación */}
                                 <Navbar />
 

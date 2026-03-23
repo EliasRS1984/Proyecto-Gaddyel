@@ -1,140 +1,112 @@
-/**
- * ✅ SERVICIO MERCADO PAGO - FRONTEND
- * 
- * FLUJO DE DATOS:
- * 1. Frontend llama a createPreference(ordenId)
- * 2. Backend crea preferencia en Mercado Pago
- * 3. Backend retorna checkoutUrl + preferenceId
- * 4. Frontend redirige usuario a Mercado Pago
- * 5. Usuario paga y Mercado Pago envía webhook al backend
- * 6. Mercado Pago redirige a /pedido-confirmado o /pedido-fallido
- * 
- * INTEGRACIONES:
- * - Backend: POST /api/mercadopago/preferences (crear checkout)
- * - Backend: GET /api/mercadopago/payment/:ordenId (consultar estado)
- * 
- * SEGURIDAD:
- * - Todos los endpoints requieren JWT (excepto webhook)
- * - Device ID enviado para anti-fraude
- * - No se manejan datos de tarjeta (PCI-DSS compliance)
- */
+// =====================================================================
+// ¿QUÉ ES ESTO?
+// Conjunto de funciones que conectan el frontend con el backend
+// para todo lo relacionado con los pagos de Mercado Pago.
+//
+// ¿CÓMO FUNCIONA?
+// 1. createPreference(ordenId)
+//    → Le pide al backend que arme el "objeto de pago" en MP (precio, ítems, URLs de retorno)
+//    → El backend retorna el preferenceId que necesita el Wallet Brick para mostrarse
+//
+// 2. getPaymentStatus(ordenId)
+//    → Consulta al backend cuál es el estado actual del pago de esa orden
+//    → Retorna: approved / rejected / pending / cancelled
+//
+// 3. pollPaymentStatus(ordenId, callback)
+//    → Consulta el estado cada N segundos hasta que sea definitivo (aprobado/rechazado)
+//    → Útil cuando el webhook de MP tarda en llegar
+//    → Retorna una función para detener las consultas manualmente
+//
+// ¿DÓNDE BUSCAR SI HAY PROBLEMAS?
+// - "No estás autenticado"   → El usuario cerró sesión o el token expiró. Revisar getAuthToken.
+// - "Error HTTP 4xx"         → El backend rechazó la solicitud. Revisar el ordenId enviado.
+// - Brick no aparece         → createPreference falló. Revisar la consola de red del browser.
+// - Polling no para          → Revisar que el backend retorne status 'approved'/'rejected'.
+//
+// SEGURIDAD:
+// - El token de sesión nunca se muestra en consola (riesgo eliminado)
+// - Los datos de tarjeta NUNCA pasan por este archivo (los maneja MP directamente)
+// =====================================================================
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'https://gaddyel-backend.onrender.com';
 
-/**
- * Obtener token JWT del cliente autenticado
- * Busca en múltiples ubicaciones posibles para compatibilidad
- */
+// ======== OBTENER TOKEN DE SESIÓN ========
+// Recupera el token de sesión guardado al iniciar sesión.
+// El token fue guardado por authService.js en localStorage con la clave 'clientToken'.
+// ¿Sin token? El usuario no está autenticado o su sesión expiró.
 const getAuthToken = () => {
-    // Intentar obtener de diferentes ubicaciones
-    const token = localStorage.getItem('clientToken') || 
-                  localStorage.getItem('token') ||
-                  sessionStorage.getItem('clientToken');
-    
+    const token = localStorage.getItem('clientToken');
+
     if (!token) {
-        console.error('❌ No se encontró token de autenticación en localStorage/sessionStorage');
-        console.log('📋 Claves en localStorage:', Object.keys(localStorage));
-        throw new Error('Usuario no autenticado. Por favor, inicia sesión nuevamente.');
+        throw new Error('Tu sesión expiró. Por favor, iniciá sesión nuevamente.');
     }
-    
-    console.log('✅ Token encontrado:', token.substring(0, 20) + '...');
+
     return token;
 };
 
-/**
- * Crear preferencia de pago en Mercado Pago
- * 
- * @param {string} ordenId - ID de la orden en MongoDB
- * @param {string} deviceId - Device ID de Mercado Pago (anti-fraude)
- * @returns {Promise<Object>} { checkoutUrl, sandboxCheckoutUrl, preferenceId }
- */
+// ======== CREAR PREFERENCIA DE PAGO ========
+// Le pide al backend que registre esta orden en Mercado Pago y obtenga
+// el "preferenceId" — el identificador único que MP necesita para mostrar el botón de pago.
+//
+// @param {string} ordenId  - ID de la orden creada (viene de MongoDB)
+// @param {string} deviceId - Identificador del dispositivo del usuario (anti-fraude de MP, opcional)
+// @returns {{ preferenceId, checkoutUrl, sandboxCheckoutUrl }}
 export const createPreference = async (ordenId, deviceId = null) => {
-    try {
-        console.log('🔵 [MP Service] Creando preferencia para orden:', ordenId);
+    const token = getAuthToken();
 
-        const token = getAuthToken();
+    const response = await fetch(`${API_BASE}/api/mercadopago/preferences`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ ordenId, deviceId })
+    });
 
-        const response = await fetch(`${API_BASE}/api/mercadopago/preferences`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                ordenId,
-                deviceId
-            })
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.error || `Error HTTP ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        console.log('✅ [MP Service] Preferencia creada:', {
-            preferenceId: data.preferenceId,
-            checkoutUrl: data.checkoutUrl
-        });
-
-        return data;
-
-    } catch (error) {
-        console.error('❌ [MP Service] Error creando preferencia:', error);
-        throw error;
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `No se pudo iniciar el checkout (Error ${response.status})`);
     }
+
+    return response.json();
 };
 
-/**
- * Obtener estado de pago de una orden
- * 
- * @param {string} ordenId - ID de la orden en MongoDB
- * @returns {Promise<Object>} { status, paymentId, statusDetail, amount, ... }
- */
+// ======== CONSULTAR ESTADO DE PAGO ========
+// Pregunta al backend cuál es el estado actual del pago de una orden específica.
+// Retorna el estado más reciente que el backend tiene registrado.
+//
+// @param {string} ordenId - ID de la orden a consultar
+// @returns {{ status, paymentId, statusDetail, amount, ... }}
 export const getPaymentStatus = async (ordenId) => {
-    try {
-        console.log('🔵 [MP Service] Consultando estado de pago:', ordenId);
+    const token = getAuthToken();
 
-        const token = getAuthToken();
-
-        const response = await fetch(`${API_BASE}/api/mercadopago/payment/${ordenId}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.error || `Error HTTP ${response.status}`);
+    const response = await fetch(`${API_BASE}/api/mercadopago/payment/${ordenId}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`
         }
+    });
 
-        const data = await response.json();
-
-        console.log('✅ [MP Service] Estado de pago:', {
-            status: data.status,
-            paymentId: data.paymentId
-        });
-
-        return data;
-
-    } catch (error) {
-        console.error('❌ [MP Service] Error obteniendo estado:', error);
-        throw error;
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `No se pudo obtener el estado del pago (Error ${response.status})`);
     }
+
+    return response.json();
 };
 
-/**
- * Consultar estado de pago con polling (cada N segundos)
- * Útil para actualizar UI cuando webhook aún no llegó
- * 
- * @param {string} ordenId - ID de la orden
- * @param {Function} callback - Función que recibe el estado actualizado
- * @param {number} interval - Intervalo en ms (default: 3000)
- * @param {number} maxAttempts - Máximo de intentos (default: 20)
- * @returns {Function} clearInterval function
- */
+// ======== CONSULTAR ESTADO AUTOMÁTICAMENTE (POLLING) ========
+// Cuando el usuario vuelve de MP, el pago puede tardar unos segundos en confirmarse.
+// Esta función pregunta al backend cada N segundos hasta que el estado sea definitivo.
+//
+// Se detiene automáticamente cuando el estado es: aprobado, rechazado, cancelado o reembolsado.
+// También se detiene si se alcanza el límite de intentos (para no consultar para siempre).
+//
+// @param {string}   ordenId     - ID de la orden a consultar
+// @param {Function} callback    - Función que se ejecuta con cada respuesta (recibe el estado)
+// @param {number}   interval    - Cada cuántos ms consultar (por defecto: 3000 = 3 segundos)
+// @param {number}   maxAttempts - Máximo de consultas antes de parar (por defecto: 20)
+// @returns {Function} - Llamar a esta función detiene el polling manualmente
 export const pollPaymentStatus = (ordenId, callback, interval = 3000, maxAttempts = 20) => {
     let attempts = 0;
 
@@ -145,19 +117,19 @@ export const pollPaymentStatus = (ordenId, callback, interval = 3000, maxAttempt
             const status = await getPaymentStatus(ordenId);
             callback(status);
 
-            // Detener polling si estado es final (approved, rejected, cancelled)
-            if (['approved', 'rejected', 'cancelled', 'refunded'].includes(status.status)) {
+            // Si el pago ya tiene un resultado definitivo, detener las consultas
+            const estadosFinales = ['approved', 'rejected', 'cancelled', 'refunded'];
+            if (estadosFinales.includes(status.status)) {
                 clearInterval(intervalId);
             }
 
-            // Detener si se alcanzó el máximo de intentos
+            // Detener si ya se consultó demasiadas veces (evita bucle infinito)
             if (attempts >= maxAttempts) {
                 clearInterval(intervalId);
-                console.warn('⚠️ [MP Service] Polling detenido: máximo de intentos alcanzado');
             }
 
-        } catch (error) {
-            console.error('❌ [MP Service] Error en polling:', error);
+        } catch {
+            // Si falla una consulta, detener el polling para no generar errores en cadena
             clearInterval(intervalId);
         }
     }, interval);

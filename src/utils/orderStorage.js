@@ -1,32 +1,44 @@
-/**
- * orderStorage.js - Gestión centralizada de órdenes en localStorage
- * 
- * Responsabilidades:
- * - Una única fuente de verdad para datos de órdenes
- * - Manejo consistente de errores
- * - Limpieza automática de datos antiguos
- * - Tipado implícito de datos
- */
+// =====================================================
+// ¿QUÉ ES ESTO?
+// Módulo que guarda y recupera los datos del último pedido
+// en el almacenamiento local del navegador (localStorage).
+// Actúa como memoria temporal entre el checkout y la pantalla
+// de confirmación de pago.
+//
+// ¿CÓMO FUNCIONA?
+// 1. Al confirmar un pedido, orderStorage.save() guarda los datos
+//    junto con la fecha y hora actuales.
+// 2. La pantalla de confirmación llama a orderStorage.get()
+//    para mostrar el resumen al usuario.
+// 3. Los datos expiran automáticamente después de 7 días.
+// 4. Al guardar o limpiar, se eliminan también claves antiguas
+//    de versiones anteriores de la app (migración).
+//
+// ¿DÓNDE BUSCAR SI HAY PROBLEMAS?
+// ¿La pantalla de confirmación no muestra el pedido?
+//   Revisá orderStorage.get() y que el pedido no haya expirado.
+// ¿Los datos se pierden al volver de Mercado Pago?
+//   Revisá que orderStorage.save() se llame antes del redirect.
+// ¿El total no es correcto?
+//   Revisá que save() reciba los datos correctos desde orderService.
+// =====================================================
+
+import { logger } from './logger';
 
 const ORDER_STORAGE_KEY = 'gaddyel_order_data';
 const ORDER_EXPIRY_DAYS = 7; // Órdenes expiran después de 7 días
 
-/**
- * Estructura del objeto de orden almacenado:
- * {
- *   order: { ordenId, total, items, ... },
- *   status: 'pending_payment' | 'approved' | 'rejected',
- *   timestamp: number,
- *   orderNumber: string
- * }
- */
+// Estructura de los datos guardados:
+// {
+//   order:       datos completos del pedido,
+//   status:      estado del pago ('pending_payment' / 'approved' / 'rejected'),
+//   timestamp:   fecha en milisegundos de cuándo se guardó,
+//   orderNumber: número identificador del pedido
+// }
 
 export const orderStorage = {
-    /**
-     * Guardar datos de orden en localStorage
-     * @param {Object} orderData - Datos completos de la orden
-     * @param {string} status - Estado de la orden
-     */
+    // Guarda los datos del pedido en el navegador.
+    // El estado por defecto es "pendiente de pago".
     save: (orderData, status = 'pending_payment') => {
         try {
             const dataToStore = {
@@ -43,15 +55,13 @@ export const orderStorage = {
             
             return true;
         } catch (error) {
-            console.error('❌ Error guardando orden en localStorage:', error);
+            logger.error('Error guardando orden en localStorage:', error);
             return false;
         }
     },
 
-    /**
-     * Obtener datos de orden desde localStorage
-     * @returns {Object|null} Datos de la orden o null si no existe
-     */
+    // Obtiene los datos del último pedido guardado.
+    // Si no hay pedido o ya expiró (más de 7 días), devuelve null.
     get: () => {
         try {
             const data = localStorage.getItem(ORDER_STORAGE_KEY);
@@ -67,33 +77,24 @@ export const orderStorage = {
 
             return parsed;
         } catch (error) {
-            console.error('❌ Error leyendo orden de localStorage:', error);
+            logger.error('Error leyendo orden de localStorage:', error);
             return null;
         }
     },
 
-    /**
-     * Obtener solo la orden (sin metadatos)
-     * @returns {Object|null}
-     */
+    // Devuelve solo los datos del pedido, sin fecha ni estado.
     getOrder: () => {
         const data = orderStorage.get();
         return data ? data.order : null;
     },
 
-    /**
-     * Obtener solo el estado de la orden
-     * @returns {string|null}
-     */
+    // Devuelve solo el estado del pedido (ej: 'approved', 'rejected').
     getStatus: () => {
         const data = orderStorage.get();
         return data ? data.status : null;
     },
 
-    /**
-     * Actualizar solo el estado sin modificar la orden
-     * @param {string} newStatus - Nuevo estado
-     */
+    // Actualiza el estado del pedido sin modificar los demás datos.
     updateStatus: (newStatus) => {
         const data = orderStorage.get();
         if (data) {
@@ -104,34 +105,25 @@ export const orderStorage = {
         return false;
     },
 
-    /**
-     * Limpiar datos de orden
-     */
+    // Borra todos los datos del pedido del navegador.
     clear: () => {
         try {
             localStorage.removeItem(ORDER_STORAGE_KEY);
             orderStorage.clearLegacyKeys();
             return true;
         } catch (error) {
-            console.error('❌ Error limpiando orden de localStorage:', error);
+            logger.error('Error limpiando orden de localStorage:', error);
             return false;
         }
     },
 
-    /**
-     * Verificar si una orden expiró
-     * @param {number} timestamp - Timestamp de cuando se guardó
-     * @returns {boolean}
-     */
+    // Verifica si el pedido tiene más de 7 días y ya no es válido.
     isExpired: (timestamp) => {
         const expiryTime = ORDER_EXPIRY_DAYS * 24 * 60 * 60 * 1000; // días en ms
         return Date.now() - timestamp > expiryTime;
     },
 
-    /**
-     * Limpiar órdenes antiguas automáticamente
-     * Debe llamarse al iniciar la app o al verificar órdenes
-     */
+    // Borra el pedido si ya expiró. Se puede llamar al iniciar la app.
     cleanup: () => {
         const data = orderStorage.get();
         if (data && orderStorage.isExpired(data.timestamp)) {
@@ -141,10 +133,7 @@ export const orderStorage = {
         return false; // No era necesario limpiar
     },
 
-    /**
-     * Limpiar keys antiguas de versiones previas (migración)
-     * Elimina: lastOrder, lastOrderStatus, lastOrderData, lastOrderTotal, etc.
-     */
+    // Elimina entradas viejas guardadas por versiones anteriores de la app.
     clearLegacyKeys: () => {
         const legacyKeys = [
             'lastOrder',
@@ -162,18 +151,12 @@ export const orderStorage = {
         });
     },
 
-    /**
-     * Verificar si hay una orden guardada
-     * @returns {boolean}
-     */
+    // Indica si hay un pedido activo guardado en el navegador.
     hasOrder: () => {
         return orderStorage.get() !== null;
     },
 
-    /**
-     * Obtener información resumida para debugging
-     * @returns {Object}
-     */
+    // Devuelve un resumen del pedido guardado. Útil para revisar el estado en desarrollo.
     getInfo: () => {
         const data = orderStorage.get();
         if (!data) {

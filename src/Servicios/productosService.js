@@ -1,10 +1,27 @@
-// src/Servicios/productosService.js
+// ============================================================
+// ¿QUÉ ES ESTO?
+// Funciones que se comunican con el servidor para traer la lista
+// de productos del catálogo y los detalles de un producto en
+// particular.
+//
+// ¿CÓMO FUNCIONA?
+// 1. Cada función hace una solicitud al servidor con los filtros
+//    o el ID que recibe.
+// 2. Si el servidor tarda o falla (cold start de Render), reintenta
+//    automáticamente hasta 3 veces antes de mostrar un error.
+// 3. Retorna los datos listos para que el componente los muestre.
+//
+// ¿DÓNDE BUSCAR SI HAY PROBLEMAS?
+// - ¿Productos no cargan? → Revisar obtenerProductos() y la URL de API.
+// - ¿Un producto no se encuentra? → Revisar obtenerProductoPorId().
+// - ¿Timeout recurrente? → El servidor puede estar en cold start.
+//   El manejo de reintentos está en fetchWithRetry().
+// ============================================================
+
 import { logger } from '../utils/logger';
 
 const API_BASE = import.meta.env.VITE_API_BASE || "https://gaddyel-backend.onrender.com";
 const API_URL = `${API_BASE}/api/productos`;
-
-logger.debug("🌐 Frontend Web - API_BASE:", API_BASE);
 
 /**
  * ✅ Reintentos con backoff exponencial para manejar Cold Start de Render
@@ -92,6 +109,7 @@ async function fetchWithRetry(url, options = {}, maxRetries = 3) {
  */
 export const obtenerProductos = async (params = {}) => {
     try {
+        logger.debug("🌐 Frontend Web - API_BASE:", API_BASE);
         logger.debug("📤 Fetch: GET /productos", params);
         
         // Construir query string
@@ -127,17 +145,15 @@ export const obtenerProductos = async (params = {}) => {
         };
     } catch (error) {
         if (error.name === 'AbortError') {
-            console.error("❌ Error: Timeout en solicitud de productos");
+            logger.error('[productosService] Timeout en solicitud de productos');
             throw new Error('La solicitud tardó demasiado. Por favor, intenta de nuevo.');
         }
-        console.error("❌ Error cargando productos:", error.message);
+        logger.error('[productosService] Error cargando productos:', error.message);
         throw new Error('No se pudieron cargar los productos. Por favor, intenta más tarde.');
     }
 };
 
-/**
- * Obtiene un producto por ID (con reintentos automáticos)
- */
+// Obtiene un producto por ID con reintentos automáticos.
 export const obtenerProductoPorId = async (id) => {
     try {
         logger.debug(`📤 Fetch: GET /productos/${id}`);
@@ -156,10 +172,10 @@ export const obtenerProductoPorId = async (id) => {
         return producto;
     } catch (error) {
         if (error.name === 'AbortError') {
-            console.error("❌ Error: Timeout en solicitud de producto");
+            logger.error('[productosService] Timeout en solicitud de producto');
             throw new Error('La solicitud tardó demasiado.');
         }
-        console.error("❌ Error cargando producto:", error.message);
+        logger.error('[productosService] Error cargando producto:', error.message);
         throw new Error('Error al obtener el producto');
     }
 };

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../Context/CartContext';
 
@@ -61,13 +60,19 @@ export const CartIcon = () => {
                 ¿El badge no aparece? Revisa useCart() y !isEmpty
             ================================================================ */}
             {!isEmpty && (
-                <span 
+                <span
+                    // aria-live="polite": cuando el número cambia (el usuario agrega un
+                    // producto), el lector de pantalla lo anuncia sin interrumpir al usuario.
+                    // aria-atomic="true": anuncia el contenido completo del badge, no solo
+                    // el carácter que cambió.
+                    aria-live="polite"
+                    aria-atomic="true"
                     className="
-                        absolute -top-1.5 -right-1.5 
+                        absolute -top-1.5 -right-1.5
                         min-w-[20px] h-5 px-1.5
                         flex items-center justify-center
-                        bg-slate-900 dark:bg-slate-100 
-                        text-white dark:text-slate-900 
+                        bg-slate-900 dark:bg-slate-100
+                        text-white dark:text-slate-900
                         text-[11px] font-bold tracking-tight
                         rounded-full
                         ring-2 ring-white dark:ring-slate-950
@@ -76,7 +81,6 @@ export const CartIcon = () => {
                         group-hover:ring-slate-100 dark:group-hover:ring-slate-900
                         group-hover:scale-110
                     "
-                    aria-label={`${itemCount} ${itemCount === 1 ? 'producto' : 'productos'} en el carrito`}
                 >
                     {itemCount > 99 ? '99+' : itemCount}
                 </span>

@@ -216,7 +216,8 @@ const Inicio = () => {
                         <section
                             className="
                                 flex items-center justify-center flex-col text-center 
-                                p-3 md:p-6 lg:p-8
+                                px-4 md:px-8 lg:px-12
+                                pt-8 pb-12
                                 bg-white/80 dark:bg-slate-900/80
                                 backdrop-blur-xl
                                 border border-slate-200/50 dark:border-slate-800/50
@@ -226,50 +227,139 @@ const Inicio = () => {
                             "
                             aria-label="Presentación principal de Gaddyel"
                         >
-                            <ImageOptimizer
-                                src={LogoGaddyel}
-                                alt="Logo Gaddyel - Blanquería personalizada premium"
-                                className="mx-auto w-40 h-40 sm:w-48 sm:h-48 md:h-64 md:w-64 lg:h-80 lg:w-80 mb-4 object-contain"
-                                width={320}
-                                height={320}
-                                priority={true}
-                            />
-                            <h1 className="italic text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-indigo-900 dark:text-indigo-300 mb-16 mt-4 leading-tight max-w-4xl mx-auto">
-                                <span className="block text-slate-800 dark:text-slate-100">Blanquería Personalizada con Distinción</span>
+                            {/* ===== FIRMA DE MARCA: Logo reducido + Píldora de identidad ===== */}
+                            {/* El logo pasa de ser el protagonista a ser una firma elegante */}
+                            <div className="flex flex-col items-center mb-8 mt-2">
+                                {/*
+                                 * LOGO CON ANIMACIONES:
+                                 * - animate-float: sube y baja 16px (4s loop) — amplitud mayor = más perceptible
+                                 * - Halo exterior pulsante: blur grande que late de 50% a 0% opacidad
+                                 * - Halo interior estático: brillo base siempre visible (no depende del pulso)
+                                 * - drop-shadow-2xl: profundidad visual sobre el fondo blanco
+                                 */}
+                                <div className="relative flex items-center justify-center mb-4
+                                    w-40 h-40 sm:w-44 sm:h-44 md:w-48 md:h-48">
+                                    {/* Halo exterior — pulsa entre visible e invisible */}
+                                    <div
+                                        className="absolute -inset-6 rounded-full animate-pulse opacity-50"
+                                        style={{ background: 'radial-gradient(circle, #818cf8 0%, transparent 65%)', filter: 'blur(32px)' }}
+                                        aria-hidden="true"
+                                    />
+                                    {/* Halo interior — siempre visible, da brillo base constante */}
+                                    <div
+                                        className="absolute -inset-2 rounded-full opacity-30"
+                                        style={{ background: 'radial-gradient(circle, #a5b4fc 0%, transparent 60%)', filter: 'blur(16px)' }}
+                                        aria-hidden="true"
+                                    />
+                                    <ImageOptimizer
+                                        src={LogoGaddyel}
+                                        alt="Logo Gaddyel - Blanquería personalizada premium"
+                                        className="relative w-36 h-36 sm:w-40 sm:h-40 md:w-44 md:h-44 object-contain drop-shadow-2xl animate-float"
+                                        width={176}
+                                        height={176}
+                                        priority={true}
+                                    />
+                                </div>
+                                {/* Píldora con el nicho exacto de Gaddyel — no aplica a ningún otro negocio */}
+                                <span className="
+                                    inline-flex items-center
+                                    text-[11px] font-semibold tracking-[0.15em] uppercase
+                                    text-indigo-700 dark:text-indigo-400
+                                    bg-indigo-50 dark:bg-indigo-950/60
+                                    border border-indigo-200/60 dark:border-indigo-800/60
+                                    px-4 py-1.5 rounded-full
+                                ">
+                                    Blanquería Personalizada · Bordado Industrial
+                                </span>
+                            </div>
+
+                            {/* ===== TÍTULO CON JERARQUÍA DE MARCA ===== */}
+                            {/* Línea pequeña = categoría del negocio / Línea grande = promesa de marca */}
+                            <h1 className="mb-12 max-w-3xl mx-auto">
+                                <span className="block text-[12px] md:text-[13px] font-semibold tracking-[0.22em] uppercase text-slate-500 dark:text-slate-400 mb-3">
+                                    Para centros de estética y spa
+                                </span>
+                                <span className="block italic text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-800 dark:text-slate-100 leading-tight">
+                                    Tu marca presente en{' '}
+                                    <span className="text-indigo-700 dark:text-indigo-400">
+                                        cada detalle de tu servicio.
+                                    </span>
+                                </span>
                             </h1>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center max-w-5xl h-full mx-auto mb-12">
+                            {/* ===== DOS COLUMNAS SIMÉTRICAS ===== */}
+                            {/* Ambas columnas usan items-stretch para forzar igual altura */}
+                            {/* Ambas tienen el mismo tratamiento visual: borde + rounded-2xl + sombra */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch w-full max-w-5xl mx-auto mb-10">
+
+                                {/* Columna de texto */}
                                 <ScrollReveal>
                                     <article className="
-                                        text-left p-6 lg:p-8
-                                        bg-slate-50/80 dark:bg-slate-800/80
+                                        flex flex-col justify-between
+                                        text-left p-7 lg:p-9 h-full
+                                        bg-slate-50/70 dark:bg-slate-800/70
                                         backdrop-blur-sm
                                         border border-slate-200/50 dark:border-slate-700/50
-                                        rounded-2xl 
-                                        shadow-lg
+                                        rounded-2xl
+                                        shadow-md
                                         transition-all duration-500 ease-out
-                                        hover:shadow-xl
+                                        hover:shadow-lg hover:border-indigo-200/60 dark:hover:border-indigo-800/60
                                     ">
-                                        <h3 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-4">La Estrategia detrás del Confort</h3>
-                                        <p className="text-[15px] text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
-                                            En Gaddyel, no solo personalizamos textiles; "diseñamos embajadores silenciosos para tu negocio". Entendemos que en un Spa o Centro de estética, el tacto de una bata o la distinción de un logo bordado son las herramientas de marketing más poderosas para fidelizar a tus clientes.
-                                        </p>
-                                        <p className="text-[15px] text-slate-700 dark:text-slate-300 leading-relaxed">
-                                            Nuestra blanquería de alta gama fusiona durabilidad extrema con una suavidad que cautiva. Al elegir Gaddyel, no solo adquieres equipamiento profesional, estás invirtiendo en un "sello de identidad" que eleva la percepción de tu servicio y garantiza que tu marca sea la protagonista en la memoria de quien la visita.
-                                        </p>
+                                        <div>
+                                            {/* Etiqueta de sección — aclara el propósito del texto */}
+                                            <p className="text-[11px] font-semibold tracking-[0.18em] uppercase text-indigo-600 dark:text-indigo-400 mb-4">
+                                                ¿Por qué Gaddyel?
+                                            </p>
+                                            <h3 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-4">
+                                                La Estrategia detrás del Confort
+                                            </h3>
+                                            <p className="text-[15px] text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
+                                                No solo personalizamos Blanquería, diseñamos embajadores silenciosos para tu gabinete. En cada bata y vincha bordada, tu logo está presente en el momento de mayor atención del cliente.
+                                            </p>
+                                            <p className="text-[15px] text-slate-700 dark:text-slate-300 leading-relaxed">
+                                                Nuestra blanquería de alta gama fusiona durabilidad extrema con una suavidad que cautiva. Estás invirtiendo en un sello de identidad que eleva la percepción de tu servicio.
+                                            </p>
+                                        </div>
+
+                                        {/* Tags de diferenciadores reales de Gaddyel — no aplican a ningún otro negocio */}
+                                        <div className="flex flex-wrap gap-2 mt-7">
+                                            {['Bordado con tu logo', 'Diseños Profesionales', 'Envíos a todo el país'].map(tag => (
+                                                <span key={tag} className="
+                                                    text-[11px] font-semibold tracking-tight
+                                                    text-slate-600 dark:text-slate-400
+                                                    bg-white dark:bg-slate-900
+                                                    border border-slate-200 dark:border-slate-700
+                                                    px-3 py-1 rounded-full
+                                                ">
+                                                    {tag}
+                                                </span>
+                                            ))}
+                                        </div>
                                     </article>
                                 </ScrollReveal>
 
+                                {/* Columna de imagen — mismo borde y redondeo que la tarjeta de texto */}
                                 <ScrollReveal>
-                                    <div className="flex justify-center items-center h-full">
+                                    <div className="
+                                        relative overflow-hidden
+                                        rounded-2xl
+                                        border border-slate-200/50 dark:border-slate-700/50
+                                        shadow-md h-full min-h-[320px]
+                                        transition-all duration-500 ease-out
+                                        hover:shadow-lg hover:border-indigo-200/60 dark:hover:border-indigo-800/60
+                                    ">
+                                        {/* object-cover + h-full asegura que llene igual espacio que el texto */}
                                         <ImageOptimizer
                                             src={ImagenArticulo}
                                             alt="Blanquería personalizada Gaddyel - Toallas y batas bordadas de alta calidad"
-                                            className="w-full h-auto max-w-lg rounded-lg shadow-xl object-contain"
+                                            className="w-full h-full object-cover"
                                             width={512}
                                             height={512}
                                             loading="lazy"
+                                            crop="fill"
                                         />
+                                        {/* Overlay sutil que unifica la imagen con la paleta Slate del sitio */}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 to-transparent" aria-hidden="true" />
                                     </div>
                                 </ScrollReveal>
                             </div>
@@ -289,7 +379,7 @@ const Inicio = () => {
                             backdrop-blur-xl
                             border border-slate-200/50 dark:border-slate-800/50
                             rounded-2xl 
-                            mt-40
+                            mt-72
                             shadow-xl
                         "
                         aria-label="Galería de productos destacados"
@@ -320,7 +410,7 @@ const Inicio = () => {
                             backdrop-blur-xl
                             border border-slate-200/50 dark:border-slate-800/50
                             rounded-2xl 
-                            mt-40
+                            mt-72
                             shadow-xl
                         "
                         aria-label="Productos destacados de Gaddyel"
@@ -375,7 +465,7 @@ const Inicio = () => {
                             border border-slate-200/50 dark:border-slate-800/50
                             py-16 px-6 sm:px-12 lg:px-16
                             rounded-2xl 
-                            mt-40
+                            mt-72
                             shadow-xl
                         "
                         aria-label="Preguntas frecuentes sobre Gaddyel"
@@ -424,7 +514,7 @@ const Inicio = () => {
                             p-12 lg:p-20
                             border border-slate-200/50 dark:border-slate-800/50
                             rounded-2xl 
-                            mt-40 mb-8
+                            mt-72 mb-24
                             shadow-xl
                         "
                         aria-label="Llamado a la acción - Contacto"

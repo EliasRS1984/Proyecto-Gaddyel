@@ -1,79 +1,95 @@
-import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
+// ============================================================
+// ¿QUÉ ES ESTO?
+// El "almacén" del carrito de compras. Guarda qué productos el
+// usuario eligió, en qué cantidades, y cuánto suma en total.
+// Esta información está disponible para toda la página sin
+// necesidad de pasarla componente por componente.
+//
+// ¿CÓMO FUNCIONA?
+// 1. Al abrir la página, lee el carrito guardado en el navegador
+//    (localStorage) para que el usuario retome donde quedó.
+// 2. Cada vez que el carrito cambia, lo guarda automáticamente.
+// 3. Expone funciones simples: agregar, quitar, cambiar cantidad,
+//    vaciar, y armar la lista para enviar al servidor al pagar.
+//
+// ¿DÓNDE BUSCAR SI HAY PROBLEMAS?
+// - ¿El carrito se vacía al recargar la página? → Revisar el
+//   inicializador de estado al comienzo de CartProvider.
+// - ¿Los totales no se actualizan? → Revisar las secciones
+//   "TOTAL" e "ITEM COUNT" dentro de los cálculos derivados.
+// - ¿El carrito no se guarda entre visitas? → Revisar el bloque
+//   "PERSISTENCIA AUTOMÁTICA".
+// - ¿Error al agregar un producto? → Revisar addToCart.
+// ============================================================
 
-/**
- * ✅ CartContext - Manejo global del carrito de compras (OPTIMIZADO)
- * Proporciona funciones para agregar, eliminar, actualizar items
- * Persiste en localStorage
- * 
- * ✅ OPTIMIZACIONES:
- * - useMemo: Cálculos de total e itemCount solo se recalculan si cartItems cambia
- * - useCallback: Funciones de acción (addToCart, etc) memorizadas
- * - Reduce renders innecesarios en componentes suscritos
- */
+import { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
+
+// ======== CONTEXTO DEL CARRITO ========
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-    const [cartItems, setCartItems] = useState([]);
 
-    // Cargar carrito desde localStorage al iniciar
-    useEffect(() => {
+    // ======== CARGA INICIAL DEL CARRITO ========
+    // Lee el carrito del navegador UNA sola vez, de forma instantánea,
+    // antes de que React muestre nada en pantalla.
+    //
+    // IMPORTANTE: No usar useEffect para esto. Usando el inicializador
+    // (función flecha en useState), se evita la condición de carrera
+    // donde el guardado automático sobreescribía el carrito cargado
+    // con un array vacío antes de que React procesara la actualización.
+    //
+    // ¿El carrito no carga los datos guardados? Revisar esta sección.
+    const [cartItems, setCartItems] = useState(() => {
         const saved = localStorage.getItem('gaddyel_cart');
-        if (saved) {
-            try {
-                setCartItems(JSON.parse(saved));
-            } catch (e) {
-                console.error('❌ Error cargando carrito:', e);
-                localStorage.removeItem('gaddyel_cart');
-            }
+        if (!saved) return [];
+        try {
+            return JSON.parse(saved);
+        } catch {
+            // Los datos guardados están corruptos — arranca con carrito vacío
+            localStorage.removeItem('gaddyel_cart');
+            return [];
         }
-    }, []);
+    });
 
-    // Guardar carrito en localStorage cuando cambia
+    // ======== PERSISTENCIA AUTOMÁTICA ========
+    // Cada vez que el carrito cambia, lo guarda en el navegador
+    // para que el usuario lo encuentre la próxima vez que visite la página.
+    //
+    // ¿El carrito no se guarda entre visitas? Revisar esta sección.
     useEffect(() => {
         localStorage.setItem('gaddyel_cart', JSON.stringify(cartItems));
     }, [cartItems]);
 
-    /**
-     * ✅ Agregar producto al carrito (memoizado)
-     * Si ya existe, incrementa cantidad pero mantiene cantidadUnidades del producto
-     */
+    // ======== ACCIONES DEL CARRITO ========
+
+    // Agrega un producto al carrito.
+    // Si el producto ya estaba, suma la cantidad indicada en lugar de duplicarlo.
     const addToCart = useCallback((producto, cantidad = 1) => {
         setCartItems(prevItems => {
             const exists = prevItems.find(item => item._id === producto._id);
-            
             if (exists) {
                 return prevItems.map(item =>
                     item._id === producto._id
-                        ? { 
-                            ...item, 
-                            cantidad: item.cantidad + cantidad
-                            // cantidadUnidades se mantiene del producto (no se acumula)
-                          }
+                        ? { ...item, cantidad: item.cantidad + cantidad }
                         : item
                 );
             }
-            
             return [...prevItems, { ...producto, cantidad }];
         });
     }, []);
 
-    /**
-     * ✅ Quitar producto del carrito completamente (memoizado)
-     */
+    // Elimina un producto del carrito por completo.
     const removeFromCart = useCallback((productoId) => {
         setCartItems(prevItems => prevItems.filter(item => item._id !== productoId));
     }, []);
 
-    /**
-     * ✅ Actualizar cantidad de un producto (memoizado)
-     * Si cantidad es 0, lo elimina
-     */
+    // Cambia la cantidad de un producto específico.
+    // Si la nueva cantidad es 0 o menos, lo elimina directamente.
     const updateQuantity = useCallback((productoId, cantidad) => {
         if (cantidad <= 0) {
             removeFromCart(productoId);
             return;
         }
-
         setCartItems(prevItems =>
             prevItems.map(item =>
                 item._id === productoId
@@ -83,37 +99,34 @@ export const CartProvider = ({ children }) => {
         );
     }, [removeFromCart]);
 
-    /**
-     * ✅ Limpiar carrito completamente (memoizado)
-     */
+    // Vacía el carrito por completo — se usa al finalizar una compra.
     const clearCart = useCallback(() => {
         setCartItems([]);
     }, []);
 
-    /**
-     * ✅ OPTIMIZACIÓN: Calcular total del carrito con useMemo
-     * Exponer valor directo, no función wrapper
-     */
+    // ======== CÁLCULOS DERIVADOS ========
+    // Estos valores se recalculan automáticamente cuando el carrito cambia.
+    // No hace falta llamar ninguna función, siempre están actualizados.
+    //
+    // ¿Los totales no coinciden? Revisar las fórmulas a continuación.
+
+    // Precio total de todos los productos (solo para mostrar en pantalla).
+    // Los precios finales siempre los confirma el servidor al procesar el pago.
     const total = useMemo(() => {
         return cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
     }, [cartItems]);
 
-    /**
-     * ✅ OPTIMIZACIÓN: Calcular cantidad total de items con useMemo
-     * Exponer valor directo, no función wrapper
-     */
+    // Cuántos artículos hay en total (suma de cantidad de cada producto).
     const itemCount = useMemo(() => {
         return cartItems.reduce((sum, item) => sum + item.cantidad, 0);
     }, [cartItems]);
 
-    /**
-     * ✅ Verificar si carrito está vacío (memoizado)
-     */
+    // Verdadero si el carrito está vacío, falso si tiene al menos un producto.
     const isEmpty = useMemo(() => cartItems.length === 0, [cartItems]);
 
-    /**
-     * ✅ Obtener detalles para enviar al servidor (callback)
-     */
+    // ======== PREPARACIÓN PARA EL PAGO ========
+    // Arma la lista simplificada que se envía al servidor al confirmar la compra.
+    // Solo incluye el ID del producto y la cantidad — los precios los calcula el servidor.
     const getCartForCheckout = useCallback(() => {
         return cartItems.map(item => ({
             productoId: item._id,
@@ -121,9 +134,8 @@ export const CartProvider = ({ children }) => {
         }));
     }, [cartItems]);
 
-    /**
-     * ✅ Value memoizado para evitar recreación en cada render
-     */
+    // ======== VALORES EXPUESTOS ========
+    // Todo lo que los demás componentes pueden leer o usar del carrito.
     const value = useMemo(() => ({
         cartItems,
         addToCart,
@@ -131,7 +143,6 @@ export const CartProvider = ({ children }) => {
         updateQuantity,
         clearCart,
         getCartForCheckout,
-        // ✅ Exponer valores calculados directamente (no funciones)
         total,
         itemCount,
         isEmpty
@@ -154,9 +165,10 @@ export const CartProvider = ({ children }) => {
     );
 };
 
-/**
- * Hook para usar CartContext en cualquier componente
- */
+// ======== ACCESO AL CARRITO ========
+// Función de acceso para usar el carrito en cualquier componente de la página.
+// ¿Error "useCart debe usarse dentro de CartProvider"? Verificar que el
+// componente esté dentro del árbol que envuelve CartProvider en App.jsx.
 export const useCart = () => {
     const context = useContext(CartContext);
     if (!context) {

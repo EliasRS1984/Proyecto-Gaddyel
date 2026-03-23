@@ -1,12 +1,28 @@
+// ============================================================
+// ¿QUÉ ES ESTO?
+// Conjunto de funciones que manejan todo lo relacionado con la
+// sesión del usuario: registrarse, iniciar sesión, ver y editar
+// el perfil, y cerrar sesión.
+//
+// ¿CÓMO FUNCIONA?
+// 1. Cada función se comunica directamente con el servidor.
+// 2. Al iniciar sesión o registrarse, guarda el token y los datos
+//    del usuario en el navegador (localStorage).
+// 3. Al hacer cualquier operación que requiere estar autenticado,
+//    adjunta el token guardado al encabezado de la solicitud.
+// 4. Si el servidor responde 401 (token expirado), limpia la sesión
+//    automáticamente para no dejar al usuario en un estado roto.
+//
+// ¿DÓNDE BUSCAR SI HAY PROBLEMAS?
+// - ¿Login no funciona? → Revisar la función login()
+// - ¿El perfil no se actualiza? → Revisar actualizarPerfil()
+// - ¿El usuario queda "logueado" sin estarlo? → Revisar logout()
+//   y limpiarSesionAnterior()
+// ============================================================
+
 import { logger } from '../utils/logger';
 
-// URL base de la API - usar variable de entorno o localhost
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000';
-
-/**
- * Servicio de autenticación de clientes
- * Gestiona registro, login, perfil y logout usando fetch nativo
- */
 
 // Registrar nuevo cliente
 export const registro = async (datosCliente) => {
@@ -46,7 +62,7 @@ export const registro = async (datosCliente) => {
             token: data.token
         };
     } catch (error) {
-        console.error('❌ Error en registro:', error);
+        logger.error('[authService] Error en registro:', error.message);
         return {
             exito: false,
             mensaje: 'Error al conectar con el servidor'
@@ -87,7 +103,7 @@ export const login = async (email, password) => {
             token: data.token
         };
     } catch (error) {
-        console.error('❌ Error en login:', error);
+        logger.error('[authService] Error en login:', error.message);
         return {
             exito: false,
             mensaje: 'Error al conectar con el servidor'
@@ -131,8 +147,8 @@ export const obtenerPerfil = async () => {
         
         return data;
     } catch (error) {
-        console.error('❌ Error al obtener perfil:', error);
-        throw error || { mensaje: 'Error al obtener perfil' };
+        logger.error('[authService] Error al obtener perfil:', error.message);
+        throw error;
     }
 };
 
@@ -173,40 +189,20 @@ export const actualizarPerfil = async (datosActualizados) => {
         
         return data;
     } catch (error) {
-        console.error('❌ Error al actualizar perfil:', error);
-        throw error || { mensaje: 'Error al actualizar perfil' };
+        logger.error('[authService] Error al actualizar perfil:', error.message);
+        throw error;
     }
 };
 
-// Cerrar sesión
+// Cierra la sesión eliminando el token y los datos del usuario del navegador.
 export const logout = () => {
     try {
-        logger.debug('🔐 [authService.logout] Iniciando limpieza de sesión...');
-        
-        // Verificar qué hay en localStorage antes de limpiar
-        const tokenAntes = localStorage.getItem('clientToken');
-        const dataAntes = localStorage.getItem('clientData');
-        
-        logger.debug('  📊 Antes de limpiar:');
-        logger.debug('    - clientToken existe:', !!tokenAntes);
-        logger.debug('    - clientData existe:', !!dataAntes);
-        
-        // Limpiar todos los items de sesión
         localStorage.removeItem('clientToken');
         localStorage.removeItem('clientData');
-        localStorage.removeItem('clienteData'); // En caso que esté con este nombre
-        
-        // Verificar que se limpió
-        const tokenDespues = localStorage.getItem('clientToken');
-        const dataDespues = localStorage.getItem('clientData');
-        
-        logger.debug('  📊 Después de limpiar:');
-        logger.debug('    - clientToken eliminado:', !tokenDespues ? '✅ SÍ' : '❌ NO');
-        logger.debug('    - clientData eliminado:', !dataDespues ? '✅ SÍ' : '❌ NO');
-
-        logger.success('✅ [authService.logout] Sesión limpiada completamente');
+        localStorage.removeItem('clienteData'); // Clave legacy por compatibilidad
+        logger.info('[authService] Sesión cerrada');
     } catch (error) {
-        console.error('❌ Error limpiando localStorage:', error);
+        logger.error('[authService] Error al cerrar sesión:', error.message);
     }
 };
 
@@ -224,7 +220,7 @@ export const obtenerClienteLocal = () => {
         const clientData = localStorage.getItem('clientData');
         return clientData ? JSON.parse(clientData) : null;
     } catch (error) {
-        console.error('❌ Error al leer datos del cliente:', error);
+        logger.error('[authService] Error al leer datos del cliente:', error.message);
         return null;
     }
 };
@@ -266,8 +262,8 @@ export const actualizarDireccion = async (datosDireccion) => {
         
         return data;
     } catch (error) {
-        console.error('❌ Error al actualizar dirección:', error);
-        throw error || { mensaje: 'Error al actualizar dirección' };
+        logger.error('[authService] Error al actualizar dirección:', error.message);
+        throw error;
     }
 };
 
@@ -281,19 +277,19 @@ export const obtenerToken = () => {
  * Usada por páginas de login/registro para eliminar sesiones previas
  * Responsabilidad: Centralizar la limpieza de datos de autenticación
  */
+// Limpia cualquier sesión activa antes de un nuevo login o registro.
+// Centraliza la limpieza para evitar que tokens anteriores interfieran.
 export const limpiarSesionAnterior = () => {
     try {
-        logger.info('🔄 [authService] Limpiando sesión anterior...');
         const tokenExistente = localStorage.getItem('clientToken');
-        
         if (tokenExistente) {
             localStorage.removeItem('clientToken');
             localStorage.removeItem('clientData');
-            localStorage.removeItem('clienteData'); // Legacy
-            logger.info('✅ Sesión anterior eliminada');
+            localStorage.removeItem('clienteData'); // Clave legacy por compatibilidad
+            logger.info('[authService] Sesión anterior eliminada');
         }
     } catch (error) {
-        console.error('❌ Error limpiando sesión anterior:', error);
+        logger.error('[authService] Error limpiando sesión anterior:', error.message);
     }
 };
 

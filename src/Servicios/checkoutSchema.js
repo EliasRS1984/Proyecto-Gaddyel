@@ -1,14 +1,23 @@
-/**
- * checkoutSchema.js
- * 
- * ✅ Esquema de validación centralizado para datos de checkout.
- * ✅ Usa constantes de validation.js para mantener consistencia
- * 
- * Usado por:
- * - useCheckoutState.js (Checkout modular - validación en tiempo real)
- * - orderService.js (validación antes de enviar)
- * - Componentes de Checkout (feedback de errores)
- */
+// ============================================================
+// ¿QUÉ ES ESTO?
+// Reglas de validación para cada campo del formulario de compra.
+// Verifica que los datos estén completos y en el formato correcto
+// antes de enviarlos al servidor.
+//
+// ¿CÓMO FUNCIONA?
+// 1. El formulario de checkout llama a validateForm() al intentar
+//    enviar el pedido.
+// 2. Cada campo tiene su propia función validadora que devuelve
+//    un mensaje de error o cadena vacía si está bien.
+// 3. formatField() limpia y normaliza lo que escribió el usuario
+//    (ej: convierte el email a minúsculas).
+//
+// ¿DÓNDE BUSCAR SI HAY PROBLEMAS?
+// - ¿Un campo no valida? → Revisar el validador correspondiente
+//   dentro del objeto `validators`.
+// - ¿Los mensajes de error no coinciden? → Revisar ERROR_MESSAGES
+//   en constants/validation.js.
+// ============================================================
 
 import { VALIDATION_RULES, ERROR_MESSAGES } from '../constants/validation';
 

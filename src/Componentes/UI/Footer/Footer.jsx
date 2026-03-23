@@ -1,5 +1,5 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
+import { SOCIAL_URLS } from '../../../constants/contactInfo';
 
 /**
  * ============================================================================
@@ -53,7 +53,7 @@ const Footer = () => {
     // ========================================================================
     const redesSociales = [
         {
-            href: 'https://www.instagram.com/gaddyel.oficial/',
+            href: SOCIAL_URLS.instagram,
             label: 'Instagram',
             icon: (
                 <svg 
@@ -73,7 +73,7 @@ const Footer = () => {
             ),
         },
         {
-            href: 'https://www.facebook.com/gaddyel.gaddyel.184/',
+            href: SOCIAL_URLS.facebook,
             label: 'Facebook',
             icon: (
                 <svg 
@@ -263,5 +263,4 @@ const Footer = () => {
     );
 };
 
-// Memoizar para evitar re-renders innecesarios
-export default React.memo(Footer);
+export default Footer;

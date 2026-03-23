@@ -1,23 +1,21 @@
+// ============================================================
+// ¿QUÉ ES ESTO?
+// Página legal: Política de Privacidad
+//
+// ¿CÓMO FUNCIONA?
+// 1. El usuario llega desde un link en el footer
+// 2. Hace scroll automático al top
+// 3. Muestra el contenido legal con estructura semántica
+//
+// ¿DÓNDE BUSCAR SI HAY PROBLEMAS?
+// - Contenido a actualizar → editar directamente las secciones de abajo
+// - Fecha no actualiza → el componente usa new Date() dinámico
+// ============================================================
+
 import React, { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 
-/**
- * PoliticaPrivacidad - Página de Política de Privacidad
- * 
- * FLUJO:
- * 1. Usuario hace click en "Política de Privacidad" en footer
- * 2. NavLink navega a /politica-privacidad
- * 3. useEffect hace scroll al top
- * 4. Página renderea con contenido legal genérico
- * 5. Usuario puede leer y modificar según necesidades de la empresa
- * 
- * SEO:
- * - Meta tags para SEO
- * - HTML5 semántico con <article> y <section>
- * - Estructura clara para lectores de pantalla
- */
 const PoliticaPrivacidad = () => {
-    // ✅ HELPER: Scroll al top al cargar página
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }, []);
@@ -27,152 +25,184 @@ const PoliticaPrivacidad = () => {
             <Helmet>
                 <title>Política de Privacidad - Gaddyel</title>
                 <meta name="description" content="Conoce cómo Gaddyel protege y utiliza tus datos personales. Política de privacidad completa y actualizada." />
-                <link rel="canonical" href={`${window.location.origin}/politica-privacidad`} />
+                {/* Hardcoded: window.location.origin falla en pre-render/SSR y puede variar entre entornos. */}
+                <link rel="canonical" href="https://gaddyel.vercel.app/politica-privacidad" />
             </Helmet>
 
-            <article className="max-w-4xl mx-auto px-6 py-16 md:py-24 bg-white">
-                {/* Header */}
-                <header className="mb-12">
-                    <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-                        Política de Privacidad
-                    </h1>
-                    <p className="text-lg text-gray-600 mb-2">
-                        Última actualización: {new Date().toLocaleDateString('es-AR')}
-                    </p>
-                    <p className="text-gray-700">
-                        En Gaddyel, tu privacidad es importante para nosotros. Esta política explica cómo recopilamos, usamos y protegemos tu información.
-                    </p>
-                </header>
+            {/* Fondo consistente con el resto del sitio */}
+            <div className="min-h-screen bg-slate-50 dark:bg-slate-950 py-12 px-6 transition-colors duration-500">
+                <article className="max-w-3xl mx-auto">
 
-                {/* Contenido Principal */}
-                <div className="space-y-8 text-gray-700 leading-relaxed">
-                    {/* Sección 1 */}
-                    <section>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-4">1. Información que Recopilamos</h2>
-                        <p className="mb-4">
-                            Recopilamos información que proporcionas directamente, tales como:
+                    {/* ======== CABECERA ======== */}
+                    <header className="mb-10">
+                        {/* Etiqueta de categoría */}
+                        <p className="text-[11px] font-semibold tracking-[0.2em] uppercase text-indigo-500 dark:text-indigo-400 mb-4">
+                            Documento legal
                         </p>
-                        <ul className="list-disc list-inside space-y-2 mb-4 ml-4">
-                            <li><strong>Información de Contacto:</strong> nombre, email, teléfono y dirección</li>
-                            <li><strong>Información de Cuenta:</strong> datos de autenticación y preferencias de usuario</li>
-                            <li><strong>Información de Transacción:</strong> historial de pedidos y métodos de pago</li>
-                            <li><strong>Información de Navegación:</strong> cookies, dirección IP y comportamiento en sitio web</li>
-                        </ul>
-                    </section>
-
-                    {/* Sección 2 */}
-                    <section>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-4">2. Cómo Usamos tu Información</h2>
-                        <p className="mb-4">
-                            Utilizamos tu información para:
+                        <h1 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-100 mb-3">
+                            Política de Privacidad
+                        </h1>
+                        <p className="text-[14px] font-medium tracking-tight text-slate-500 dark:text-slate-400 mb-6">
+                            Última actualización: {new Date().toLocaleDateString('es-AR')}
                         </p>
-                        <ul className="list-disc list-inside space-y-2 mb-4 ml-4">
-                            <li>Proporcionar y mejorar nuestros productos y servicios</li>
-                            <li>Procesar transacciones y envíos</li>
-                            <li>Comunicarte sobre pedidos, actualizaciones y promociones</li>
-                            <li>Personalizar tu experiencia en nuestro sitio</li>
-                            <li>Cumplir con obligaciones legales y normativas</li>
-                        </ul>
-                    </section>
-
-                    {/* Sección 3 */}
-                    <section>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-4">3. Protección de Datos</h2>
-                        <p className="mb-4">
-                            Implementamos medidas de seguridad técnicas, administrativas y físicas para proteger tu información:
-                        </p>
-                        <ul className="list-disc list-inside space-y-2 mb-4 ml-4">
-                            <li>Encriptación SSL/TLS en todas las transmisiones de datos</li>
-                            <li>Autenticación de dos factores para cuentas de usuario</li>
-                            <li>Acceso restringido a información personal</li>
-                            <li>Auditorías regulares de seguridad</li>
-                        </ul>
-                    </section>
-
-                    {/* Sección 4 */}
-                    <section>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-4">4. Cookies y Tecnologías de Rastreo</h2>
-                        <p className="mb-4">
-                            Utilizamos cookies y tecnologías similares para:
-                        </p>
-                        <ul className="list-disc list-inside space-y-2 mb-4 ml-4">
-                            <li>Mantener tu sesión activa</li>
-                            <li>Recordar tus preferencias</li>
-                            <li>Analizar el tráfico del sitio</li>
-                            <li>Mejorar la experiencia de usuario</li>
-                        </ul>
-                        <p className="mt-4">
-                            Puedes controlar o eliminar cookies a través de la configuración de tu navegador.
-                        </p>
-                    </section>
-
-                    {/* Sección 5 */}
-                    <section>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-4">5. Compartir Información con Terceros</h2>
-                        <p className="mb-4">
-                            No vendemos tu información personal. Solo compartimos datos cuando es necesario para:
-                        </p>
-                        <ul className="list-disc list-inside space-y-2 mb-4 ml-4">
-                            <li>Procesar pagos (procesadores de pago autorizados)</li>
-                            <li>Gestionar envíos (empresas logísticas asociadas)</li>
-                            <li>Cumplir con leyes y regulaciones</li>
-                        </ul>
-                    </section>
-
-                    {/* Sección 6 */}
-                    <section>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-4">6. Derechos del Usuario</h2>
-                        <p className="mb-4">
-                            Tienes derecho a:
-                        </p>
-                        <ul className="list-disc list-inside space-y-2 mb-4 ml-4">
-                            <li>Acceder a tus datos personales</li>
-                            <li>Solicitar la corrección de información incorrecta</li>
-                            <li>Eliminar tu cuenta y datos personales</li>
-                            <li>Optar por no recibir comunicaciones de marketing</li>
-                            <li>Revocar consentimientos previos</li>
-                        </ul>
-                    </section>
-
-                    {/* Sección 7 */}
-                    <section>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-4">7. Retención de Datos</h2>
-                        <p>
-                            Conservamos tu información personal el tiempo necesario para cumplir con los propósitos descritos en esta política, 
-                            o según lo requiera la ley. Puedes solicitar la eliminación de tus datos en cualquier momento contactándonos.
-                        </p>
-                    </section>
-
-                    {/* Sección 8 */}
-                    <section>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-4">8. Cambios a Esta Política</h2>
-                        <p>
-                            Podemos actualizar esta política de privacidad ocasionalmente. Te notificaremos sobre cambios significativos 
-                            publicando la versión actualizada en nuestro sitio con una nueva fecha de "Última actualización".
-                        </p>
-                    </section>
-
-                    {/* Sección 9 */}
-                    <section>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-4">9. Contacto</h2>
-                        <p className="mb-4">
-                            Si tienes preguntas sobre esta política de privacidad o deseas ejercer tus derechos, contáctanos:
-                        </p>
-                        <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-                            <p className="mb-2"><strong>Email:</strong> gaddyel.gaddyel@gmail.com</p>
-                            <p className="mb-2"><strong>Teléfono:</strong> +54 9 11 5509-8426</p>
-                            <p><strong>Ubicación:</strong> Virrey del Pino, Buenos Aires</p>
+                        {/* Card intro */}
+                        <div className="bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 rounded-2xl px-6 py-4">
+                            <p className="text-[14px] tracking-tight text-slate-700 dark:text-slate-300 leading-relaxed">
+                                En Gaddyel, tu privacidad es importante para nosotros. Esta política explica cómo recopilamos, usamos y protegemos tu información.
+                            </p>
                         </div>
-                    </section>
-                </div>
+                    </header>
 
-                {/* Footer de política */}
-                <footer className="mt-16 pt-8 border-t border-gray-200">
-                    <p className="text-sm text-gray-600">
-                        Esta política de privacidad es válida desde {new Date().toLocaleDateString('es-AR')} y puede ser modificada en cualquier momento.
-                    </p>
-                </footer>
-            </article>
+                    {/* ======== CONTENIDO LEGAL ======== */}
+                    {/* Card principal que contiene todas las secciones */}
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800/50 rounded-2xl overflow-hidden">
+
+                        {[
+                            {
+                                titulo: '1. Información que Recopilamos',
+                                contenido: 'Recopilamos información que proporcionas directamente, tales como:',
+                                items: [
+                                    <><strong className="text-slate-700 dark:text-slate-300">Información de Contacto:</strong> nombre, email, teléfono y dirección</>,
+                                    <><strong className="text-slate-700 dark:text-slate-300">Información de Cuenta:</strong> datos de autenticación y preferencias de usuario</>,
+                                    <><strong className="text-slate-700 dark:text-slate-300">Información de Transacción:</strong> historial de pedidos y métodos de pago</>,
+                                    <><strong className="text-slate-700 dark:text-slate-300">Información de Navegación:</strong> cookies, dirección IP y comportamiento en sitio web</>,
+                                ]
+                            },
+                            {
+                                titulo: '2. Cómo Usamos tu Información',
+                                contenido: 'Utilizamos tu información para:',
+                                items: [
+                                    'Proporcionar y mejorar nuestros productos y servicios',
+                                    'Procesar transacciones y envíos',
+                                    'Comunicarte sobre pedidos, actualizaciones y promociones',
+                                    'Personalizar tu experiencia en nuestro sitio',
+                                    'Cumplir con obligaciones legales y normativas',
+                                ]
+                            },
+                            {
+                                titulo: '3. Protección de Datos',
+                                contenido: 'Implementamos medidas de seguridad técnicas, administrativas y físicas para proteger tu información:',
+                                items: [
+                                    'Encriptación SSL/TLS en todas las transmisiones de datos',
+                                    'Autenticación de dos factores para cuentas de usuario',
+                                    'Acceso restringido a información personal',
+                                    'Auditorías regulares de seguridad',
+                                ]
+                            },
+                            {
+                                titulo: '4. Cookies y Tecnologías de Rastreo',
+                                contenido: 'Utilizamos cookies y tecnologías similares para:',
+                                items: [
+                                    'Mantener tu sesión activa',
+                                    'Recordar tus preferencias',
+                                    'Analizar el tráfico del sitio',
+                                    'Mejorar la experiencia de usuario',
+                                ],
+                                nota: 'Puedes controlar o eliminar cookies a través de la configuración de tu navegador.'
+                            },
+                            {
+                                titulo: '5. Compartir Información con Terceros',
+                                contenido: 'No vendemos tu información personal. Solo compartimos datos cuando es necesario para:',
+                                items: [
+                                    'Procesar pagos (procesadores de pago autorizados)',
+                                    'Gestionar envíos (empresas logísticas asociadas)',
+                                    'Cumplir con leyes y regulaciones',
+                                ]
+                            },
+                            {
+                                titulo: '6. Derechos del Usuario',
+                                contenido: 'Tenés derecho a:',
+                                items: [
+                                    'Acceder a tus datos personales',
+                                    'Solicitar la corrección de información incorrecta',
+                                    'Eliminar tu cuenta y datos personales',
+                                    'Optar por no recibir comunicaciones de marketing',
+                                    'Revocar consentimientos previos',
+                                ]
+                            },
+                            {
+                                titulo: '7. Retención de Datos',
+                                texto: 'Conservamos tu información personal el tiempo necesario para cumplir con los propósitos descritos en esta política, o según lo requiera la ley. Podés solicitar la eliminación de tus datos en cualquier momento contactándonos.'
+                            },
+                            {
+                                titulo: '8. Cambios a Esta Política',
+                                texto: 'Podemos actualizar esta política de privacidad ocasionalmente. Te notificaremos sobre cambios significativos publicando la versión actualizada en nuestro sitio con una nueva fecha de "Última actualización".'
+                            },
+                        ].map(({ titulo, contenido, items, nota, texto }, i, arr) => (
+                            <section
+                                key={titulo}
+                                className={`px-8 py-7 ${
+                                    i < arr.length - 1
+                                        ? 'border-b border-slate-100 dark:border-slate-800/60'
+                                        : ''
+                                }`}
+                            >
+                                {/* Título de sección con acento indigo a la izquierda */}
+                                <h2 className="flex items-center gap-3 text-[15px] font-semibold tracking-tight text-slate-800 dark:text-slate-200 mb-3">
+                                    <span className="w-0.5 h-4 bg-indigo-400 dark:bg-indigo-500 rounded-full flex-shrink-0" aria-hidden="true" />
+                                    {titulo}
+                                </h2>
+                                {contenido && (
+                                    <p className="text-[14px] tracking-tight text-slate-600 dark:text-slate-400 leading-relaxed mb-3">
+                                        {contenido}
+                                    </p>
+                                )}
+                                {texto && (
+                                    <p className="text-[14px] tracking-tight text-slate-600 dark:text-slate-400 leading-relaxed">
+                                        {texto}
+                                    </p>
+                                )}
+                                {items && (
+                                    <ul className="space-y-2">
+                                        {items.map((item, j) => (
+                                            <li key={j} className="flex items-start gap-2.5 text-[14px] tracking-tight text-slate-600 dark:text-slate-400 leading-relaxed">
+                                                <span className="w-1 h-1 rounded-full bg-indigo-400 dark:bg-indigo-500 flex-shrink-0 mt-2" aria-hidden="true" />
+                                                <span>{item}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                                {nota && (
+                                    <p className="mt-3 text-[14px] tracking-tight text-slate-600 dark:text-slate-400 leading-relaxed">
+                                        {nota}
+                                    </p>
+                                )}
+                            </section>
+                        ))}
+
+                        {/* ======== SECCIÓN CONTACTO ======== */}
+                        <section className="px-8 py-7">
+                            <h2 className="flex items-center gap-3 text-[15px] font-semibold tracking-tight text-slate-800 dark:text-slate-200 mb-3">
+                                <span className="w-0.5 h-4 bg-indigo-400 dark:bg-indigo-500 rounded-full flex-shrink-0" aria-hidden="true" />
+                                9. Contacto
+                            </h2>
+                            <p className="text-[14px] tracking-tight text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
+                                Si tenés preguntas sobre esta política o deseás ejercer tus derechos, contactanos:
+                            </p>
+                            <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60 rounded-2xl px-6 py-5 space-y-2">
+                                <p className="text-[14px] tracking-tight text-slate-700 dark:text-slate-300">
+                                    <span className="font-semibold">Email:</span> gaddyel.gaddyel@gmail.com
+                                </p>
+                                <p className="text-[14px] tracking-tight text-slate-700 dark:text-slate-300">
+                                    <span className="font-semibold">Teléfono:</span> +54 9 11 5509-8426
+                                </p>
+                                <p className="text-[14px] tracking-tight text-slate-700 dark:text-slate-300">
+                                    <span className="font-semibold">Ubicación:</span> Virrey del Pino, Buenos Aires
+                                </p>
+                            </div>
+                        </section>
+
+                    </div>
+
+                    {/* ======== PIE DE PÁGINA LEGAL ======== */}
+                    <footer className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800">
+                        <p className="text-[12px] tracking-tight text-slate-400 dark:text-slate-500">
+                            Esta política de privacidad es válida desde {new Date().toLocaleDateString('es-AR')} y puede ser modificada en cualquier momento.
+                        </p>
+                    </footer>
+
+                </article>
+            </div>
         </>
     );
 };

@@ -1,42 +1,65 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+// ============================================================
+// ¿QUÉ ES ESTO?
+// El "almacén" del estado de pedidos. Guarda qué pedido está en
+// proceso, cuál fue el último pedido confirmado, y si algo salió
+// mal durante la creación o consulta de un pedido.
+// Esta información está disponible para toda la página sin
+// necesidad de pasarla componente por componente.
+//
+// ¿CÓMO FUNCIONA?
+// 1. Al abrir la página, recupera el úlimo pedido guardado en el
+//    navegador (si no expiró en los últimos 7 días).
+// 2. Cuando el usuario confirma una compra, crea el pedido en el
+//    servidor y lo guarda localmente como respaldo.
+// 3. Cada vez que el estado del pedido cambia, lo actualiza tanto
+//    en memoria como en el navegador de forma automática.
+// 4. Si el pedido almacenado es muy antiguo, lo limpia al iniciar.
+//
+// ¿DÓNDE BUSCAR SI HAY PROBLEMAS?
+// - ¿El pedido no se crea? → Revisar la sección "CREAR PEDIDO"
+//   y el archivo Servicios/orderService.js.
+// - ¿El último pedido no aparece al volver a la página? →
+//   Revisar la sección "CARGA INICIAL DEL PEDIDO".
+// - ¿El estado del pedido no se actualiza? → Revisar la sección
+//   "ACTUALIZAR ESTADO DEL PEDIDO".
+// - ¿El pedido persiste cuando no debería? → Revisar clearOrder
+//   en la sección "LIMPIAR PEDIDO".
+// ============================================================
+
+import { createContext, useContext, useState, useEffect } from 'react';
 import orderService from '../Servicios/orderService';
 import orderStorage from '../utils/orderStorage';
 import { logger } from '../utils/logger';
 
-/**
- * OrderContext - Gestiona el estado global de órdenes
- * ✅ Ahora usa orderStorage centralizado para localStorage
- * 
- * Proporciona acceso a:
- * - Orden actual en proceso
- * - Orden completada/confirmada
- * - Historial de órdenes
- * - Funciones para crear, actualizar, recuperar órdenes
- */
+// ======== CONTEXTO DE PEDIDOS ========
 const OrderContext = createContext();
 
 export const OrderProvider = ({ children }) => {
-  // Orden en proceso (para checkout)
+  // Pedido en proceso (datos del checkout antes de confirmar)
   const [currentOrder, setCurrentOrder] = useState(null);
 
-  // ✅ Última orden confirmada usando orderStorage centralizado
+  // ======== CARGA INICIAL DEL PEDIDO ========
+  // Lee el último pedido guardado en el navegador al abrir la página.
+  // Si el pedido tiene más de 7 días, orderStorage lo descarta solo.
+  //
+  // ¿El último pedido no aparece al volver a la página?
+  // Revisar orderStorage.getOrder() en utils/orderStorage.js.
   const [lastOrder, setLastOrder] = useState(() => {
-    const stored = orderStorage.getOrder();
-    return stored || null;
+    return orderStorage.getOrder() || null;
   });
 
-  // ✅ Estado de la última orden usando orderStorage
   const [lastOrderStatus, setLastOrderStatus] = useState(() => {
     return orderStorage.getStatus() || null;
   });
 
-  // Error de la última operación
+  // Mensaje del último error que ocurrió (null si no hay error)
   const [lastError, setLastError] = useState(null);
 
-  // Loading state
+  // Verdadero mientras se espera respuesta del servidor
   const [isLoading, setIsLoading] = useState(false);
 
-  // ✅ Limpiar órdenes antiguas al montar
+  // ======== LIMPIEZA DE PEDIDOS ANTIGUOS ========
+  // Al abrir la página, revisa si hay pedidos expirados y los elimina.
   useEffect(() => {
     const wasCleanedUp = orderStorage.cleanup();
     if (wasCleanedUp) {
@@ -46,7 +69,9 @@ export const OrderProvider = ({ children }) => {
     }
   }, []);
 
-  // ✅ Persistir usando orderStorage centralizado
+  // ======== PERSISTENCIA AUTOMÁTICA ========
+  // Cada vez que el pedido o su estado cambia, lo guarda en el navegador.
+  // Si el pedido se borra (null), también lo borra del navegador.
   useEffect(() => {
     if (lastOrder) {
       orderStorage.save(lastOrder, lastOrderStatus || 'pending_payment');
@@ -55,12 +80,12 @@ export const OrderProvider = ({ children }) => {
     }
   }, [lastOrder, lastOrderStatus]);
 
-  /**
-   * Crea una nueva orden
-   * @param {Object} checkoutData - Datos del formulario de checkout
-   * @param {Array} cartItems - Items del carrito
-   * @returns {Promise<Object>} Respuesta de la orden
-   */
+  // ======== CREAR PEDIDO ========
+  // Envía los datos del checkout al servidor y guarda el pedido resultante.
+  // Si algo falla, el error queda en `lastError` para mostrarlo en pantalla.
+  //
+  // ¿El pedido no se crea? Revisar orderService.createOrder en
+  // Servicios/orderService.js y verificar que el servidor responda.
   const createOrder = async (checkoutData, cartItems) => {
     setIsLoading(true);
     setLastError(null);
@@ -68,7 +93,6 @@ export const OrderProvider = ({ children }) => {
     try {
       const response = await orderService.createOrder(checkoutData, cartItems);
 
-      // ✅ Guardar usando orderStorage (limpia automáticamente keys antiguas)
       setLastOrder(response);
       setLastOrderStatus('pending_payment');
       setCurrentOrder(null);
@@ -86,11 +110,9 @@ export const OrderProvider = ({ children }) => {
     }
   };
 
-  /**
-   * Obtiene una orden por ID
-   * @param {string} orderId - ID de la orden
-   * @returns {Promise<Object>} Detalles de la orden
-   */
+  // ======== CONSULTAR PEDIDO ========
+  // Busca los datos actualizados de un pedido en el servidor por su ID.
+  // Si es el mismo pedido que ya estaba guardado, actualiza los datos locales.
   const getOrder = async (orderId) => {
     setIsLoading(true);
     setLastError(null);
@@ -98,7 +120,6 @@ export const OrderProvider = ({ children }) => {
     try {
       const order = await orderService.getOrder(orderId);
       
-      // Actualizar estado si es la orden actual
       if (order.ordenId === lastOrder?.ordenId) {
         setLastOrder(order);
         setLastOrderStatus(order.estado);
@@ -113,11 +134,9 @@ export const OrderProvider = ({ children }) => {
     }
   };
 
-  /**
-   * Reintentar pago de una orden
-   * @param {string} orderId - ID de la orden
-   * @returns {Promise<Object>} Respuesta con nuevo enlace de pago
-   */
+  // ======== REINTENTAR PAGO ========
+  // Solicita al servidor un nuevo enlace de pago para un pedido que
+  // no pudo completar el pago anteriormente.
   const retryPayment = async (orderId) => {
     setIsLoading(true);
     setLastError(null);
@@ -138,10 +157,10 @@ export const OrderProvider = ({ children }) => {
     }
   };
 
-  /**
-   * Actualiza el estado de la última orden
-   * @param {string} newStatus - Nuevo estado
-   */
+  // ======== ACTUALIZAR ESTADO DEL PEDIDO ========
+  // Cambia el estado del último pedido (ej: de 'pending_payment' a 'approved').
+  // El cambio se refleja tanto en memoria como en el navegador automáticamente
+  // a través de la persistencia automática definida más arriba.
   const updateOrderStatus = (newStatus) => {
     setLastOrderStatus(newStatus);
     if (lastOrder) {
@@ -152,25 +171,27 @@ export const OrderProvider = ({ children }) => {
     }
   };
 
-  /**
-   * Limpia la orden actual y el estado
-   */
+  // ======== LIMPIAR PEDIDO ========
+  // Borra todos los datos del pedido en memoria.
+  // El borrado del navegador ocurre automáticamente cuando `lastOrder`
+  // se vuelve null (ver sección "PERSISTENCIA AUTOMÁTICA" arriba).
+  //
+  // ¿El pedido sigue apareciendo después de limpiar?
+  // Revisar el useEffect de persistencia automática.
   const clearOrder = () => {
     setCurrentOrder(null);
     setLastOrder(null);
     setLastOrderStatus(null);
     setLastError(null);
-    localStorage.removeItem('lastOrder');
-    localStorage.removeItem('lastOrderStatus');
   };
 
-  /**
-   * Limpia solo el error
-   */
+  // Borra solo el mensaje de error sin tocar el pedido.
   const clearError = () => {
     setLastError(null);
   };
 
+  // ======== VALORES EXPUESTOS ========
+  // Todo lo que los demás componentes pueden leer o usar sobre pedidos.
   const value = {
     // Estado
     currentOrder,
@@ -199,10 +220,11 @@ export const OrderProvider = ({ children }) => {
   );
 };
 
-/**
- * Hook para usar OrderContext
- * @returns {Object} Contexto de órdenes
- */
+// ======== ACCESO AL CONTEXTO DE PEDIDOS ========
+// Función de acceso para usar el contexto de pedidos en cualquier
+// componente de la página.
+// ¿Error "useOrder debe usarse dentro de OrderProvider"? Verificar que
+// el componente esté dentro del árbol que envuelve OrderProvider en App.jsx.
 export const useOrder = () => {
   const context = useContext(OrderContext);
   if (!context) {

@@ -35,6 +35,45 @@ html {
 }
 
 /* Utility para truncar texto con line-clamp (usado en ProductCard) */
+/* ============================================================================
+   ANIMACIÓN FLOAT — Movimiento vertical suave para el logo de Login
+   El logo sube y baja 8px con una curva ease-in-out.
+   Duración: 3 segundos, loop infinito, alterna dirección (alternate).
+============================================================================ */
+@keyframes float {
+    0%   { transform: translateY(0px); }
+    50%  { transform: translateY(-16px); }
+    100% { transform: translateY(0px); }
+}
+
+.animate-float {
+    animation: float 4s ease-in-out infinite;
+}
+
+/* ============================================================================
+   AUTOFILL OVERRIDE
+   El browser (Chrome/Safari) aplica fondo blanco brillante a los campos
+   cuando el usuario usa autocompletar. Esto rompe el estilo en dark mode.
+   Solución: sobreescribir con box-shadow inset (el único hack que funciona).
+   Claro:  fondo blanco suave  + texto slate-800
+   Oscuro: fondo slate-800/90  + texto slate-200
+============================================================================ */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.92) inset !important;
+    -webkit-text-fill-color: #1e293b !important; /* slate-800 */
+    caret-color: #1e293b;
+}
+
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px rgba(30, 41, 59, 0.92) inset !important; /* slate-800 */
+    -webkit-text-fill-color: #e2e8f0 !important; /* slate-200 */
+    caret-color: #e2e8f0;
+}
+
 .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;

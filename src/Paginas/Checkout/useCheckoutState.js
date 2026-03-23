@@ -1,9 +1,10 @@
-import { useState, useCallback, useEffect, useContext } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../Context/CartContext';
 import { useOrder } from '../../Context/OrderContext';
-import { AuthContext } from '../../Context/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 import orderService from '../../Servicios/orderService';
+import * as authService from '../../Servicios/authService';
 import orderStorage from '../../utils/orderStorage';
 import { validateForm, formatField, INITIAL_FORM_STATE } from '../../Servicios/checkoutSchema';
 import { logger } from '../../utils/logger';
@@ -11,15 +12,12 @@ import { logger } from '../../utils/logger';
 /**
  * Hook personalizado para manejar el estado y lógica del checkout
  * Separa la lógica de negocio de la UI
- * 
- * REFACTORIZADO: Usa AuthContext en lugar de useAuth hook
- * Razón: AuthContext es la fuente única de verdad para estado de autenticación
  */
 export const useCheckoutState = () => {
     const navigate = useNavigate();
     const { cartItems, total, clearCart, isEmpty } = useCart();
     const { createOrder, isLoading: orderLoading, lastError, clearError } = useOrder();
-    const { isAuthenticated, cliente, actualizarPerfil } = useContext(AuthContext);
+    const { isAuthenticated, cliente, refrescarPerfil } = useAuth();
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -167,12 +165,13 @@ export const useCheckoutState = () => {
 
                 if (direccionCambio) {
                     try {
-                        await actualizarPerfil({
+                        await authService.actualizarPerfil({
                             domicilio: formData.domicilio,
                             localidad: formData.localidad,
                             provincia: formData.provincia,
                             codigoPostal: formData.codigoPostal
                         });
+                        await refrescarPerfil();
                         logger.success('[Checkout] Perfil actualizado');
                     } catch (error) {
                         logger.warn('[Checkout] Error al actualizar perfil', error);
@@ -202,20 +201,6 @@ export const useCheckoutState = () => {
             const resultado = await createOrder(checkoutData, cartItems);
 
             logger.success('[Checkout] Orden creada', resultado.ordenId);
-            
-            // ✅ DEBUG DETALLADO: Mostrar TODA la respuesta del backend
-            console.log('🔍 [Checkout] RESPUESTA COMPLETA DEL BACKEND:', resultado);
-            console.log('💾 [Checkout] Datos a guardar en orderStorage:', {
-                ordenId: resultado.ordenId,
-                total: resultado.total,
-                subtotal: resultado.subtotal,
-                costoEnvio: resultado.costoEnvio,
-                itemsCount: resultado.items?.length || 0,
-                hasCheckoutUrl: !!resultado.checkoutUrl,
-                checkoutUrl: resultado.checkoutUrl || 'UNDEFINED ❌',
-                preferenceId: resultado.preferenceId || 'UNDEFINED ❌',
-                sandboxCheckoutUrl: resultado.sandboxCheckoutUrl || 'UNDEFINED ❌'
-            });
 
             // ✅ IMPORTANTE: Guardar datos de la orden en localStorage para PedidoConfirmado
             // Esto asegura que los detalles del pedido estén disponibles en la página de confirmación
@@ -227,12 +212,8 @@ export const useCheckoutState = () => {
 
             // Redireccionar según resultado
             if (resultado.checkoutUrl) {
-                // ✅ Mercado Pago: Redirige a pagar
-                console.log('✅ REDIRIGIENDO A MERCADO PAGO:', resultado.checkoutUrl);
                 window.location.href = resultado.checkoutUrl;
             } else {
-                // ❌ Sin Mercado Pago: Ir directamente a confirmación
-                console.warn('⚠️ SIN CHECKOUT URL - Ir a confirmación (checkoutUrl undefined)');
                 navigate(`/pedido-confirmado/${resultado.ordenId}`);
             }
 
@@ -251,7 +232,7 @@ export const useCheckoutState = () => {
         formData,
         cliente,
         clearError,
-        actualizarPerfil,
+        refrescarPerfil,
         total,
         createOrder,
         clearCart,

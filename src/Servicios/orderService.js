@@ -1,14 +1,25 @@
-/**
- * orderService.js
- * 
- * Servicio centralizado para gestión de órdenes de compra.
- * Responsabilidades:
- * - Normalizar datos entre frontend y backend
- * - Comunicación con API de órdenes
- * - Enriquecimiento de datos antes de enviar
- * - Manejo consistente de respuestas
- * - Manejo de errores estandarizado
- */
+// ============================================================
+// ¿QUÉ ES ESTO?
+// Funciones que se comunican con el servidor para crear y consultar
+// pedidos de compra. También transforma los datos entre el formato
+// que usa el frontend y el que espera el backend.
+//
+// ¿CÓMO FUNCIONA?
+// 1. Al confirmar una compra, normalizeCheckoutData transforma los
+//    datos del formulario al formato que entiende el servidor.
+// 2. createOrder envía el pedido al servidor y guarda la respuesta
+//    localmente para que las páginas de confirmación puedan leerla.
+// 3. denormalizeResponse convierte la respuesta del servidor de
+//    vuelta al formato que espera el frontend.
+//
+// ¿DÓNDE BUSCAR SI HAY PROBLEMAS?
+// - ¿El pedido no se crea? → Revisar createOrder() y el endpoint
+//   del servidor /api/pedidos/crear.
+// - ¿La página de confirmación no muestra datos? → Revisar
+//   denormalizeResponse() y la clave 'lastOrderData' en localStorage.
+// - ¿Timeout al crear pedido? → El servidor tiene 15 segundos para
+//   responder. Revisar la sección CREAR PEDIDO.
+// ============================================================
 
 import { logger } from '../utils/logger';
 
@@ -71,9 +82,12 @@ const denormalizeResponse = (backendResponse) => {
     pedidoId: backendResponse.orderId || backendResponse.ordenId,  // Alias para compatibilidad
     success: true,
     ok: true,  // Alias para compatibilidad
-    total: backendResponse.totals?.total || backendResponse.total,
-    subtotal: backendResponse.totals?.subtotal || backendResponse.subtotal,
-    costoEnvio: backendResponse.totals?.shippingCost || backendResponse.costoEnvio,
+    total: backendResponse.totals?.total ?? backendResponse.total,
+    subtotal: backendResponse.totals?.subtotal ?? backendResponse.subtotal,
+    // ?? en lugar de || para preservar el valor 0 (envío gratis).
+    // Con ||, si shippingCost = 0 (falsy), se evaluaba el segundo operador y
+    // podía resultar en undefined, rompiendo la visualización en PedidoConfirmado.
+    costoEnvio: backendResponse.totals?.shippingCost ?? backendResponse.costoEnvio,
     cantidadProductos: backendResponse.cantidadProductos,
     items: backendResponse.items || [],
     orderNumber: backendResponse.orderNumber || '',
@@ -96,24 +110,13 @@ export const createOrder = async (checkoutData, cartItems, options = {}) => {
   try {
     const { includeItems = true } = options;
 
-    // Debug de entrada
-    console.log('🔍 [orderService] createOrder llamado con:', {
-      checkoutData: checkoutData ? 'presente' : 'ausente',
-      cartItems: cartItems ? `${cartItems.length} items` : 'ausente',
-      cartItemsArray: cartItems
-    });
-
     // Validaciones iniciales
     if (!checkoutData) {
       throw new Error('Los datos del checkout son requeridos');
     }
 
     if (!cartItems || cartItems.length === 0) {
-      console.error('❌ [orderService] Validación falló:', {
-        cartItems,
-        isArray: Array.isArray(cartItems),
-        length: cartItems?.length
-      });
+      logger.error('[orderService] Cartón vacío al intentar crear orden');
       throw new Error('El carrito está vacío');
     }
 
@@ -152,14 +155,8 @@ export const createOrder = async (checkoutData, cartItems, options = {}) => {
 
     const backendResponse = await response.json();
 
-    // ✅ DEBUG: Mostrar respuesta RAW del backend
-    console.log('🔍 [orderService] RESPUESTA RAW DEL BACKEND:', backendResponse);
-    console.log('   - checkoutUrl presente:', !!backendResponse.checkoutUrl);
-    console.log('   - preferenceId presente:', !!backendResponse.preferenceId);
-    console.log('   - sandboxCheckoutUrl presente:', !!backendResponse.sandboxCheckoutUrl);
-
     if (isDev) {
-      logger.success('✅ orderService: Orden creada exitosamente');
+      logger.success('orderService: Orden creada exitosamente');
       logger.debug('  Backend response:', backendResponse);
     }
 
@@ -170,11 +167,8 @@ export const createOrder = async (checkoutData, cartItems, options = {}) => {
     if (denormalizedResponse.success) {
       try {
         localStorage.setItem('lastOrderData', JSON.stringify(denormalizedResponse));
-        if (isDev) {
-          logger.debug('💾 orderService: Datos de la orden guardados en localStorage');
-        }
       } catch (e) {
-        console.error('❌ orderService: Error al guardar en localStorage', e);
+        logger.error('[orderService] Error al guardar en localStorage', e.message);
       }
     }
 
@@ -182,20 +176,15 @@ export const createOrder = async (checkoutData, cartItems, options = {}) => {
 
   } catch (error) {
     if (error.name === 'AbortError') {
-      console.error('❌ orderService: Timeout en creación de orden');
+      logger.error('[orderService] Timeout en creación de orden');
       throw new Error('La solicitud tardó demasiado. Por favor, intenta de nuevo.');
     }
-
-    console.error('❌ orderService: Error creando orden:', error.message);
+    logger.error('[orderService] Error creando orden:', error.message);
     throw error;
   }
 };
 
-/**
- * Obtiene una orden existente por ID
- * @param {string} orderId - ID de la orden
- * @returns {Promise<Object>} Detalles de la orden
- */
+// Obtiene una orden existente por su ID.
 export const getOrder = async (orderId) => {
   try {
     if (!orderId) {
@@ -231,20 +220,16 @@ export const getOrder = async (orderId) => {
 
   } catch (error) {
     if (error.name === 'AbortError') {
-      console.error('❌ orderService: Timeout obteniendo orden');
+      logger.error('[orderService] Timeout obteniendo orden');
       throw new Error('La solicitud tardó demasiado.');
     }
-
-    console.error('❌ orderService: Error obteniendo orden:', error.message);
+    logger.error('[orderService] Error obteniendo orden:', error.message);
     throw error;
   }
 };
 
-/**
- * Reintentar pago de una orden
- * @param {string} orderId - ID de la orden
- * @returns {Promise<Object>} Respuesta con nuevo checkout URL
- */
+// Solicita al servidor un nuevo enlace de pago para una orden que
+// no completó el pago anteriormente.
 export const retryPayment = async (orderId) => {
   try {
     if (!orderId) {

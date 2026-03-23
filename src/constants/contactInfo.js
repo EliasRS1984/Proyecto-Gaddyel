@@ -1,14 +1,20 @@
-/**
- * 📞 Configuración de Contacto Centralizada
- * 
- * Este archivo contiene todos los datos de contacto y redes sociales.
- * Se usa en todo el proyecto para evitar duplicación de datos.
- * 
- * ¿Por qué centralizado?
- * - Single source of truth: Un lugar para actualizar datos
- * - Evita inconsistencias: Todas las páginas usan los mismos valores
- * - Fácil mantenimiento: Cambiar teléfono = 1 archivo a editar
- */
+// ============================================================
+// ¿QUÉ ES ESTO?
+// Archivo central con todos los datos de contacto de Gaddyel.
+// Es la única fuente de verdad: si el teléfono o el mail cambia,
+// solo hace falta editarlo aquí y se actualiza en todo el sitio.
+//
+// ¿CÓMO FUNCIONA?
+// Exporta tres objetos que se importan según la necesidad:
+//   CONTACT_INFO  → datos completos (paginas de contacto, footer, schema)
+//   SCHEMA_CONTACT → solo los datos que Google necesita en su ficha
+//   SOCIAL_URLS   → solo las URLs de redes (para botones o links)
+//
+// ¿DÓNDE BUSCAR SI HAY PROBLEMAS?
+// ¿El número de WhatsApp no funciona? Revisa CONTACT_INFO.whatsapp.url
+// ¿La ficha de Google tiene datos errados? Revisa SCHEMA_CONTACT
+// ¿Las redes no abren? Revisa las URLs en CONTACT_INFO.instagram/facebook
+// ============================================================
 
 export const CONTACT_INFO = {
   // WhatsApp Business
@@ -65,7 +71,7 @@ export const CONTACT_INFO = {
 };
 
 /**
- * Exportar URLs de redes para fácil acceso
+ * Exportar URLs de redes para fácil acceso en botones y links del sitio.
  * Uso: import { SOCIAL_URLS } from '../constants/contactInfo'
  */
 export const SOCIAL_URLS = {
@@ -75,8 +81,8 @@ export const SOCIAL_URLS = {
 };
 
 /**
- * Exportar información para schema.org
- * Uso: en SchemaMarkup.jsx
+ * Exportar información para schema.org (datos estructurados para Google).
+ * Uso: en SchemaMarkup.jsx y seoMeta.js
  */
 export const SCHEMA_CONTACT = {
   telephone: CONTACT_INFO.phone,
@@ -88,4 +94,5 @@ export const SCHEMA_CONTACT = {
   ]
 };
 
-export default CONTACT_INFO;
+// Usa siempre los exports nombrados: { CONTACT_INFO }, { SCHEMA_CONTACT }, { SOCIAL_URLS }
+// No hay export default — evita confusiones al importar.

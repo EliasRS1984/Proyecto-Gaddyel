@@ -41,28 +41,33 @@ const FaqItem = ({ question, answer }) => {
     const id = `faq-${question.replace(/\s+/g, '-').toLowerCase()}`;
 
     return (
-        <div className="border-b border-gray-200">
+        <div className="border-b border-slate-200 dark:border-slate-700/60">
             {/* Botón que funciona como cabecera del acordeón */}
             <button
-                className="w-full flex justify-between items-center py-4 px-6 text-left focus:outline-none focus:ring-2 focus:ring-purple-300 rounded transition-colors duration-300 hover:bg-gray-50"
+                className="w-full flex justify-between items-center py-4 px-6 text-left
+                    focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-inset
+                    rounded-2xl
+                    hover:bg-slate-50 dark:hover:bg-slate-800/50
+                    transition-all duration-500 ease-out"
                 onClick={() => setIsOpen(!isOpen)}
                 aria-expanded={isOpen}
                 aria-controls={id}
                 type="button"
             >
-                <span className="text-lg font-semibold text-gray-800 pr-4">
+                <span className="text-[15px] font-semibold tracking-tight text-slate-800 dark:text-slate-100 pr-4">
                     {question}
                 </span>
                 
                 {/* Ícono de flecha que rota cuando está abierto */}
                 <svg
-                    className={`w-6 h-6 flex-shrink-0 transform transition-transform duration-300 ${
-                        isOpen ? 'rotate-180 text-purple-600' : 'text-gray-500'
+                    className={`w-5 h-5 flex-shrink-0 transition-transform duration-500 ease-out ${
+                        isOpen
+                            ? 'rotate-180 text-indigo-500 dark:text-indigo-400'
+                            : 'text-slate-400 dark:text-slate-500'
                     }`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
                     aria-hidden="true"
                 >
                     <path 
@@ -78,7 +83,7 @@ const FaqItem = ({ question, answer }) => {
             {isOpen && (
                 <div
                     id={id}
-                    className="px-6 pb-4 text-gray-600 leading-relaxed transition-all duration-500 ease-in-out animate-fadeIn"
+                    className="px-6 pb-5 text-[14px] text-slate-600 dark:text-slate-300 leading-relaxed"
                     role="region"
                     aria-labelledby={`button-${id}`}
                 >

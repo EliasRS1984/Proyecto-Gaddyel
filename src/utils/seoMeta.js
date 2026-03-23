@@ -1,30 +1,20 @@
-/**
- * 🔍 UTILIDADES SEO - Función para centralizar y reutilizar metadatos
- * 
- * FLUJO DE DATOS:
- * 1. Componente importa { seoMeta } desde utils/seoMeta.js
- * 2. Llama: const meta = seoMeta.page('inicio', { customProp: value })
- * 3. Retorna: { title, description, keywords, og, canonical }
- * 4. Pasa a Helmet con spread operator
- * 
- * VENTAJAS:
- * - Consistencia: Todos los meta tags siguen mismo formato
- * - Reutilizable: Evita duplicar estructura en cada página
- * - Escalable: Agregar nueva página = solo agregar entry
- * - Mantenible: Cambios globales en un solo archivo
- * - SEO: Keywords consistentes + intención de búsqueda clara
- * 
- * PALABRAS CLAVE DE NICHO (incluidas):
- * - vinchas para tratamientos faciales
- * - batas con logo para spa
- * - toallas bordadas personalizadas
- * - insumos textiles para estética
- * - regalos empresariales para pacientes
- * - blanquería para gabinetes
- * - personalización industrial (bordado)
- * - mínimos bajos (desde 12 unidades)
- * - envíos a todo Argentina
- */
+// =====================================================
+// ¿QUÉ ES ESTO?
+// Archivo que centraliza todos los títulos, descripciones y metadatos
+// de cada página del sitio (para Google y redes sociales).
+//
+// ¿CÓMO FUNCIONA?
+// 1. Cada página importa { seoMeta } y llama a seoMeta.page('nombre').
+// 2. Recibe un objeto con title, description, keywords, canonical y og
+//    listos para pasar a react-helmet-async.
+// 3. Para páginas de productos se usa seoMeta.product(producto, id),
+//    que genera título y descripción dinámica a partir del producto.
+//
+// ¿DÓNDE BUSCAR SI HAY PROBLEMAS?
+// ¿El título en Google no actualiza?  Revisá el <Helmet> en la página correspondiente.
+// ¿El canonical está mal?             Verificá DOMAIN y que options.path sea correcto.
+// ¿Agregar una página nueva?          Añadila en el objeto PAGES más abajo.
+// =====================================================
 
 import { SCHEMA_CONTACT } from '../constants/contactInfo';
 
@@ -33,7 +23,7 @@ const DOMAIN = 'https://gaddyel.vercel.app';
 const PHONE = SCHEMA_CONTACT.telephone;
 const EMAIL = SCHEMA_CONTACT.email;
 
-// ✅ Palabras clave maestras agrupadas por intención
+// Palabras clave agrupadas por intención de búsqueda
 const KEYWORDS = {
   brand: 'Gaddyel, gaddyel blanquería',
   
@@ -207,9 +197,11 @@ export const seoMeta = {
 /**
  * CONSTANTES GLOBALES para Schema.org
  */
+// IMPORTANTE: Debe coincidir con SchemaMarkup.jsx — usar el subtipo más específico.
+// Google exige 'HomeGoodsStore' (LocalBusiness → Store → HomeGoodsStore) para comercios de textiles del hogar.
 export const ORGANIZATION = {
   '@context': 'https://schema.org',
-  '@type': 'LocalBusiness',
+  '@type': 'HomeGoodsStore',
   name: 'Gaddyel',
   alternateName: 'Gaddyel Blanquería Personalizada',
   description: 'Blanquería personalizada premium para centros de estética, spas y gabinetes',

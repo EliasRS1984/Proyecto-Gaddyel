@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, memo } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
 import CartIcon from '../../CartIcon';
@@ -185,11 +185,8 @@ const Navbar = () => {
         setIsUserMenuOpen(false);
     }, []);
 
-    /**
-     * Cierra la sesión del usuario y lo lleva a la página de inicio.
-     * 
-     * ¿El logout no funciona? Revisa esta función y cerrarSesion() en useAuth.
-     */
+    // Cierra la sesión del usuario y lo lleva a la página de inicio.
+    // ¿El logout no funciona? Revisá esta función y cerrarSesion en AuthContext.jsx.
     const handleLogout = useCallback(() => {
         logger.info('[Navbar] Logout iniciado');
         cerrarSesion();
@@ -394,6 +391,11 @@ const Navbar = () => {
 
                                 {/* Dropdown: Usuario no logueado */}
                                 <div className={`absolute right-0 mt-3 w-56 bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200/50 dark:border-slate-800/50 py-2 z-50 transition-all duration-500 ease-out origin-top-right ${isUserMenuOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'}`}>
+                                    {/*
+                                     * Solo se muestra "Iniciar Sesión".
+                                     * El registro está disponible dentro de la misma página
+                                     * de login con el link "Registrate aquí" — evita redundancia.
+                                     */}
                                     <button
                                         onClick={() => {
                                             navigate('/login');
@@ -406,19 +408,6 @@ const Navbar = () => {
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                                         </svg>
                                         <span className="font-medium tracking-tight">Iniciar Sesión</span>
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            navigate('/registro');
-                                            closeUserMenu();
-                                        }}
-                                        className="w-full text-left px-5 py-3 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-all duration-300 flex items-center gap-3 group"
-                                    >
-                                        {/* Icono de registro */}
-                                        <svg className="w-4 h-4 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                                        </svg>
-                                        <span className="font-medium tracking-tight">Registrarse</span>
                                     </button>
                                 </div>
                             </>
@@ -490,6 +479,7 @@ const Navbar = () => {
                         </>
                     ) : (
                         <>
+                            {/* Solo Iniciar Sesión — el registro está dentro de esa página */}
                             <button
                                 onClick={() => {
                                     navigate('/login');
@@ -499,15 +489,6 @@ const Navbar = () => {
                             >
                                 Iniciar Sesión
                             </button>
-                            <button
-                                onClick={() => {
-                                    navigate('/registro');
-                                    closeMenu();
-                                }}
-                                className="w-full text-left px-5 py-4 text-base font-medium tracking-tight rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-all duration-300"
-                            >
-                                Registrarse
-                            </button>
                         </>
                     )}
                 </div>
@@ -516,6 +497,6 @@ const Navbar = () => {
     );
 };
 
-// Memoizamos el componente para evitar renderizados innecesarios
-// cuando el componente padre se actualiza pero el Navbar no cambió.
-export default React.memo(Navbar);
+// El Navbar no recibe props: esta línea evita que se redibuje cuando un componente padre
+// cambia por razones que no le afectan directamente.
+export default memo(Navbar);

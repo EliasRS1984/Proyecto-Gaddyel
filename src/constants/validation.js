@@ -1,9 +1,23 @@
-/**
- * validation.js - Constantes de validación para formularios
- * 
- * Centraliza todas las reglas de validación y mensajes de error
- * para mantener consistencia en toda la aplicación
- */
+// ============================================================
+// ¿QUÉ ES ESTO?
+// Archivo central con todas las reglas y mensajes que se usan
+// para validar formularios del sitio (checkout, contacto, etc.).
+//
+// ¿CÓMO FUNCIONA?
+// Exporta cuatro grupos:
+//   VALIDATION_RULES    → los límites numéricos y patrones regex de cada campo
+//   ERROR_MESSAGES      → los textos de error que ve el usuario
+//   SUCCESS_MESSAGES    → los textos de éxito tras completar una acción
+//   PROVINCIAS_ARGENTINA → lista de provincias para selects de envío
+//
+// Y tres funciones de ayuda para validar desde cualquier componente:
+//   isValidEmail / isValidWhatsApp / isValidCodigoPostal
+//
+// ¿DÓNDE BUSCAR SI HAY PROBLEMAS?
+// ¿Un campo acepta texto inválido? Revisa el PATTERN correspondiente en VALIDATION_RULES
+// ¿Los mensajes de error no coinciden con las reglas? Revisa ERROR_MESSAGES
+// ¿Las provincias no aparecen en el selector? Revisa PROVINCIAS_ARGENTINA
+// ============================================================
 
 /**
  * Reglas de validación
@@ -142,17 +156,28 @@ export const PROVINCIAS_ARGENTINA = [
     'Tucumán'
 ];
 
+// ======== AYUDANTES DE VALIDACIÓN ========
+// Funciones listas para usar en cualquier componente o formulario.
+// Devuelven true si el valor es válido, false si no lo es.
+
 /**
- * Helper: Validar email
+ * Verifica si un email tiene formato correcto.
+ * Ejemplo válido: "usuario@dominio.com"
  */
 export const isValidEmail = (email) => {
     return VALIDATION_RULES.EMAIL_PATTERN.test(email);
 };
 
 /**
- * Helper: Validar WhatsApp
+ * Verifica si un número de WhatsApp es válido.
+ * Acepta: dígitos, espacios, +, -, ( y ).
+ * Rechaza: letras u otros caracteres.
+ * Longitud válida: entre 10 y 15 dígitos (sin contar separadores).
  */
 export const isValidWhatsApp = (whatsapp) => {
+    // Primero verificamos que solo contenga caracteres telefónicos válidos
+    if (!VALIDATION_RULES.WHATSAPP_PATTERN.test(whatsapp)) return false;
+    // Luego contamos solo los dígitos para verificar la longitud
     const digits = whatsapp.replace(/\D/g, '');
     return (
         digits.length >= VALIDATION_RULES.WHATSAPP_MIN_DIGITS &&
@@ -161,18 +186,11 @@ export const isValidWhatsApp = (whatsapp) => {
 };
 
 /**
- * Helper: Validar código postal
+ * Verifica si un código postal argentino es válido (4 a 6 dígitos).
  */
 export const isValidCodigoPostal = (codigo) => {
     return VALIDATION_RULES.CODIGO_POSTAL_PATTERN.test(codigo.replace(/\s/g, ''));
 };
 
-export default {
-    VALIDATION_RULES,
-    ERROR_MESSAGES,
-    SUCCESS_MESSAGES,
-    PROVINCIAS_ARGENTINA,
-    isValidEmail,
-    isValidWhatsApp,
-    isValidCodigoPostal
-};
+// Usa siempre los exports nombrados: { VALIDATION_RULES }, { ERROR_MESSAGES }, etc.
+// No hay export default — evita confusiones al importar.

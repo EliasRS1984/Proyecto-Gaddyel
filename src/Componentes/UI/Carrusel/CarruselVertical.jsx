@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 
 /**
  * ============================================================================
@@ -121,7 +122,9 @@ const CarruselVertical = ({ imagenes = [], nombreProducto = 'Producto' }) => {
     const [arrastrando, setArrastrando] = useState(false);
     
     // Punto donde empezó el arrastre (para calcular cuánto se movió)
-    const [puntoInicio, setPuntoInicio] = useState({ x: 0, y: 0 });
+    // useRef en lugar de useState: es un valor interno de movimiento que no
+    // necesita disparar renders — solo se lee y escribe durante el arrastre.
+    const puntoInicio = useRef({ x: 0, y: 0 });
     
     // Referencia al contenedor de la imagen (para cálculos de posición)
     const contenedorRef = useRef(null);
@@ -248,7 +251,11 @@ const CarruselVertical = ({ imagenes = [], nombreProducto = 'Producto' }) => {
      * Girar la rueda hacia arriba acerca, hacia abajo aleja.
      * Límites: mínimo 1x (normal), máximo 4x
      * 
-     * ¿El zoom con scroll no funciona? Revisa aquí.
+     * NOTA TÉCNICA: Se adjunta de forma imperativa con { passive: false } porque
+     * React 17+ registra onWheel como listener pasivo por defecto, lo que hace
+     * que e.preventDefault() sea ignorado y el scroll del mouse no funcione.
+     * 
+     * ¿El zoom con scroll no funciona? Revisa el useEffect que lo adjunta (línea ~207)
      */
     const handleWheel = useCallback((e) => {
         e.preventDefault();
@@ -261,6 +268,24 @@ const CarruselVertical = ({ imagenes = [], nombreProducto = 'Producto' }) => {
         });
     }, []);
 
+    // ========================================================================
+    // ADJUNTAR WHEEL LISTENER DE FORMA IMPERATIVA (NO PASIVO)
+    // ========================================================================
+    /**
+     * El zoom con la rueda del mouse necesita bloquear el scroll nativo del browser.
+     * Para eso se necesita { passive: false }, que no se puede usar con los eventos
+     * de React (onWheel). Por eso lo adjuntamos directamente al elemento del DOM.
+     * 
+     * Se activa solo cuando el lightbox está abierto para no interferir con el
+     * scroll normal de la página.
+     */
+    useEffect(() => {
+        const contenedor = contenedorRef.current;
+        if (!contenedor || !lightboxAbierto) return;
+        contenedor.addEventListener('wheel', handleWheel, { passive: false });
+        return () => contenedor.removeEventListener('wheel', handleWheel);
+    }, [lightboxAbierto, handleWheel]);
+
     /**
      * ARRASTRAR LA IMAGEN (inicio)
      * Cuando el usuario hace click y mantiene presionado sobre la imagen con zoom,
@@ -270,7 +295,7 @@ const CarruselVertical = ({ imagenes = [], nombreProducto = 'Producto' }) => {
         if (zoom > 1) {
             e.preventDefault();
             setArrastrando(true);
-            setPuntoInicio({ x: e.clientX - posicion.x, y: e.clientY - posicion.y });
+            puntoInicio.current = { x: e.clientX - posicion.x, y: e.clientY - posicion.y };
         }
     }, [zoom, posicion]);
 
@@ -282,11 +307,11 @@ const CarruselVertical = ({ imagenes = [], nombreProducto = 'Producto' }) => {
     const handleMouseMove = useCallback((e) => {
         if (arrastrando && zoom > 1) {
             setPosicion({
-                x: e.clientX - puntoInicio.x,
-                y: e.clientY - puntoInicio.y
+                x: e.clientX - puntoInicio.current.x,
+                y: e.clientY - puntoInicio.current.y
             });
         }
-    }, [arrastrando, zoom, puntoInicio]);
+    }, [arrastrando, zoom]);
 
     /**
      * ARRASTRAR LA IMAGEN (fin)
@@ -324,7 +349,7 @@ const CarruselVertical = ({ imagenes = [], nombreProducto = 'Producto' }) => {
         if (zoom > 1 && e.touches.length === 1) {
             const touch = e.touches[0];
             setArrastrando(true);
-            setPuntoInicio({ x: touch.clientX - posicion.x, y: touch.clientY - posicion.y });
+            puntoInicio.current = { x: touch.clientX - posicion.x, y: touch.clientY - posicion.y };
         }
     }, [zoom, posicion]);
 
@@ -332,11 +357,11 @@ const CarruselVertical = ({ imagenes = [], nombreProducto = 'Producto' }) => {
         if (arrastrando && zoom > 1 && e.touches.length === 1) {
             const touch = e.touches[0];
             setPosicion({
-                x: touch.clientX - puntoInicio.x,
-                y: touch.clientY - puntoInicio.y
+                x: touch.clientX - puntoInicio.current.x,
+                y: touch.clientY - puntoInicio.current.y
             });
         }
-    }, [arrastrando, zoom, puntoInicio]);
+    }, [arrastrando, zoom]);
 
     const handleTouchEnd = useCallback(() => {
         setArrastrando(false);
@@ -379,7 +404,12 @@ const CarruselVertical = ({ imagenes = [], nombreProducto = 'Producto' }) => {
                 <button
                     type="button"
                     onClick={() => setLightboxAbierto(true)}
-                    className="w-full lg:w-4/5 h-[400px] md:h-[500px] bg-gray-100 rounded-xl overflow-hidden shadow-lg cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full lg:w-4/5 h-[400px] md:h-[500px]
+                        bg-slate-100 dark:bg-slate-800
+                        rounded-2xl overflow-hidden
+                        shadow-lg cursor-zoom-in
+                        focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
+                        transition-all duration-500 ease-out"
                     aria-label="Ver imagen ampliada"
                 >
                     <img
@@ -404,10 +434,12 @@ const CarruselVertical = ({ imagenes = [], nombreProducto = 'Producto' }) => {
                             <button
                                 key={imagen.src}
                                 type="button"
-                                className={`shrink-0 w-20 h-20 rounded-lg overflow-hidden cursor-pointer transition-all duration-300 transform focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+                                className={`shrink-0 w-20 h-20 rounded-2xl overflow-hidden cursor-pointer
+                                    transition-all duration-500 ease-out
+                                    focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 ${
                                     index === indiceActual
-                                        ? 'border-2 border-purple-600 scale-110 shadow-lg'
-                                        : 'border-2 border-transparent hover:border-gray-400'
+                                        ? 'border-2 border-indigo-500 scale-110 shadow-lg ring-2 ring-indigo-100 dark:ring-indigo-900/50'
+                                        : 'border-2 border-transparent hover:border-slate-300 dark:hover:border-slate-600'
                                 }`}
                                 onClick={() => handleSeleccionarImagen(index)}
                                 aria-label={`Ver ${imagen.alt}`}
@@ -422,7 +454,7 @@ const CarruselVertical = ({ imagenes = [], nombreProducto = 'Producto' }) => {
                             </button>
                         ))
                     ) : (
-                        <p className="text-gray-500 text-sm">Sin imágenes disponibles</p>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm">Sin imágenes disponibles</p>
                     )}
                 </div>
             </div>
@@ -435,10 +467,12 @@ const CarruselVertical = ({ imagenes = [], nombreProducto = 'Producto' }) => {
                 
                 ¿El visor no se abre? Revisa si 'lightboxAbierto' cambia a true.
                 ¿El fondo no es oscuro? Revisa 'bg-black/[0.97]' (97% opacidad)
+                NOTA: z-[9999] en lugar de z-50 porque backdrop-blur-xl en el panel
+                del producto crea un nuevo contexto de apilamiento que supera z-50.
             ---------------------------------------------------------------- */}
-            {lightboxAbierto && (
+            {lightboxAbierto && createPortal(
                 <div 
-                    className="fixed inset-0 z-50 bg-black/[0.97] flex items-center justify-center"
+                    className="fixed inset-0 z-[9999] bg-black/[0.97] flex items-center justify-center"
                     onClick={() => setLightboxAbierto(false)}
                     onMouseMove={handleMouseMove}
                     onMouseUp={handleMouseUp}
@@ -537,7 +571,6 @@ const CarruselVertical = ({ imagenes = [], nombreProducto = 'Producto' }) => {
                     <div 
                         ref={contenedorRef}
                         className="relative flex items-center justify-center overflow-hidden"
-                        onWheel={handleWheel}
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Indicador de carga (spinner giratorio) */}
@@ -601,7 +634,7 @@ const CarruselVertical = ({ imagenes = [], nombreProducto = 'Producto' }) => {
                         </span>
                     </div>
                 </div>
-            )}
+            , document.body)}
         </>
     );
 };

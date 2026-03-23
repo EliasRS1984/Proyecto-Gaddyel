@@ -1,19 +1,19 @@
-/**
- * UTILIDAD: Formato de Precios - Estándar Argentino
- * 
- * ¿QUÉ HACE?
- * - Formatea precios usando formato argentino: punto (.) para miles, coma (,) para decimales
- * - Ejemplo: 1234.56 → "1.234,56"
- * 
- * ¿POR QUÉ?
- * - Normativa argentina: usar punto para miles y coma para decimales
- * - Evitar confusión en precios
- * - Consistencia en toda la aplicación
- * 
- * @param {number} precio - Precio a formatear
- * @param {boolean} includeDecimals - Si incluir decimales (default: true)
- * @returns {string} - Precio formateado en formato argentino
- */
+// =====================================================
+// ¿QUÉ ES ESTO?
+// Funciones para mostrar precios en formato argentino (pesos).
+// Ejemplo: el número 1234.56 se muestra como "1.234,56"
+//
+// ¿CÓMO FUNCIONA?
+// - formatPrice(precio)           → devuelve el número con formato local
+// - formatPriceWithSymbol(precio) → igual pero con el símbolo $ adelante
+// - parseArgentinePrice(texto)    → convierte el texto "1.234,56" al número 1234.56
+// Usa el estándar argentino: punto (.) para miles, coma (,) para decimales.
+//
+// ¿DÓNDE BUSCAR SI HAY PROBLEMAS?
+// ¿El precio se muestra sin formato?   Verificá que el valor sea un número (no string).
+// ¿El precio muestra NaN?              El valor es null/undefined/NaN → la función devuelve '0,00'.
+// ¿ParseArgentinePrice devuelve 0?     Verificá que el string use punto para miles y coma para decimales.
+// =====================================================
 export const formatPrice = (precio, includeDecimals = true) => {
     if (precio === null || precio === undefined || isNaN(precio)) {
         return '0,00';
