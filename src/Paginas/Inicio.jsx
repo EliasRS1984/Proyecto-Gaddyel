@@ -12,6 +12,7 @@ import FaqItem from '../Componentes/FaqItem';
 import ImagenArticulo from '../Activos/Imagenes/imagen-articulo/imagen-articulo.jpg';
 import TarjetaProducto from '../Componentes/TarjetaProducto/TarjetaProducto.jsx';
 import ImageOptimizer from '../Componentes/ImageOptimizer.jsx';
+import { logger } from '../utils/logger';
 
 /**
  * CTAButton - Componente reutilizable para botones de llamada a acción
@@ -124,7 +125,7 @@ const Inicio = () => {
                 // ✅ VALIDACIÓN: Asegurar que imagenes sea array
                 setCarouselImages(Array.isArray(imagenes) ? imagenes : []);
             } catch (err) {
-                console.error("Error al obtener datos:", err.message);
+                logger.error("Error al obtener datos:", err.message);
                 // ✅ ERROR HANDLING: Mensaje específico según tipo de error
                 const mensajeError = err.message.includes('timeout')
                     ? 'La conexión tardó demasiado. Por favor, intenta de nuevo.'

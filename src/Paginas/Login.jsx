@@ -41,9 +41,16 @@ const Login = () => {
         e.preventDefault();
         setError('');
 
-        // Validación básica
+        // Validación básica: campos vacíos
         if (!formData.email || !formData.password) {
             setError('Por favor completa todos los campos');
+            return;
+        }
+
+        // Validación de formato de email (evita enviar al servidor emails claramente incorrectos)
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.email)) {
+            setError('El email no tiene un formato válido');
             return;
         }
 

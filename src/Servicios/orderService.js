@@ -21,9 +21,9 @@
 //   responder. Revisar la sección CREAR PEDIDO.
 // ============================================================
 
+import axiosInstance from './axiosInstance';
 import { logger } from '../utils/logger';
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000';
 const isDev = import.meta.env.DEV;
 
 /**
@@ -130,30 +130,11 @@ export const createOrder = async (checkoutData, cartItems, options = {}) => {
       logger.debug('  Normalized data:', normalizedData);
     }
 
-    // Crear AbortController para timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 segundos
-
-    const response = await fetch(`${API_BASE}/api/pedidos/crear`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify(normalizedData),
-      credentials: 'include',
-      signal: controller.signal
-    });
-
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      const errorMessage = errorData.error || errorData.message || `Error ${response.status}`;
-      throw new Error(errorMessage);
-    }
-
-    const backendResponse = await response.json();
+    const { data: backendResponse } = await axiosInstance.post(
+      '/api/pedidos/crear',
+      normalizedData,
+      { withCredentials: true, timeout: 15000 }
+    );
 
     if (isDev) {
       logger.success('orderService: Orden creada exitosamente');
@@ -175,12 +156,13 @@ export const createOrder = async (checkoutData, cartItems, options = {}) => {
     return denormalizedResponse;
 
   } catch (error) {
-    if (error.name === 'AbortError') {
+    if (error.code === 'ECONNABORTED') {
       logger.error('[orderService] Timeout en creación de orden');
       throw new Error('La solicitud tardó demasiado. Por favor, intenta de nuevo.');
     }
-    logger.error('[orderService] Error creando orden:', error.message);
-    throw error;
+    const errorMessage = error.response?.data?.error || error.response?.data?.message || error.message;
+    logger.error('[orderService] Error creando orden:', errorMessage);
+    throw new Error(errorMessage);
   }
 };
 
@@ -191,26 +173,10 @@ export const getOrder = async (orderId) => {
       throw new Error('ID de orden requerido');
     }
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-    const response = await fetch(`${API_BASE}/api/orders/${orderId}`, {
-      method: 'GET',
-      headers: { 'Accept': 'application/json' },
-      credentials: 'include',
-      signal: controller.signal
+    const { data } = await axiosInstance.get(`/api/orders/${orderId}`, {
+      withCredentials: true,
+      timeout: 10000
     });
-
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      if (response.status === 404) {
-        throw new Error('Orden no encontrada');
-      }
-      throw new Error(`Error ${response.status} al obtener orden`);
-    }
-
-    const data = await response.json();
 
     if (isDev) {
       logger.debug('✅ orderService: Orden obtenida:', data);
@@ -219,9 +185,12 @@ export const getOrder = async (orderId) => {
     return denormalizeResponse(data);
 
   } catch (error) {
-    if (error.name === 'AbortError') {
+    if (error.code === 'ECONNABORTED') {
       logger.error('[orderService] Timeout obteniendo orden');
       throw new Error('La solicitud tardó demasiado.');
+    }
+    if (error.response?.status === 404) {
+      throw new Error('Orden no encontrada');
     }
     logger.error('[orderService] Error obteniendo orden:', error.message);
     throw error;
@@ -236,24 +205,10 @@ export const retryPayment = async (orderId) => {
       throw new Error('ID de orden requerido');
     }
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-    const response = await fetch(`${API_BASE}/api/orders/${orderId}/retry`, {
-      method: 'POST',
-      headers: { 'Accept': 'application/json' },
-      credentials: 'include',
-      signal: controller.signal
+    const { data } = await axiosInstance.post(`/api/orders/${orderId}/retry`, null, {
+      withCredentials: true,
+      timeout: 10000
     });
-
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || `Error ${response.status}`);
-    }
-
-    const data = await response.json();
 
     if (isDev) {
       logger.debug('✅ orderService: Reintento iniciado:', data);
@@ -262,11 +217,10 @@ export const retryPayment = async (orderId) => {
     return denormalizeResponse(data);
 
   } catch (error) {
-    if (error.name === 'AbortError') {
+    if (error.code === 'ECONNABORTED') {
       throw new Error('La solicitud tardó demasiado.');
     }
-
-    console.error('❌ orderService: Error reintentando pago:', error.message);
+    logger.error('Error reintentando pago:', error.message);
     throw error;
   }
 };
@@ -362,7 +316,7 @@ export const deserializeOrderFromStorage = (key = 'currentOrder') => {
     const stored = localStorage.getItem(key);
     return stored ? JSON.parse(stored) : null;
   } catch (error) {
-    console.error('Error deserializando orden:', error);
+    logger.error('Error deserializando orden:', error);
     return null;
   }
 };

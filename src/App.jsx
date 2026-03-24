@@ -1,5 +1,6 @@
 import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import useServerWarmup from './hooks/useServerWarmup';
 import { HelmetProvider } from 'react-helmet-async';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
@@ -36,6 +37,10 @@ import { AuthProvider } from './Context/AuthContext';
 import { OrderProvider } from './Context/OrderContext';
 
 const App = () => {
+    // Despierta al servidor en el fondo ni bien carga la app.
+    // Reduce la espera del cold start de Render antes de que el usuario navegue al catálogo.
+    useServerWarmup();
+
     return (
         <HelmetProvider>
             <SchemaMarkup />

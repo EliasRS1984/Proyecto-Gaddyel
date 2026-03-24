@@ -42,7 +42,6 @@ if (import.meta.env.PROD) {
     },
   });
   
-  console.log('✅ Sentry inicializado en producción');
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(

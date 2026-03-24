@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { useCart } from '../Context/CartContext';
 import orderStorage from '../utils/orderStorage';
+import { logger } from '../utils/logger';
 
 /**
  * Función para formatear fecha (fuera del componente para evitar problemas de hooks)
@@ -48,7 +49,7 @@ const PedidoConfirmado = () => {
                 setLoading(true);
                 
                 // Log de parámetros recibidos
-                console.log('🔍 [PedidoConfirmado] Parámetros:', {
+                logger.debug('[PedidoConfirmado] Parámetros:', {
                     ordenId,
                     status: searchParams.get('status'),
                     payment_id: searchParams.get('payment_id'),
@@ -56,14 +57,14 @@ const PedidoConfirmado = () => {
                 });
                 
                 if (ordenId) {
-                    console.log('✅ Pedido confirmado con ID:', ordenId);
+                    logger.debug('Pedido confirmado con ID:', ordenId);
                     
                     // ✅ CORRECCIÓN: Usar orderStorage.getOrder() para obtener datos completos
                     // Antes intentaba acceder a 'lastOrderData' que no existía
                     const pedidoData = orderStorage.getOrder() || {};
                     
                     // ✅ DEBUG: Mostrar qué se obtuvo
-                    console.log('📖 [PedidoConfirmado] Datos obtenidos de orderStorage:', {
+                    logger.debug('[PedidoConfirmado] Datos obtenidos de orderStorage:', {
                         hasData: Object.keys(pedidoData).length > 0,
                         ordenId: pedidoData.ordenId,
                         total: pedidoData.total,
@@ -74,14 +75,14 @@ const PedidoConfirmado = () => {
                     });
                     
                     if (Object.keys(pedidoData).length > 0) {
-                        console.log('📦 Datos del pedido recuperados desde orderStorage:', pedidoData);
+                        logger.debug('Datos del pedido recuperados desde orderStorage:', pedidoData);
                     } else {
-                        console.warn('⚠️ No hay datos de pedido en orderStorage');
+                        logger.warn('No hay datos de pedido en orderStorage');
                     }
                     
                     // Limpiar carrito después de pago exitoso (solo una vez)
                     if (!hasCleanedCartRef.current && searchParams.get('status') === 'approved') {
-                        console.log('🧹 Limpiando carrito después de pago exitoso');
+                        logger.debug('Limpiando carrito después de pago exitoso');
                         clearCart();
                         hasCleanedCartRef.current = true;
                     }
@@ -101,7 +102,7 @@ const PedidoConfirmado = () => {
                     // Cantidad de solicitudes = suma total de cantidades
                     const cantidadProductos = items.reduce((sum, item) => sum + (item.cantidad || 1), 0);
                     
-                    console.log('✅ Datos procesados:', { 
+                    logger.debug('Datos procesados:', { 
                         orderNumber, 
                         cantidadProductos, 
                         costoEnvio,
@@ -135,7 +136,7 @@ const PedidoConfirmado = () => {
                 
                 setLoading(false);
             } catch (err) {
-                console.error('❌ Error cargando pedido:', err);
+                logger.error('Error cargando pedido:', err);
                 setError('No se pudo cargar la información del pedido');
                 setLoading(false);
             }

@@ -14,12 +14,13 @@
 // ¿DÓNDE BUSCAR SI HAY PROBLEMAS?
 //   - Página no muestra número de orden → revisar "lastOrderData" en localStorage
 //   - Botón "Intentar nuevamente" va al lugar incorrecto → revisar `ordenId` en useParams
-//   - Parámetros de MP → revisar console.log con 🔍 en el useEffect
+//   - Parámetros de MP → revisar logger.debug en el useEffect
 // ============================================================
 
 import React, { useEffect, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import orderStorage from '../utils/orderStorage';
+import { logger } from '../utils/logger';
 
 // ======== COMPONENTE PRINCIPAL ========
 
@@ -53,7 +54,7 @@ export const PedidoFallido = () => {
         const orderData = orderStorage.getOrder();
         if (orderData) {
             setOrden(orderData);
-            console.log('📦 [PedidoFallido] Datos de orden cargados:', orderData.orderNumber);
+            logger.debug('[PedidoFallido] Datos de orden cargados:', orderData.orderNumber);
         }
 
         // MP puede enviar status='null' (string literal) cuando el usuario abandona
@@ -61,7 +62,7 @@ export const PedidoFallido = () => {
         // flujo normal de abandono. La página muestra la UI de rechazo en todos los casos.
         const statusParam = searchParams.get('status');
         const statusReal = (statusParam === 'null' || statusParam === null) ? 'abandonado' : statusParam;
-        console.log('🔍 [PedidoFallido] Parámetros:', {
+        logger.debug('[PedidoFallido] Parámetros:', {
             ordenId,
             status: statusReal,
             payment_id: searchParams.get('payment_id'),

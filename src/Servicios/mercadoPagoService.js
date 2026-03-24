@@ -18,7 +18,7 @@
 //    → Retorna una función para detener las consultas manualmente
 //
 // ¿DÓNDE BUSCAR SI HAY PROBLEMAS?
-// - "No estás autenticado"   → El usuario cerró sesión o el token expiró. Revisar getAuthToken.
+// - "No estás autenticado"   → El usuario cerró sesión o el token expiró. El interceptor de Axios maneja esto automáticamente.
 // - "Error HTTP 4xx"         → El backend rechazó la solicitud. Revisar el ordenId enviado.
 // - Brick no aparece         → createPreference falló. Revisar la consola de red del browser.
 // - Polling no para          → Revisar que el backend retorne status 'approved'/'rejected'.
@@ -28,21 +28,7 @@
 // - Los datos de tarjeta NUNCA pasan por este archivo (los maneja MP directamente)
 // =====================================================================
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'https://gaddyel-backend.onrender.com';
-
-// ======== OBTENER TOKEN DE SESIÓN ========
-// Recupera el token de sesión guardado al iniciar sesión.
-// El token fue guardado por authService.js en localStorage con la clave 'clientToken'.
-// ¿Sin token? El usuario no está autenticado o su sesión expiró.
-const getAuthToken = () => {
-    const token = localStorage.getItem('clientToken');
-
-    if (!token) {
-        throw new Error('Tu sesión expiró. Por favor, iniciá sesión nuevamente.');
-    }
-
-    return token;
-};
+import axiosInstance from './axiosInstance';
 
 // ======== CREAR PREFERENCIA DE PAGO ========
 // Le pide al backend que registre esta orden en Mercado Pago y obtenga
@@ -52,23 +38,15 @@ const getAuthToken = () => {
 // @param {string} deviceId - Identificador del dispositivo del usuario (anti-fraude de MP, opcional)
 // @returns {{ preferenceId, checkoutUrl, sandboxCheckoutUrl }}
 export const createPreference = async (ordenId, deviceId = null) => {
-    const token = getAuthToken();
-
-    const response = await fetch(`${API_BASE}/api/mercadopago/preferences`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ ordenId, deviceId })
-    });
-
-    if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `No se pudo iniciar el checkout (Error ${response.status})`);
+    try {
+        const { data } = await axiosInstance.post('/api/mercadopago/preferences', { ordenId, deviceId });
+        return data;
+    } catch (error) {
+        throw new Error(
+            error.response?.data?.error ||
+            `No se pudo iniciar el checkout (Error ${error.response?.status ?? 'desconocido'})`
+        );
     }
-
-    return response.json();
 };
 
 // ======== CONSULTAR ESTADO DE PAGO ========
@@ -78,21 +56,15 @@ export const createPreference = async (ordenId, deviceId = null) => {
 // @param {string} ordenId - ID de la orden a consultar
 // @returns {{ status, paymentId, statusDetail, amount, ... }}
 export const getPaymentStatus = async (ordenId) => {
-    const token = getAuthToken();
-
-    const response = await fetch(`${API_BASE}/api/mercadopago/payment/${ordenId}`, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
-    });
-
-    if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `No se pudo obtener el estado del pago (Error ${response.status})`);
+    try {
+        const { data } = await axiosInstance.get(`/api/mercadopago/payment/${ordenId}`);
+        return data;
+    } catch (error) {
+        throw new Error(
+            error.response?.data?.error ||
+            `No se pudo obtener el estado del pago (Error ${error.response?.status ?? 'desconocido'})`
+        );
     }
-
-    return response.json();
 };
 
 // ======== CONSULTAR ESTADO AUTOMÁTICAMENTE (POLLING) ========

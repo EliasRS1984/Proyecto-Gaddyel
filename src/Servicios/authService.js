@@ -20,34 +20,18 @@
 //   y limpiarSesionAnterior()
 // ============================================================
 
+import axiosInstance from './axiosInstance';
 import { logger } from '../utils/logger';
-
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000';
 
 // Registrar nuevo cliente
 export const registro = async (datosCliente) => {
     try {
-        const response = await fetch(`${API_BASE}/api/auth/registro`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                nombre: datosCliente.nombre,
-                email: datosCliente.email,
-                password: datosCliente.password,
-                whatsapp: datosCliente.whatsapp
-            })
+        const { data } = await axiosInstance.post('/api/auth/registro', {
+            nombre: datosCliente.nombre,
+            email: datosCliente.email,
+            password: datosCliente.password,
+            whatsapp: datosCliente.whatsapp
         });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            return {
-                exito: false,
-                mensaje: data.error || 'Error al registrar usuario'
-            };
-        }
 
         // Guardar token en localStorage
         if (data.token) {
@@ -65,7 +49,7 @@ export const registro = async (datosCliente) => {
         logger.error('[authService] Error en registro:', error.message);
         return {
             exito: false,
-            mensaje: 'Error al conectar con el servidor'
+            mensaje: error.response?.data?.error || 'Error al conectar con el servidor'
         };
     }
 };
@@ -73,22 +57,7 @@ export const registro = async (datosCliente) => {
 // Login de cliente existente
 export const login = async (email, password) => {
     try {
-        const response = await fetch(`${API_BASE}/api/auth/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ email, password })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            return {
-                exito: false,
-                mensaje: data.error || 'Error al iniciar sesión'
-            };
-        }
+        const { data } = await axiosInstance.post('/api/auth/login', { email, password });
 
         // Guardar token y datos del cliente
         if (data.token) {
@@ -106,7 +75,7 @@ export const login = async (email, password) => {
         logger.error('[authService] Error en login:', error.message);
         return {
             exito: false,
-            mensaje: 'Error al conectar con el servidor'
+            mensaje: error.response?.data?.error || 'Credenciales incorrectas'
         };
     }
 };
@@ -114,34 +83,12 @@ export const login = async (email, password) => {
 // Obtener perfil del cliente autenticado
 export const obtenerPerfil = async () => {
     try {
-        const token = localStorage.getItem('clientToken');
-        
-        if (!token) {
+        if (!localStorage.getItem('clientToken')) {
             throw { mensaje: 'No hay sesión activa' };
         }
-        
-        const response = await fetch(`${API_BASE}/api/auth/perfil`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-        if (!response.ok) {
-            const error = await response.json();
-            
-            // Si el token expiró, limpiar localStorage
-            if (response.status === 401) {
-                localStorage.removeItem('clientToken');
-                localStorage.removeItem('clientData');
-            }
-            
-            throw error;
-        }
 
-        const data = await response.json();
-        
-        // Actualizar datos en localStorage
+        const { data } = await axiosInstance.get('/api/auth/perfil');
+
         // Actualizar datos en localStorage (incluye domicilio/localidad/provincia)
         localStorage.setItem('clientData', JSON.stringify(data.cliente));
         
@@ -155,35 +102,12 @@ export const obtenerPerfil = async () => {
 // Actualizar perfil del cliente
 export const actualizarPerfil = async (datosActualizados) => {
     try {
-        const token = localStorage.getItem('clientToken');
-        
-        if (!token) {
+        if (!localStorage.getItem('clientToken')) {
             throw { mensaje: 'No hay sesión activa' };
         }
-        
-        const response = await fetch(`${API_BASE}/api/auth/perfil`, {
-            method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(datosActualizados)
-        });
 
-        if (!response.ok) {
-            const error = await response.json();
-            
-            // Si el token expiró, limpiar localStorage
-            if (response.status === 401) {
-                localStorage.removeItem('clientToken');
-                localStorage.removeItem('clientData');
-            }
-            
-            throw error;
-        }
+        const { data } = await axiosInstance.put('/api/auth/perfil', datosActualizados);
 
-        const data = await response.json();
-        
         // Actualizar datos en localStorage
         localStorage.setItem('clientData', JSON.stringify(data.cliente));
         
@@ -228,35 +152,12 @@ export const obtenerClienteLocal = () => {
 // Actualizar dirección del cliente
 export const actualizarDireccion = async (datosDireccion) => {
     try {
-        const token = localStorage.getItem('clientToken');
-        
-        if (!token) {
+        if (!localStorage.getItem('clientToken')) {
             throw { mensaje: 'No hay sesión activa' };
         }
-        
-        const response = await fetch(`${API_BASE}/api/auth/direccion`, {
-            method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(datosDireccion)
-        });
 
-        if (!response.ok) {
-            const error = await response.json();
-            
-            // Si el token expiró, limpiar localStorage
-            if (response.status === 401) {
-                localStorage.removeItem('clientToken');
-                localStorage.removeItem('clientData');
-            }
-            
-            throw error;
-        }
+        const { data } = await axiosInstance.put('/api/auth/direccion', datosDireccion);
 
-        const data = await response.json();
-        
         // Actualizar datos en localStorage
         localStorage.setItem('clientData', JSON.stringify(data.cliente));
         
@@ -306,7 +207,7 @@ export const guardarSesion = (respuestaAPI) => {
             logger.info('✅ Sesión guardada correctamente');
         }
     } catch (error) {
-        console.error('❌ Error guardando sesión:', error);
+        logger.error('Error guardando sesión:', error);
     }
 };
 

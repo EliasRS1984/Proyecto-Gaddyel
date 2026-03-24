@@ -23,16 +23,16 @@
     
     <!-- Sobre Gaddyel -->
     <url>
-        <loc>https://gaddyel.vercel.app/sobre-gaddyel</loc>
-        <lastmod>2026-02-03</lastmod>
+        <loc>https://gaddyel.vercel.app/nosotros</loc>
+        <lastmod>2026-03-23</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
     
     <!-- Nuestro Proceso -->
     <url>
-        <loc>https://gaddyel.vercel.app/nuestro-proceso</loc>
-        <lastmod>2026-02-03</lastmod>
+        <loc>https://gaddyel.vercel.app/proceso</loc>
+        <lastmod>2026-03-23</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>

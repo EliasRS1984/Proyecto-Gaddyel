@@ -18,10 +18,8 @@
 //   El manejo de reintentos está en fetchWithRetry().
 // ============================================================
 
+import axiosInstance from './axiosInstance';
 import { logger } from '../utils/logger';
-
-const API_BASE = import.meta.env.VITE_API_BASE || "https://gaddyel-backend.onrender.com";
-const API_URL = `${API_BASE}/api/productos`;
 
 /**
  * ✅ Reintentos con backoff exponencial para manejar Cold Start de Render
@@ -34,57 +32,30 @@ const API_URL = `${API_BASE}/api/productos`;
  * 
  * Esto da tiempo a Render (~20-30s) para despertar del Cold Start
  */
-async function fetchWithRetry(url, options = {}, maxRetries = 3) {
-    const { timeout = 8000, ...fetchOptions } = options;
+// Reintentos con backoff exponencial para manejar el arranque lento del servidor.
+// Intento 1: inmediato — 2: 1s — 3: 2s — 4: 4s.
+async function fetchWithRetry(path, timeout = 8000, maxRetries = 3) {
     let lastError;
 
     for (let attempt = 1; attempt <= maxRetries + 1; attempt++) {
         try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), timeout);
-
-            const response = await fetch(url, {
-                ...fetchOptions,
-                signal: controller.signal
-            });
-
-            clearTimeout(timeoutId);
-
-            // ✅ Éxito
-            if (response.ok) {
-                return response;
-            }
-
-            // ⚠️ Cold Start (503 Service Unavailable)
-            if (response.status === 503) {
-                lastError = new Error(`Server unavailable (Cold Start)`);
-                if (attempt <= maxRetries) {
-                    const delay = Math.min(1000 * Math.pow(2, attempt - 1), 8000);
-                    logger.warn(
-                        `[productosService] 503 - Reintentando en ${delay}ms ` +
-                        `(intento ${attempt}/${maxRetries + 1})`
-                    );
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                    continue;
-                }
-                throw lastError;
-            }
-
-            // ❌ Otros errores HTTP
-            throw new Error(`HTTP ${response.status}`);
+            const response = await axiosInstance.get(path, { timeout });
+            return response;
 
         } catch (error) {
             lastError = error;
+            const status = error.response?.status;
 
-            // Reintentar solo en errores de red o timeout
-            if (attempt <= maxRetries && (
-                error.name === 'AbortError' || 
-                error.message.includes('Cold Start') ||
-                error.message.includes('Failed to fetch')
-            )) {
+            const shouldRetry = attempt <= maxRetries && (
+                status === 503 ||
+                error.code === 'ECONNABORTED' ||
+                error.message.includes('Network Error')
+            );
+
+            if (shouldRetry) {
                 const delay = Math.min(1000 * Math.pow(2, attempt - 1), 8000);
                 logger.warn(
-                    `[productosService] Error de red - Reintentando en ${delay}ms ` +
+                    `[productosService] Reintentando en ${delay}ms ` +
                     `(intento ${attempt}/${maxRetries + 1}): ${error.message}`
                 );
                 await new Promise(resolve => setTimeout(resolve, delay));
@@ -109,8 +80,7 @@ async function fetchWithRetry(url, options = {}, maxRetries = 3) {
  */
 export const obtenerProductos = async (params = {}) => {
     try {
-        logger.debug("🌐 Frontend Web - API_BASE:", API_BASE);
-        logger.debug("📤 Fetch: GET /productos", params);
+        logger.debug("📤 GET /productos", params);
         
         // Construir query string
         const queryParams = new URLSearchParams({
@@ -121,16 +91,8 @@ export const obtenerProductos = async (params = {}) => {
             ...params
         });
         
-        const respuesta = await fetchWithRetry(
-            `${API_URL}?${queryParams.toString()}`,
-            { headers: { 'Accept': 'application/json' } }
-        );
-        
-        if (!respuesta.ok) {
-            throw new Error(`Error ${respuesta.status} al obtener productos`);
-        }
-        
-        const resultado = await respuesta.json();
+        const respuesta = await fetchWithRetry(`/api/productos?${queryParams.toString()}`);
+        const resultado = respuesta.data;
         
         // ✅ Backend retorna { data, pagination }
         const productos = resultado.data || resultado; // Backwards compatibility
@@ -144,7 +106,7 @@ export const obtenerProductos = async (params = {}) => {
             pagination: resultado.pagination || null
         };
     } catch (error) {
-        if (error.name === 'AbortError') {
+        if (error.code === 'ECONNABORTED') {
             logger.error('[productosService] Timeout en solicitud de productos');
             throw new Error('La solicitud tardó demasiado. Por favor, intenta de nuevo.');
         }
@@ -156,22 +118,13 @@ export const obtenerProductos = async (params = {}) => {
 // Obtiene un producto por ID con reintentos automáticos.
 export const obtenerProductoPorId = async (id) => {
     try {
-        logger.debug(`📤 Fetch: GET /productos/${id}`);
-        
-        const respuesta = await fetchWithRetry(
-            `${API_URL}/${id}`,
-            { headers: { 'Accept': 'application/json' } }
-        );
-        
-        if (!respuesta.ok) {
-            throw new Error(`Producto no encontrado`);
-        }
-        
-        const producto = await respuesta.json();
+        logger.debug(`📤 GET /productos/${id}`);
+        const respuesta = await fetchWithRetry(`/api/productos/${id}`);
+        const producto = respuesta.data;
         logger.debug("✅ Producto cargado:", producto.nombre);
         return producto;
     } catch (error) {
-        if (error.name === 'AbortError') {
+        if (error.code === 'ECONNABORTED') {
             logger.error('[productosService] Timeout en solicitud de producto');
             throw new Error('La solicitud tardó demasiado.');
         }

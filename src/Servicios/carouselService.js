@@ -15,11 +15,8 @@
 //   El manejo de reintentos está en fetchWithRetry().
 // ============================================================
 
-import axios from 'axios';
+import axiosInstance from './axiosInstance';
 import { logger } from '../utils/logger';
-
-const API_BASE = import.meta.env.VITE_API_BASE || 'https://gaddyel-backend.onrender.com';
-const API_URL = `${API_BASE}/api/carousel`;
 
 // Reintentos con backoff para manejar cold start de Render.
 // Intento 1: inmediato — 2: 1s — 3: 2s — 4: 4s.
@@ -30,7 +27,7 @@ async function fetchWithRetry(url, maxRetries = 3) {
         try {
             logger.debug(`[carouselService] Intento ${attempt}/${maxRetries + 1}: ${url}`);
             
-            const response = await axios.get(url, { timeout: 8000 });
+            const response = await axiosInstance.get(url, { timeout: 8000 });
             
             logger.debug('[carouselService] ✅ Carrusel cargado');
             return response;
@@ -72,7 +69,7 @@ async function fetchWithRetry(url, maxRetries = 3) {
 const carouselService = {
     getCarouselImages: async () => {
         try {
-            const response = await fetchWithRetry(`${API_URL}/public`);
+            const response = await fetchWithRetry('/api/carousel/public');
             return response.data.data;
         } catch (error) {
             logger.error('[carouselService] Error al obtener carrusel:', error.message);

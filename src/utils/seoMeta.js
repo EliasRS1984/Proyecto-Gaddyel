@@ -19,7 +19,10 @@
 import { SCHEMA_CONTACT } from '../constants/contactInfo';
 
 const BRAND = 'Gaddyel';
-const DOMAIN = 'https://gaddyel.vercel.app';
+// Lee el dominio del sitio desde la variable de entorno.
+// Si no está definida, usa el dominio de producción actual como respaldo.
+// Para cambiarlo: agregar VITE_SITE_URL=https://tudominio.com en el archivo .env
+const DOMAIN = import.meta.env.VITE_SITE_URL || 'https://gaddyel.vercel.app';
 const PHONE = SCHEMA_CONTACT.telephone;
 const EMAIL = SCHEMA_CONTACT.email;
 
@@ -100,7 +103,7 @@ const PAGES = {
   
   nosotros: {
     title: 'Quiénes Somos | Gaddyel - Blanquería Premium para Profesionales de la Estética',
-    description: 'Gaddyel es tu aliado en elevar la identidad de marca de tu centro estético. Más de X años ofreciendo blanquería personalizada de calidad con atención a detalle.',
+    description: 'Gaddyel es tu aliado en elevar la identidad de marca de tu centro estético. Especialistas en blanquería personalizada de calidad: vinchas, batas y toallas bordadas para spas y gabinetes en Argentina.',
     keywords: 'quiénes somos, blanquería premium, marca estética, personalización textiles',
     og: {
       type: 'website',

@@ -23,6 +23,7 @@ import { Helmet } from 'react-helmet-async';
 import { useCart } from '../Context/CartContext';
 import { obtenerProductoPorId } from '../Servicios/productosService';
 import { formatPriceWithSymbol } from '../utils/formatPrice';
+import { logger } from '../utils/logger';
 
 // ======== COMPONENTE PRINCIPAL ========
 
@@ -50,7 +51,7 @@ const DetalleProducto = () => {
                 const data = await obtenerProductoPorId(id);
                 setProductoData(data);
             } catch (error) {
-                console.error('Error al obtener producto:', error);
+                logger.error('Error al obtener producto:', error);
                 setProductoData(null);
             } finally {
                 setLoading(false);
