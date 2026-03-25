@@ -212,11 +212,11 @@ const DetalleProducto = () => {
                     </p>
 
                     {/* ── Precio ── */}
-                    <div className="flex items-baseline gap-3 px-6 py-5 mb-6
+                    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-6 py-5 mb-6
                         bg-indigo-50/60 dark:bg-indigo-900/25
                         border border-indigo-100 dark:border-indigo-700/40
                         rounded-2xl">
-                        <span className="text-4xl font-bold tracking-tight text-indigo-600 dark:text-indigo-300">
+                        <span className="text-3xl sm:text-4xl font-bold tracking-tight text-indigo-600 dark:text-indigo-300">
                             {formatPriceWithSymbol(precio)}
                         </span>
                         <span className="text-[13px] font-semibold text-indigo-500 dark:text-indigo-300">
@@ -269,7 +269,7 @@ const DetalleProducto = () => {
                                 onClick={() => setCantidad(c => Math.max(1, c - 1))}
                                 disabled={cantidad <= 1}
                                 aria-label="Disminuir cantidad"
-                                className="w-9 h-9 flex items-center justify-center
+                                className="w-11 h-11 flex items-center justify-center
                                     bg-slate-100 dark:bg-slate-800
                                     hover:bg-slate-200 dark:hover:bg-slate-700
                                     border border-slate-200/60 dark:border-slate-700/60
@@ -286,7 +286,7 @@ const DetalleProducto = () => {
                             <button
                                 onClick={() => setCantidad(c => c + 1)}
                                 aria-label="Aumentar cantidad"
-                                className="w-9 h-9 flex items-center justify-center
+                                className="w-11 h-11 flex items-center justify-center
                                     bg-slate-100 dark:bg-slate-800
                                     hover:bg-slate-200 dark:hover:bg-slate-700
                                     border border-slate-200/60 dark:border-slate-700/60

@@ -158,14 +158,14 @@ const NuestroProceso = () => {
                                         hover:shadow-xl hover:border-indigo-200/60 dark:hover:border-indigo-800/60
                                     ">
                                         {/* Imagen: izquierda en impares, derecha en pares */}
-                                        <div className={`relative overflow-hidden min-h-[280px] md:h-full
+                                        <div className={`relative overflow-hidden min-h-[240px] sm:min-h-[280px] md:h-full
                                             bg-slate-100 dark:bg-slate-800
                                             ${esImpar ? 'md:order-1' : 'md:order-2'}
                                         `}>
                                             <img
                                                 src={proceso.image}
                                                 alt={proceso.alt}
-                                                className="absolute inset-0 w-full h-full object-contain object-center"
+                                                className="absolute inset-0 w-full h-full object-cover object-center"
                                                 loading="lazy"
                                             />
                                             {/* Overlay con número de paso */}
@@ -173,7 +173,7 @@ const NuestroProceso = () => {
                                             <span className="
                                                 absolute bottom-5 left-5
                                                 text-[64px] font-extrabold tracking-tighter
-                                                text-white/20 leading-none select-none
+                                                text-white/40 leading-none select-none
                                             ">
                                                 {proceso.paso}
                                             </span>
