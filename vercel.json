@@ -11,6 +11,16 @@
       "permanent": true
     }
   ],
+  "headers": [
+    {
+      "source": "/og-:name.jpg",
+      "headers": [
+        { "key": "Content-Type", "value": "image/jpeg" },
+        { "key": "Cache-Control", "value": "public, max-age=86400" },
+        { "key": "Accept-Ranges", "value": "none" }
+      ]
+    }
+  ],
   "rewrites": [
     {
       "source": "/(.*)",
