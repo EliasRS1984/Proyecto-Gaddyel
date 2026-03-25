@@ -29,7 +29,7 @@ const API_BASE = import.meta.env.VITE_API_BASE || 'https://gaddyel-backend.onren
 
 const axiosInstance = axios.create({
     baseURL: API_BASE,
-    timeout: 15000,
+    timeout: 35000, // 35s para cubrir cold start de Render (puede tardar hasta 50s)
     headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'

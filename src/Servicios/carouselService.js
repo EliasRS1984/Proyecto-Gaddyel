@@ -19,15 +19,20 @@ import axiosInstance from './axiosInstance';
 import { logger } from '../utils/logger';
 
 // Reintentos con backoff para manejar cold start de Render.
-// Intento 1: inmediato — 2: 1s — 3: 2s — 4: 4s.
+// Intento 1: 35s (cubre cold start de Render que tarda hasta 50s)
+// Intento 2+: 20s (el servidor ya debería estar despierto)
 async function fetchWithRetry(url, maxRetries = 3) {
     let lastError;
 
     for (let attempt = 1; attempt <= maxRetries + 1; attempt++) {
+        // Primer intento: espera larga para cubrir el arranque del servidor.
+        // Reintentos: más cortos, el servidor ya debería estar activo.
+        const timeout = attempt === 1 ? 35000 : 20000;
+
         try {
             logger.debug(`[carouselService] Intento ${attempt}/${maxRetries + 1}: ${url}`);
             
-            const response = await axiosInstance.get(url, { timeout: 8000 });
+            const response = await axiosInstance.get(url, { timeout });
             
             logger.debug('[carouselService] ✅ Carrusel cargado');
             return response;
@@ -35,12 +40,14 @@ async function fetchWithRetry(url, maxRetries = 3) {
         } catch (error) {
             lastError = error;
 
-            // Reintentar en caso de Cold Start (503) o timeout
+            // Reintentar en caso de arranque lento (503), timeout o error de red
             const status = error.response?.status;
             const shouldRetry = attempt <= maxRetries && (
-                status === 503 || 
+                status === 503 ||
+                status === 502 ||
                 error.code === 'ECONNABORTED' ||
-                error.message.includes('timeout')
+                error.message?.toLowerCase().includes('timeout') ||
+                error.message?.toLowerCase().includes('network error')
             );
 
             if (shouldRetry) {

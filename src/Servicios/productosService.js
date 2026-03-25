@@ -33,11 +33,16 @@ import { logger } from '../utils/logger';
  * Esto da tiempo a Render (~20-30s) para despertar del Cold Start
  */
 // Reintentos con backoff exponencial para manejar el arranque lento del servidor.
-// Intento 1: inmediato — 2: 1s — 3: 2s — 4: 4s.
-async function fetchWithRetry(path, timeout = 8000, maxRetries = 3) {
+// Intento 1: 35s (cubre cold start de Render que tarda hasta 50s)
+// Intento 2+: 20s (el servidor ya debería estar despierto)
+async function fetchWithRetry(path, maxRetries = 3) {
     let lastError;
 
     for (let attempt = 1; attempt <= maxRetries + 1; attempt++) {
+        // El primer intento espera más tiempo porque el servidor puede estar dormido.
+        // Los reintentos son más cortos: si el servidor tardó, ya estará despierto.
+        const timeout = attempt === 1 ? 35000 : 20000;
+
         try {
             const response = await axiosInstance.get(path, { timeout });
             return response;
@@ -48,8 +53,10 @@ async function fetchWithRetry(path, timeout = 8000, maxRetries = 3) {
 
             const shouldRetry = attempt <= maxRetries && (
                 status === 503 ||
+                status === 502 ||
                 error.code === 'ECONNABORTED' ||
-                error.message.includes('Network Error')
+                error.message?.toLowerCase().includes('timeout') ||
+                error.message?.toLowerCase().includes('network error')
             );
 
             if (shouldRetry) {

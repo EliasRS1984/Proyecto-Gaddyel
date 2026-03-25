@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
 import TarjetaProducto from '../Componentes/TarjetaProducto/TarjetaProducto.jsx';
 import { logger } from '../utils/logger';
-import axiosInstance from '../Servicios/axiosInstance';
+import { obtenerProductos } from '../Servicios/productosService';
 
 /**
  * FLUJO DE DATOS - Página Catálogo (Paginación Manual Simple)
@@ -63,27 +63,26 @@ const Catalogo = () => {
                 setLoading(true);
                 setError(null);
                 
-                const { data } = await axiosInstance.get('/api/productos', {
-                    params: {
-                        page: currentPage,
-                        limit: itemsPerPage,
-                        sortBy: 'createdAt',
-                        sortDir: -1
-                    }
+                // Usamos obtenerProductos (con reintentos automáticos) en lugar de
+                // llamar al servidor directamente, para manejar el arranque lento de Render.
+                const { productos, pagination } = await obtenerProductos({
+                    page: currentPage,
+                    limit: itemsPerPage,
+                    sortBy: 'createdAt',
+                    sortDir: -1
                 });
-                setAllProducts(data.data || []);
+                setAllProducts(productos || []);
                 
-                const pagination = data.pagination || {};
-                const pages = pagination.pages || 1;
-                const total = pagination.total || 0;
+                const pages = pagination?.pages || 1;
+                const total = pagination?.total || 0;
                 
                 setTotalPages(pages);
                 setTotalProducts(total);
                 
-                logger.debug(`Página ${currentPage}/${pages} cargada (${data.data?.length || 0} de ${total} productos)`);
+                logger.debug(`Página ${currentPage}/${pages} cargada (${productos?.length || 0} de ${total} productos)`);
                 
             } catch (err) {
-                const errorMsg = err.response?.data?.error || err.message || 'No se pudieron cargar los productos';
+                const errorMsg = err.message || 'No se pudieron cargar los productos';
                 logger.error('Error loading products:', errorMsg);
                 setError(errorMsg);
                 setAllProducts([]);
