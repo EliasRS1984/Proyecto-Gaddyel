@@ -240,7 +240,7 @@ const Catalogo = () => {
                 </script>
             </Helmet>
 
-            <main className="container mx-auto px-4 md:px-8 lg:px-12 py-10">
+            <main className="w-full max-w-7xl mx-auto px-4 md:px-8 lg:px-12 py-10">
 
                 {/* ===== ENCABEZADO CON ADN DE MARCA ===== */}
                 {/* Mismo tratamiento glassmorphism que el Hero de Inicio */}

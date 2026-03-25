@@ -93,7 +93,7 @@ const NuestroProceso = () => {
                 <meta property="og:url" content="https://gaddyel.vercel.app/proceso" />
             </Helmet>
             <div className="w-full min-h-screen bg-transparent">
-                <div className="container mx-auto px-4 md:px-8 lg:px-12 py-16 pt-24 max-w-5xl">
+                <div className="w-full max-w-5xl mx-auto px-4 md:px-8 lg:px-12 py-16 pt-24">
 
                     {/* ===== ENCABEZADO CON ADN DE MARCA ===== */}
                     <ScrollReveal>

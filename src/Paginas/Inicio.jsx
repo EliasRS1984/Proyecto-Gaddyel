@@ -212,7 +212,7 @@ const Inicio = () => {
                 overlayColor="bg-slate-950/5 dark:bg-slate-950/20"
                 className="w-full"
             >
-                <div className="container mx-auto pt-0 pb-8">
+                <div className="w-full max-w-7xl mx-auto pt-0 pb-8">
 
                     {/* Hero Section - Contenido principal */}
                     <main>

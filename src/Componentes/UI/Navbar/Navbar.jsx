@@ -248,12 +248,12 @@ const Navbar = () => {
                 </div>
 
                 {/* ------------------------------------------------------------
-                    BOTÓN HAMBURGUESA (solo móvil)
+                    BOTÓN HAMBURGUESA (solo móvil y tablet hasta 768px)
                     Abre/cierra el menú desplegable en pantallas pequeñas.
                     
                     ¿El ícono no cambia? Revisa las clases de opacity.
                 ------------------------------------------------------------ */}
-                <div className="lg:hidden flex items-center gap-4">
+                <div className="md:hidden flex items-center gap-4">
                     {/* Carrito en móvil */}
                     <CartIcon />
                     
@@ -290,9 +290,9 @@ const Navbar = () => {
 
                 {/* ------------------------------------------------------------
                     MENÚ DESKTOP (enlaces horizontales)
-                    Solo visible en pantallas medianas y grandes.
+                    Visible desde tablets en adelante (768px+).
                 ------------------------------------------------------------ */}
-                <div className="hidden lg:flex items-center gap-1" role="navigation" aria-label="Menú principal">
+                <div className="hidden md:flex items-center gap-1" role="navigation" aria-label="Menú principal">
                     {ENLACES_NAVEGACION.map((link) => (
                         <NavLink
                             key={link.to}
@@ -428,7 +428,7 @@ const Navbar = () => {
             ---------------------------------------------------------------- */}
             <div
                 id="mobile-menu"
-                className={`lg:hidden absolute w-full transition-all duration-500 ease-out transform origin-top bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`}
+                className={`md:hidden absolute w-full transition-all duration-500 ease-out transform origin-top bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`}
             >
                 <div className="px-6 py-6 space-y-1 flex flex-col">
                     {/* Enlaces de navegación */}
