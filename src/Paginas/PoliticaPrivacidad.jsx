@@ -25,8 +25,13 @@ const PoliticaPrivacidad = () => {
             <Helmet>
                 <title>Política de Privacidad - Gaddyel</title>
                 <meta name="description" content="Conoce cómo Gaddyel protege y utiliza tus datos personales. Política de privacidad completa y actualizada." />
-                {/* Hardcoded: window.location.origin falla en pre-render/SSR y puede variar entre entornos. */}
+                <meta name="robots" content="index, follow" />
                 <link rel="canonical" href="https://gaddyel.vercel.app/politica-privacidad" />
+                <meta property="og:title" content="Política de Privacidad - Gaddyel" />
+                <meta property="og:description" content="Conoce cómo Gaddyel protege y utiliza tus datos personales." />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content="https://gaddyel.vercel.app/politica-privacidad" />
+                <meta property="og:image" content="https://gaddyel.vercel.app/og-home.jpg" />
             </Helmet>
 
             {/* Fondo consistente con el resto del sitio */}

@@ -25,8 +25,13 @@ const TerminosServicio = () => {
             <Helmet>
                 <title>Términos de Servicio - Gaddyel</title>
                 <meta name="description" content="Lee nuestros Términos y Condiciones de Servicio. Información sobre el uso de Gaddyel y nuestros productos." />
-                {/* Hardcoded: window.location.origin falla en pre-render/SSR y puede variar entre entornos. */}
+                <meta name="robots" content="index, follow" />
                 <link rel="canonical" href="https://gaddyel.vercel.app/terminos-servicio" />
+                <meta property="og:title" content="Términos de Servicio - Gaddyel" />
+                <meta property="og:description" content="Términos y Condiciones de uso de Gaddyel y nuestros productos de blanquería personalizada." />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content="https://gaddyel.vercel.app/terminos-servicio" />
+                <meta property="og:image" content="https://gaddyel.vercel.app/og-home.jpg" />
             </Helmet>
 
             {/* Fondo consistente con el resto del sitio */}

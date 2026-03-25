@@ -157,10 +157,9 @@ const Catalogo = () => {
                 />
                 <meta property="og:type" content="website" />
                 <meta property="og:url" content={`https://gaddyel.vercel.app/catalogo${currentPage > 1 ? `?page=${currentPage}` : ''}`} />
-                <link 
-                    rel="canonical" 
-                    href={`https://gaddyel.vercel.app/catalogo${currentPage > 1 ? `?page=${currentPage}` : ''}`} 
-                />
+                <meta property="og:image" content="https://gaddyel.vercel.app/og-catalogo.jpg" />
+                <meta property="og:image:width" content="1200" />
+                <meta property="og:image:height" content="630" />
                 
                 {/* Paginación SEO: Prev/Next para páginas múltiples */}
                 {currentPage > 1 && (

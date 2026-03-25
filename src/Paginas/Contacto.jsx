@@ -26,6 +26,9 @@ const Contacto = () => {
                 <meta property="og:description" content="Estamos aquí para ayudarte. Consulta sin cargo sobre tu proyecto de personalización." />
                 <meta property="og:type" content="website" />
                 <meta property="og:url" content="https://gaddyel.vercel.app/contacto" />
+                <meta property="og:image" content="https://gaddyel.vercel.app/og-contact.jpg" />
+                <meta property="og:image:width" content="1200" />
+                <meta property="og:image:height" content="630" />
             </Helmet>
             <div className="w-full min-h-screen bg-transparent flex items-center justify-center p-4 md:p-8 lg:p-12 pt-24">
                 <div className="

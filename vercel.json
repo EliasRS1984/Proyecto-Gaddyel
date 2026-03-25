@@ -1,4 +1,16 @@
 {
+  "redirects": [
+    {
+      "source": "/nuestro-proceso",
+      "destination": "/proceso",
+      "permanent": true
+    },
+    {
+      "source": "/sobre-gaddyel",
+      "destination": "/nosotros",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/(.*)",
