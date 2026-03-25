@@ -25,16 +25,24 @@ import axiosInstance from '../Servicios/axiosInstance';
 // No muestra nada en pantalla — trabaja completamente en el fondo.
 const useServerWarmup = () => {
     useEffect(() => {
-        // Enviamos un ping silencioso.
-        // Usamos un tiempo de espera largo (40s) porque el cold start
-        // de Render puede tardar hasta 50 segundos en el plan gratuito.
-        // Si falla por cualquier motivo, lo ignoramos — no es crítico.
-        axiosInstance
-            .get('/api/health', { timeout: 40000 })
-            .catch(() => {
-                // Silencio intencional: si el ping falla, la app funciona igual.
-                // Los servicios individuales tienen su propio sistema de reintentos.
-            });
+        // Esperamos a que el navegador esté "sin trabajo" antes de enviar el ping.
+        // Esto evita que el ping compita con la carga inicial de la página,
+        // mejorando la capacidad de respuesta en móvil.
+        const sendPing = () => {
+            axiosInstance
+                .get('/api/health', { timeout: 40000 })
+                .catch(() => {
+                    // Silencio intencional: si el ping falla, la app funciona igual.
+                });
+        };
+
+        if (typeof window.requestIdleCallback === 'function') {
+            // Navegadores modernos: espera a que no haya trabajo urgente (máx. 5s)
+            window.requestIdleCallback(sendPing, { timeout: 5000 });
+        } else {
+            // Safari / navegadores sin soporte: 2s de delay como fallback
+            setTimeout(sendPing, 2000);
+        }
     }, []); // El [] hace que esto solo corra al abrir la página, no en cada pantalla
 };
 

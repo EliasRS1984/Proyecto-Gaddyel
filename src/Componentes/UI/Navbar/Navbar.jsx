@@ -224,7 +224,7 @@ const Navbar = () => {
     // ========================================================================
     return (
         <header className={`bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl sticky top-0 z-50 border-b transition-all duration-500 ease-out ${scrolled ? 'border-slate-200/60 dark:border-slate-800/60 shadow-sm' : 'border-transparent'}`}>
-            <nav className={`max-w-7xl mx-auto px-6 lg:px-12 flex justify-between items-center transition-all duration-500 ${scrolled ? 'py-2' : 'py-15'}`}>
+            <nav className={`max-w-7xl mx-auto px-6 lg:px-12 flex justify-between items-center transition-all duration-500 ${scrolled ? 'py-2' : 'py-4'}`}>
                 
                 {/* ------------------------------------------------------------
                     LOGO
@@ -240,7 +240,9 @@ const Navbar = () => {
                         <img
                             src={logoSrc}
                             alt="Logo de Gaddyel"
-                            className="h-14 transition-all duration-700 ease-out group-hover:brightness-110"
+                            width={168}
+                            height={56}
+                            className="h-14 w-auto transition-all duration-700 ease-out group-hover:brightness-110"
                         />
                     </NavLink>
                 </div>
