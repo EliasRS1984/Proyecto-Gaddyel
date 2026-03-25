@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import TarjetaProducto from '../Componentes/TarjetaProducto/TarjetaProducto.jsx';
 import { logger } from '../utils/logger';
 import { obtenerProductos } from '../Servicios/productosService';
+import useLoadingMessage from '../hooks/useLoadingMessage';
 
 /**
  * FLUJO DE DATOS - Página Catálogo (Paginación Manual Simple)
@@ -46,12 +47,38 @@ import { obtenerProductos } from '../Servicios/productosService';
  * - HTML5 semántico: <main>, <article>, role="grid"
  * - Open Graph para compartir en redes
  */
+// ======== TARJETA SKELETON ========
+// Imita la forma de TarjetaProducto mientras los datos aún no llegaron.
+// Usa una animación de brillo que se mueve de izquierda a derecha (shimmer)
+// para que el usuario vea que la página está activa y cargando.
+const TarjetaSkeleton = () => (
+    <div className="group flex flex-col h-full bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800/50 rounded-2xl overflow-hidden">
+        {/* Área de imagen — coincide con aspect-square de TarjetaProducto */}
+        <div className="w-full aspect-square bg-slate-200 dark:bg-slate-800 animate-pulse" />
+        <div className="px-5 pt-5 pb-2">
+            {/* Línea de título */}
+            <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded animate-pulse mb-2" />
+            <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded animate-pulse w-3/4" />
+        </div>
+        <div className="flex flex-col px-5 pb-5 gap-4">
+            {/* Líneas de descripción */}
+            <div className="h-3 bg-slate-200 dark:bg-slate-800 rounded animate-pulse" />
+            <div className="h-3 bg-slate-200 dark:bg-slate-800 rounded animate-pulse w-5/6" />
+            {/* Precio */}
+            <div className="h-5 bg-slate-200 dark:bg-slate-800 rounded animate-pulse w-1/3 mt-auto" />
+            {/* Botón */}
+            <div className="h-10 bg-slate-200 dark:bg-slate-800 rounded-2xl animate-pulse" />
+        </div>
+    </div>
+);
+
 const Catalogo = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(20); // 20 productos por página
     const [allProducts, setAllProducts] = useState([]);
     const [loading, setLoading] = useState(false);
+    const { mensaje: mensajeCarga, submensaje, isLong } = useLoadingMessage(loading);
     const [error, setError] = useState(null);
     const [totalPages, setTotalPages] = useState(1);
     const [totalProducts, setTotalProducts] = useState(0);
@@ -304,18 +331,27 @@ const Catalogo = () => {
                     )}
                 </section>
 
-                {/* ===== ESTADO DE CARGA ===== */}
+                {/* ===== ESTADO DE CARGA — SKELETON GRID ===== */}
+                {/* Muestra tarjetas grises animadas que imitan los productos reales.   */}
+                {/* El mensaje cambia con el tiempo para explicar por qué tarda.        */}
                 {loading && allProducts.length === 0 && (
-                    <div className="
-                        flex justify-center items-center min-h-96
-                        bg-white/60 dark:bg-slate-900/60
-                        backdrop-blur-xl
-                        border border-slate-200/50 dark:border-slate-800/50
-                        rounded-2xl shadow-lg
-                    " role="status" aria-live="polite">
-                        <div className="text-center py-16">
-                            <div className="inline-block h-10 w-10 animate-spin rounded-full border-4 border-slate-200 dark:border-slate-700 border-t-indigo-600 dark:border-t-indigo-400 mb-5"></div>
-                            <p className="text-[14px] font-medium tracking-tight text-slate-500 dark:text-slate-400">Cargando productos...</p>
+                    <div role="status" aria-live="polite" aria-label={mensajeCarga}>
+                        {/* Mensaje dinámico según tiempo de espera */}
+                        <div className="text-center mb-8">
+                            <p className="text-[15px] font-medium tracking-tight text-slate-600 dark:text-slate-400">
+                                {mensajeCarga}
+                            </p>
+                            {submensaje && (
+                                <p className="mt-2 text-[13px] text-slate-400 dark:text-slate-500 max-w-sm mx-auto leading-relaxed">
+                                    {submensaje}
+                                </p>
+                            )}
+                        </div>
+                        {/* Grid de tarjetas skeleton — 8 tarjetas simulan una página parcial */}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
+                            {Array.from({ length: 8 }).map((_, i) => (
+                                <TarjetaSkeleton key={i} />
+                            ))}
                         </div>
                     </div>
                 )}

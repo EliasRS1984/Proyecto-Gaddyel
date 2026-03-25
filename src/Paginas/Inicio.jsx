@@ -13,6 +13,7 @@ import ImagenArticulo from '../Activos/Imagenes/imagen-articulo/imagen-articulo.
 import TarjetaProducto from '../Componentes/TarjetaProducto/TarjetaProducto.jsx';
 import ImageOptimizer from '../Componentes/ImageOptimizer.jsx';
 import { logger } from '../utils/logger';
+import useLoadingMessage from '../hooks/useLoadingMessage';
 
 /**
  * CTAButton - Componente reutilizable para botones de llamada a acción
@@ -90,6 +91,7 @@ const Inicio = () => {
     const [carouselImages, setCarouselImages] = useState([]);
     const [cargando, setCargando] = useState(true);
     const [error, setError] = useState(null);
+    const { mensaje: mensajeCarga, submensaje, isLong } = useLoadingMessage(cargando);
 
     // ✅ FLUJO: Obtener datos iniciales al montar componente
     // ¿Por qué useEffect? Datos necesarios antes de renderizar contenido
@@ -421,9 +423,32 @@ const Inicio = () => {
                         </h2>
 
                         {cargando ? (
-                            <div className="flex flex-col items-center justify-center" role="status" aria-live="polite">
-                                <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-indigo-600 dark:border-indigo-400 border-r-transparent mb-4"></div>
-                                <p className="text-slate-600 dark:text-slate-400">Cargando productos destacados...</p>
+                            // Mientras carga: skeletons + mensaje que cambia con el tiempo
+                            <div role="status" aria-live="polite" aria-label={mensajeCarga}>
+                                <div className="text-center mb-8">
+                                    <p className="text-[15px] font-medium tracking-tight text-slate-600 dark:text-slate-400">
+                                        {mensajeCarga}
+                                    </p>
+                                    {submensaje && (
+                                        <p className="mt-2 text-[13px] text-slate-400 dark:text-slate-500 max-w-sm mx-auto leading-relaxed">
+                                            {submensaje}
+                                        </p>
+                                    )}
+                                </div>
+                                {/* 4 skeleton cards imitan la grilla de productos destacados */}
+                                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+                                    {Array.from({ length: 4 }).map((_, i) => (
+                                        <div key={i} className="flex flex-col bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800/50 rounded-2xl overflow-hidden">
+                                            <div className="w-full aspect-square bg-slate-200 dark:bg-slate-800 animate-pulse" />
+                                            <div className="px-5 pt-5 pb-5 flex flex-col gap-3">
+                                                <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded animate-pulse" />
+                                                <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded animate-pulse w-3/4" />
+                                                <div className="h-5 bg-slate-200 dark:bg-slate-800 rounded animate-pulse w-1/3 mt-1" />
+                                                <div className="h-10 bg-slate-200 dark:bg-slate-800 rounded-2xl animate-pulse mt-1" />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         ) : error ? (
                             <div className="text-center" role="alert" aria-live="assertive">
