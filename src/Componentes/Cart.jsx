@@ -113,7 +113,7 @@ export const Cart = () => {
     // ¿Los precios no coinciden? Revisá formatPrice en utils/formatPrice
     // ¿El envío gratis no aparece? Revisá el cálculo de shippingInfo arriba
     return (
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-24">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-28 pb-24">
 
             {/* ---- Encabezado de sección ---- */}
             <div className="mb-10">
@@ -147,95 +147,58 @@ export const Cart = () => {
                     {cartItems.map(item => (
                         <div
                             key={item._id}
-                            className="flex items-center gap-4 p-5 sm:p-6
+                            className="flex flex-col gap-3 p-5 sm:p-6
                                 transition-colors duration-500 ease-out
                                 hover:bg-slate-50/60 dark:hover:bg-slate-800/30"
                         >
-                            {/* Imagen del producto */}
-                            <div className="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0
-                                rounded-2xl overflow-hidden
-                                bg-slate-100 dark:bg-slate-800
-                                border border-slate-200/60 dark:border-slate-700/60">
-                                {item.imagenSrc ? (
-                                    <img
-                                        src={item.imagenSrc}
-                                        alt={item.nombre}
-                                        className="w-full h-full object-cover"
-                                        loading="lazy"
-                                    />
-                                ) : (
-                                    /* Placeholder cuando no hay imagen */
-                                    <div className="w-full h-full flex items-center justify-center">
-                                        <svg className="w-8 h-8 text-slate-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                        </svg>
-                                    </div>
-                                )}
-                            </div>
+                            {/* ---- Fila superior: imagen + nombre/precio + eliminar ---- */}
+                            {/* En mobile, imagen, texto y botón eliminar ocupan la primera fila */}
+                            <div className="flex items-start gap-4">
+                                {/* Imagen del producto */}
+                                <div className="w-20 h-20 flex-shrink-0
+                                    rounded-2xl overflow-hidden
+                                    bg-slate-100 dark:bg-slate-800
+                                    border border-slate-200/60 dark:border-slate-700/60">
+                                    {item.imagenSrc ? (
+                                        <img
+                                            src={item.imagenSrc}
+                                            alt={item.nombre}
+                                            className="w-full h-full object-cover"
+                                            loading="lazy"
+                                        />
+                                    ) : (
+                                        /* Placeholder cuando no hay imagen */
+                                        <div className="w-full h-full flex items-center justify-center">
+                                            <svg className="w-8 h-8 text-slate-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                        </div>
+                                    )}
+                                </div>
 
-                            {/* Nombre y precio unitario */}
-                            <div className="flex-grow min-w-0">
-                                <h3 className="font-semibold tracking-tight text-slate-800 dark:text-slate-100 truncate">
-                                    {item.nombre}
-                                </h3>
-                                {item.cantidadUnidades && (() => {
-                                    // Calcular una sola vez para evitar duplicar la operación en el JSX
-                                    const totalUnidades = item.cantidadUnidades * item.cantidad;
-                                    return (
-                                        <p className="text-[13px] text-slate-400 dark:text-slate-500 mt-0.5">
-                                            {totalUnidades} {totalUnidades === 1 ? 'unidad' : 'unidades'}
-                                        </p>
-                                    );
-                                })()}
-                                <p className="text-[14px] font-semibold text-indigo-600 dark:text-indigo-400 mt-1">
-                                    ${formatPrice(item.precio)} c/u
-                                </p>
-                            </div>
+                                {/* Nombre y precio unitario */}
+                                <div className="flex-grow min-w-0">
+                                    <h3 className="font-semibold tracking-tight text-slate-800 dark:text-slate-100 truncate">
+                                        {item.nombre}
+                                    </h3>
+                                    {item.cantidadUnidades && (() => {
+                                        // Calcular una sola vez para evitar duplicar la operación en el JSX
+                                        const totalUnidades = item.cantidadUnidades * item.cantidad;
+                                        return (
+                                            <p className="text-[13px] text-slate-400 dark:text-slate-500 mt-0.5">
+                                                {totalUnidades} {totalUnidades === 1 ? 'unidad' : 'unidades'}
+                                            </p>
+                                        );
+                                    })()}
+                                    <p className="text-[14px] font-semibold text-indigo-600 dark:text-indigo-400 mt-1">
+                                        ${formatPrice(item.precio)} c/u
+                                    </p>
+                                </div>
 
-                            {/* Control de cantidad: − número + */}
-                            {/* ¿Los botones no responden? Revisá updateQuantity en CartContext */}
-                            <div className="flex items-center gap-1.5 flex-shrink-0">
-                                <button
-                                    onClick={() => updateQuantity(item._id, item.cantidad - 1)}
-                                    className="w-8 h-8 flex items-center justify-center
-                                        bg-slate-100 dark:bg-slate-800
-                                        hover:bg-slate-200 dark:hover:bg-slate-700
-                                        border border-slate-200/60 dark:border-slate-700/60
-                                        text-slate-600 dark:text-slate-400
-                                        font-bold rounded-xl
-                                        transition-all duration-500 ease-out
-                                        disabled:opacity-40 disabled:cursor-not-allowed"
-                                    disabled={item.cantidad <= 1}
-                                    aria-label="Disminuir cantidad"
-                                >
-                                    −
-                                </button>
-                                <span className="w-10 text-center font-semibold text-[15px] text-slate-800 dark:text-slate-100">
-                                    {item.cantidad}
-                                </span>
-                                <button
-                                    onClick={() => updateQuantity(item._id, item.cantidad + 1)}
-                                    className="w-8 h-8 flex items-center justify-center
-                                        bg-slate-100 dark:bg-slate-800
-                                        hover:bg-slate-200 dark:hover:bg-slate-700
-                                        border border-slate-200/60 dark:border-slate-700/60
-                                        text-slate-600 dark:text-slate-400
-                                        font-bold rounded-xl
-                                        transition-all duration-500 ease-out"
-                                    aria-label="Aumentar cantidad"
-                                >
-                                    +
-                                </button>
-                            </div>
-
-                            {/* Subtotal de este producto + botón eliminar */}
-                            <div className="text-right flex-shrink-0 flex flex-col items-end gap-2 min-w-[5rem]">
-                                <p className="font-bold tracking-tight text-slate-800 dark:text-slate-100">
-                                    ${formatPrice(item.precio * item.cantidad)}
-                                </p>
+                                {/* Botón eliminar — alineado arriba a la derecha */}
                                 <button
                                     onClick={() => removeFromCart(item._id)}
-                                    className="group p-2 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-xl transition-all duration-500 ease-out"
+                                    className="group flex-shrink-0 p-2 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-xl transition-all duration-500 ease-out"
                                     aria-label="Eliminar producto"
                                     title="Eliminar"
                                 >
@@ -249,6 +212,51 @@ export const Cart = () => {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                     </svg>
                                 </button>
+                            </div>
+
+                            {/* ---- Fila inferior: controles de cantidad + subtotal ---- */}
+                            {/* Alineada debajo de la imagen (pl-24 = 80px imagen + 16px gap) */}
+                            {/* ¿Los botones no responden? Revisá updateQuantity en CartContext */}
+                            <div className="flex items-center justify-between pl-24">
+                                {/* Control de cantidad: − número + */}
+                                <div className="flex items-center gap-1.5">
+                                    <button
+                                        onClick={() => updateQuantity(item._id, item.cantidad - 1)}
+                                        className="w-11 h-11 flex items-center justify-center
+                                            bg-slate-100 dark:bg-slate-800
+                                            hover:bg-slate-200 dark:hover:bg-slate-700
+                                            border border-slate-200/60 dark:border-slate-700/60
+                                            text-slate-600 dark:text-slate-400
+                                            font-bold rounded-xl
+                                            transition-all duration-500 ease-out
+                                            disabled:opacity-40 disabled:cursor-not-allowed"
+                                        disabled={item.cantidad <= 1}
+                                        aria-label="Disminuir cantidad"
+                                    >
+                                        −
+                                    </button>
+                                    <span className="w-10 text-center font-semibold text-[15px] text-slate-800 dark:text-slate-100">
+                                        {item.cantidad}
+                                    </span>
+                                    <button
+                                        onClick={() => updateQuantity(item._id, item.cantidad + 1)}
+                                        className="w-11 h-11 flex items-center justify-center
+                                            bg-slate-100 dark:bg-slate-800
+                                            hover:bg-slate-200 dark:hover:bg-slate-700
+                                            border border-slate-200/60 dark:border-slate-700/60
+                                            text-slate-600 dark:text-slate-400
+                                            font-bold rounded-xl
+                                            transition-all duration-500 ease-out"
+                                        aria-label="Aumentar cantidad"
+                                    >
+                                        +
+                                    </button>
+                                </div>
+
+                                {/* Subtotal de este producto */}
+                                <p className="font-bold tracking-tight text-slate-800 dark:text-slate-100">
+                                    ${formatPrice(item.precio * item.cantidad)}
+                                </p>
                             </div>
                         </div>
                     ))}

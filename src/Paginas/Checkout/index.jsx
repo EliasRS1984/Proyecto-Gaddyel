@@ -83,7 +83,7 @@ export const Checkout = () => {
             </Helmet>
 
             {/* ======== LAYOUT PRINCIPAL ======== */}
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 py-24">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-28 pb-24">
 
                 {/* Encabezado de página */}
                 <div className="mb-10">
