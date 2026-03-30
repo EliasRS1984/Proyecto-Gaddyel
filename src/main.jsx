@@ -28,13 +28,29 @@ if (import.meta.env.PROD) {
     
     // Filtrar errores irrelevantes
     beforeSend(event, hint) {
+      const errorMessage = event.exception?.values?.[0]?.value ?? '';
+
       // Ignorar errores de extensiones de navegador
-      if (event.exception?.values?.[0]?.value?.includes('chrome-extension')) {
+      if (errorMessage.includes('chrome-extension')) {
         return null;
       }
       
       // Ignorar errores de ad-blockers
-      if (event.exception?.values?.[0]?.value?.includes('adsbygoogle')) {
+      if (errorMessage.includes('adsbygoogle')) {
+        return null;
+      }
+
+      // Ignorar errores del WebView de Instagram en Android
+      // Causa: Instagram inyecta JS para rastrear el teclado; cuando el Activity de Android
+      // se destruye antes de que el JS termine, el bridge de Java ya no existe.
+      // No es un bug de la app — no se puede corregir desde el frontend.
+      if (errorMessage.includes('enableDidUserTypeOnKeyboardLogging')) {
+        return null;
+      }
+
+      // Ignorar otros errores conocidos de WebViews de terceros (Facebook, TikTok, etc.)
+      // que inyectan scripts nativos que fallan al destruirse la vista
+      if (errorMessage.includes('Java object is gone')) {
         return null;
       }
       
