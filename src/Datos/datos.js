@@ -6,8 +6,15 @@ import LogoGaddyel from '../Activos/Imagenes/Logo-Gaddyel.png';
 // ✅ Imagen de fondo con efecto parallax - Logo Neon Gaddyel
 import imagenFondo from '../Activos/Imagenes/imagenFondo.jpg';
 
-// Exportamos los datos de las preguntas frecuentes (FAQ)
-export const faqs = [
+// =====================================================
+// Exportamos las preguntas frecuentes como una función que recibe la cantidad
+// mínima de productos necesaria para el envío gratis.
+// Así, si el administrador cambia ese valor desde el panel, la respuesta
+// del FAQ se actualiza automáticamente sin tocar este archivo.
+//
+// ¿El FAQ muestra siempre "3"? Revisá useShippingConfig.js y /api/config/envio
+// =====================================================
+export const getFaqs = (cantidadMinima = 3) => [
     {
         question: '¿Cómo funciona el proceso de compra?',
         answer: 'Podés realizar tu compra directamente desde nuestra web a través del carrito Seleccionás los productos, cargás tus datos y finalizás el pago de forma segura mediante Mercado Pago. Una vez confirmado el pago, iniciamos la producción de tu pedido.'
@@ -37,8 +44,7 @@ export const faqs = [
     },
     {
         question: '¿El envío tiene algún beneficio?',
-        answer: `Sí.
-                👉 Si comprás 3 o más productos (iguales o diferentes), el envío es bonificado.`
+        answer: `Sí.\n                👉 Si comprás ${cantidadMinima} o más productos (iguales o diferentes), el envío es bonificado.`
     },
     {
         question: 'Cómo puedo seguir mi pedido',

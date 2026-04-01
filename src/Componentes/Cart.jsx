@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { useCart } from '../Context/CartContext';
 import { Link } from 'react-router-dom';
 import { formatPrice } from '../utils/formatPrice';
+import { useShippingConfig } from '../hooks/useShippingConfig';
 
 /**
  * Componente Carrito - Muestra items del carrito con opciones para modificar
@@ -9,20 +10,25 @@ import { formatPrice } from '../utils/formatPrice';
 export const Cart = () => {
     const { cartItems, removeFromCart, updateQuantity, total, isEmpty } = useCart();
 
+    // Obtiene la regla de envío gratis desde el servidor.
+    // Si el admin cambia el valor en el panel, el carrito se actualiza automáticamente.
+    // ¿Banner de envío gratis no coincide con el FAQ? Revisá useShippingConfig.js
+    const { cantidadMinima, costoEnvio: costoEnvioBase } = useShippingConfig();
+
     // ======== CÁLCULO DE ENVÍO ========
     // IMPORTANTE: este useMemo debe estar ANTES del early return de carrito vacío.
     // Los hooks de React deben ejecutarse en el mismo orden en cada render.
     // Si se pusiera después del `if (isEmpty) return`, React lanzaría un error
     // al pasar de carrito vacío a carrito con productos (orden de hooks cambia).
-    // ¿El envío gratis no se activa? Revisá la condición cantidadSolicitudes >= 3
+    // ¿El envío gratis no se activa? Revisá la condición cantidadSolicitudes >= cantidadMinima
     const shippingInfo = useMemo(() => {
         const cantidadSolicitudes = cartItems.reduce((sum, item) => sum + item.cantidad, 0);
-        const envioGratis = cantidadSolicitudes >= 3;
-        const costoEnvio = envioGratis ? 0 : 12000;
+        const envioGratis = cantidadSolicitudes >= cantidadMinima;
+        const costoEnvio = envioGratis ? 0 : costoEnvioBase;
         const totalConEnvio = total + costoEnvio;
-        const productosRestantes = envioGratis ? 0 : 3 - cantidadSolicitudes;
+        const productosRestantes = envioGratis ? 0 : cantidadMinima - cantidadSolicitudes;
         return { cantidadSolicitudes, envioGratis, costoEnvio, totalConEnvio, productosRestantes };
-    }, [cartItems, total]);
+    }, [cartItems, total, cantidadMinima, costoEnvioBase]);
 
     // ======== CARRITO VACÍO ========
     // Cuando el usuario no tiene productos seleccionados, se muestra esta pantalla

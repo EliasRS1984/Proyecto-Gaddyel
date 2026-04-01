@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { LogoGaddyel, imagenFondo, faqs } from '../Datos/datos.js';
+import { LogoGaddyel, imagenFondo, getFaqs } from '../Datos/datos.js';
+import { useShippingConfig } from '../hooks/useShippingConfig';
 import { seoMeta } from '../utils/seoMeta';
 import { obtenerProductos } from '../Servicios/productosService.js';
 import carouselService from '../Servicios/carouselService.js';
@@ -151,12 +152,17 @@ const Inicio = () => {
     const [showAllFaqs, setShowAllFaqs] = useState(false);
     const initialFaqCount = 3;
 
-    // ✅ PERFORMANCE: useMemo para evitar cálculo en cada render
-    // ¿Por qué? faqsToShow solo debe recalcularse cuando showAllFaqs cambia
-    // ¿Por qué no incluir faqs? Es constante importada, nunca cambia
+    // Obtiene la cantidad mínima de productos para envío gratis desde el servidor.
+    // Si el admin cambia el valor en el panel, el FAQ se actualiza automáticamente.
+    // ¿El FAQ siempre muestra "3"? Revisá useShippingConfig.js y /api/config/envio
+    const { cantidadMinima } = useShippingConfig();
+
+    // Genera el array de FAQs con el valor dinámico de cantidadMinima.
+    // Se recalcula solo si cantidadMinima o showAllFaqs cambian.
+    const faqs = useMemo(() => getFaqs(cantidadMinima), [cantidadMinima]);
     const faqsToShow = useMemo(() => {
         return showAllFaqs ? faqs : faqs.slice(0, initialFaqCount);
-    }, [showAllFaqs]); // ✅ Solo showAllFaqs como dependencia
+    }, [showAllFaqs, faqs]);
 
     return (
         <>

@@ -1,4 +1,5 @@
 import orderService from '../../Servicios/orderService';
+import { useShippingConfig } from '../../hooks/useShippingConfig';
 
 // =====================================================
 // ¿QUÉ ES ESTO?
@@ -19,7 +20,9 @@ import orderService from '../../Servicios/orderService';
 export const OrderSummary = ({ cartItems, total }) => {
     const cantidadSolicitudes = cartItems.reduce((sum, item) => sum + item.cantidad, 0);
     const subtotal = total;
-    const costoEnvio = orderService.calculateShipping(cantidadSolicitudes);
+    // cantidadMinima y costoEnvio vienen del servidor (seteados por el admin en el panel)
+    const { cantidadMinima, costoEnvio: costoEnvioBase } = useShippingConfig();
+    const costoEnvio = orderService.calculateShipping(cantidadSolicitudes, cantidadMinima, costoEnvioBase);
     const totalFinal = subtotal + costoEnvio;
 
     return (
@@ -79,9 +82,9 @@ export const OrderSummary = ({ cartItems, total }) => {
                 </div>
 
                 {/* Aviso de envío gratis si aún no aplica */}
-                {cantidadSolicitudes < 3 && costoEnvio > 0 && (
+                {cantidadSolicitudes < cantidadMinima && costoEnvio > 0 && (
                     <p className="text-[12px] text-indigo-500 dark:text-indigo-400">
-                        Envío gratis a partir de 3 productos
+                        Envío gratis a partir de {cantidadMinima} productos
                     </p>
                 )}
 

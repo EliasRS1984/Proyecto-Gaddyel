@@ -228,11 +228,12 @@ export const retryPayment = async (orderId) => {
 /**
  * Calcula el costo de envío basado en cantidad de SOLICITUDES
  * @param {number} cantidadSolicitudes - Suma total de item.cantidad (total de veces que se agregaron productos)
- * @returns {number} Costo de envío ($12.000 o $0 gratis)
+ * @param {number} threshold - Cantidad mínima para envío gratis (por defecto 3, puede venir del servidor)
+ * @param {number} costo - Costo del envío si no aplica la bonificación (por defecto $12.000)
+ * @returns {number} Costo de envío en pesos argentinos (0 si aplica gratis)
  */
-export const calculateShipping = (cantidadSolicitudes) => {
-  // Envío gratis a partir de 3 solicitudes diferentes
-  return cantidadSolicitudes >= 3 ? 0 : 12000; // En pesos argentinos
+export const calculateShipping = (cantidadSolicitudes, threshold = 3, costo = 12000) => {
+  return cantidadSolicitudes >= threshold ? 0 : costo;
 };
 
 /**

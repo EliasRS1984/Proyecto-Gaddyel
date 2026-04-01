@@ -8,6 +8,7 @@ import * as authService from '../../Servicios/authService';
 import orderStorage from '../../utils/orderStorage';
 import { validateForm, formatField, INITIAL_FORM_STATE } from '../../Servicios/checkoutSchema';
 import { logger } from '../../utils/logger';
+import { useShippingConfig } from '../../hooks/useShippingConfig';
 
 /**
  * Hook personalizado para manejar el estado y lógica del checkout
@@ -18,6 +19,9 @@ export const useCheckoutState = () => {
     const { cartItems, total, clearCart, isEmpty } = useCart();
     const { createOrder, isLoading: orderLoading, lastError, clearError } = useOrder();
     const { isAuthenticated, cliente, refrescarPerfil } = useAuth();
+
+    // Lee la regla de envío gratis del servidor (la misma que usa el carrito y el FAQ)
+    const { cantidadMinima, costoEnvio: costoEnvioBase } = useShippingConfig();
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -182,7 +186,7 @@ export const useCheckoutState = () => {
             // Calcular totales
             const cantidadSolicitudes = cartItems.reduce((sum, item) => sum + item.cantidad, 0);
             const subtotal = total;
-            const costoEnvio = orderService.calculateShipping(cantidadSolicitudes);
+            const costoEnvio = orderService.calculateShipping(cantidadSolicitudes, cantidadMinima, costoEnvioBase);
             const totalFinal = subtotal + costoEnvio;
 
             // Preparar datos para crear orden

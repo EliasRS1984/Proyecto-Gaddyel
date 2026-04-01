@@ -314,15 +314,13 @@ const PedidoConfirmado = () => {
                                         </div>
                                     )}
                                     {/* Dirección de entrega */}
-                                    {(orden.datosComprador.calle || orden.datosComprador.ciudad) && (
+                                    {(orden.datosComprador.domicilio || orden.datosComprador.localidad) && (
                                         <div className="pt-3 mt-1 border-t border-slate-100 dark:border-slate-800">
                                             <p className="text-[13px] text-slate-400 dark:text-slate-500 mb-2">Dirección de entrega</p>
                                             <p className="text-[14px] font-medium tracking-tight text-slate-700 dark:text-slate-300 leading-relaxed">
                                                 {[
-                                                    orden.datosComprador.calle,
-                                                    orden.datosComprador.altura,
-                                                    orden.datosComprador.piso,
-                                                    orden.datosComprador.ciudad,
+                                                    orden.datosComprador.domicilio,
+                                                    orden.datosComprador.localidad,
                                                     orden.datosComprador.provincia,
                                                     orden.datosComprador.codigoPostal,
                                                 ].filter(Boolean).join(', ')}
