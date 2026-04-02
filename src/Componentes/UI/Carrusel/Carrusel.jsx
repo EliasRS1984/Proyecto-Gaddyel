@@ -44,7 +44,7 @@ const Carrusel = ({ imagenes, intervalo = 5000 }) => {
 
     if (!imagenes || imagenes.length === 0) {
         return (
-            <div className="bg-gray-200 h-[80vh] flex items-center justify-center rounded-lg shadow-md mb-12 w-full text-gray-700 text-xl">
+            <div className="bg-gray-200 h-[480px] sm:h-[560px] lg:h-[640px] flex items-center justify-center rounded-lg shadow-md mb-12 w-full text-gray-700 text-xl">
                 <p>No hay imágenes disponibles para el carrusel.</p>
             </div>
         );
@@ -130,7 +130,7 @@ const Carrusel = ({ imagenes, intervalo = 5000 }) => {
     };
 
     return (
-        <div className="relative w-[90vw] h-[80vh] mx-auto rounded-xl shadow-2xl group overflow-hidden">
+        <div className="relative w-[90vw] h-[480px] sm:h-[560px] lg:h-[640px] mx-auto rounded-xl shadow-2xl group overflow-hidden">
             <div 
                 className="flex h-full transition-transform duration-700 ease-in-out"
                 style={{ transform: `translateX(-${diapositivaActual * 100}%)` }}

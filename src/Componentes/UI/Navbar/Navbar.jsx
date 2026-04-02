@@ -224,7 +224,7 @@ const Navbar = () => {
     // ========================================================================
     return (
         <header className={`bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl sticky top-0 z-50 border-b transition-all duration-500 ease-out ${scrolled ? 'border-slate-200/60 dark:border-slate-800/60 shadow-sm' : 'border-transparent'}`}>
-            <nav className={`max-w-7xl mx-auto px-6 lg:px-12 flex justify-between items-center transition-all duration-500 ${scrolled ? 'py-2' : 'py-4'}`}>
+            <nav className="max-w-7xl mx-auto px-6 lg:px-12 flex justify-between items-center py-3">
                 
                 {/* ------------------------------------------------------------
                     LOGO
