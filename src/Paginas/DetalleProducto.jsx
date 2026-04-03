@@ -233,7 +233,7 @@ const DetalleProducto = () => {
                             {[
                                 { label: 'Material', value: material },
                                 { label: 'Tamaño', value: tamanos.length > 0 ? tamanos.join(', ') : 'No especificado' },
-                                { label: 'Colores', value: colores.length > 0 ? colores.join(', ') : 'No especificado' },
+                                { label: 'Colores', value: colores.length > 0 ? colores.map(c => typeof c === 'object' && c !== null ? c.nombre : c).join(', ') : 'No especificado' },
                             ].map(({ label, value }) => (
                                 <li key={label} className="flex justify-between items-center text-[14px]">
                                     <span className="text-slate-400 dark:text-slate-400">{label}</span>
