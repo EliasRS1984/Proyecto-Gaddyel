@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { SOCIAL_URLS } from '../../../constants/contactInfo';
+import { SOCIAL_URLS, CONTACT_INFO } from '../../../constants/contactInfo';
 
 /**
  * ============================================================================
@@ -132,10 +132,12 @@ const Footer = () => {
                         <p className="flex items-start gap-3">
                             <span className="text-slate-400 dark:text-slate-500 flex-shrink-0">📱</span>
                             <a 
-                                href="tel:+5491155098426"
+                                href={CONTACT_INFO.whatsapp.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 className="hover:text-slate-100 dark:hover:text-slate-200 transition-colors duration-500 ease-out"
                             >
-                                +54 9 11 5509-8426
+                                {CONTACT_INFO.whatsapp.number}
                             </a>
                         </p>
                     </div>
