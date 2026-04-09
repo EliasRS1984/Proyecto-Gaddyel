@@ -32,6 +32,7 @@ import Navbar from './Componentes/UI/Navbar/Navbar';
 import ProtectedRoute from './Componentes/ProtectedRoute';
 import LoadingScreen from './Componentes/LoadingScreen';
 import SchemaMarkup from './Componentes/SchemaMarkup';
+import WhatsAppButton from './Componentes/UI/WhatsAppButton/WhatsAppButton';
 import { CartProvider } from './Context/CartContext';
 import { AuthProvider } from './Context/AuthContext';
 import { OrderProvider } from './Context/OrderContext';
@@ -85,6 +86,7 @@ const App = () => {
                                     </Suspense>
                                 </main>
                                 <Footer />
+                                <WhatsAppButton />
                                 <Analytics />
                                 <SpeedInsights />
                             </div>

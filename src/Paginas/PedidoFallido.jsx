@@ -21,6 +21,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import orderStorage from '../utils/orderStorage';
 import { logger } from '../utils/logger';
+import { CONTACT_INFO } from '../constants/contactInfo';
 
 // ======== COMPONENTE PRINCIPAL ========
 
@@ -180,7 +181,7 @@ export const PedidoFallido = () => {
                 <p className="text-[13px] text-center text-slate-400 dark:text-slate-600 mt-8 leading-relaxed">
                     ¿El problema persiste?{' '}
                     <a
-                        href="https://wa.me/5493537407069"
+                        href={CONTACT_INFO.whatsapp.url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-indigo-500 hover:text-indigo-600 transition-colors duration-500 ease-out"
