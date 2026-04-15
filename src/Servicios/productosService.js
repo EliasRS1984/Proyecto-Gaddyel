@@ -122,6 +122,26 @@ export const obtenerProductos = async (params = {}) => {
     }
 };
 
+// Obtiene los productos marcados como 'destacados' directamente desde el endpoint
+// específico del backend, sin pasar por la paginación general.
+// Esto evita que un producto destacado quede fuera si hay más de 12 productos en total.
+export const obtenerProductosDestacados = async () => {
+    try {
+        logger.debug('📤 GET /productos/destacados');
+        const respuesta = await fetchWithRetry('/api/productos/destacados');
+        const productos = Array.isArray(respuesta.data) ? respuesta.data : [];
+        logger.debug('✅ Destacados cargados:', productos.length);
+        return productos;
+    } catch (error) {
+        if (error.code === 'ECONNABORTED') {
+            logger.error('[productosService] Timeout en solicitud de destacados');
+            throw new Error('La solicitud tardó demasiado. Por favor, intenta de nuevo.');
+        }
+        logger.error('[productosService] Error cargando destacados:', error.message);
+        throw new Error('No se pudieron cargar los productos destacados.');
+    }
+};
+
 // Obtiene un producto por ID con reintentos automáticos.
 export const obtenerProductoPorId = async (id) => {
     try {

@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { LogoGaddyel, imagenFondo, getFaqs } from '../Datos/datos.js';
 import { useShippingConfig } from '../hooks/useShippingConfig';
 import { seoMeta } from '../utils/seoMeta';
-import { obtenerProductos } from '../Servicios/productosService.js';
+import { obtenerProductosDestacados } from '../Servicios/productosService.js';
 import carouselService from '../Servicios/carouselService.js';
 import Carrusel from '../Componentes/UI/Carrusel/Carrusel.jsx';
 import ScrollReveal from '../Componentes/Layout/ScrollReveal/ScrollReveal.jsx';
@@ -105,26 +105,17 @@ const Inicio = () => {
 
                 // ✅ PERFORMANCE: Promise.all para peticiones paralelas
                 // Ahorra ~50% del tiempo vs peticiones secuenciales
-                const [resultadoProductos, imagenes] = await Promise.all([
-                    obtenerProductos(),
+                // ✅ PERFORMANCE: Promise.all para peticiones paralelas
+                // Ahora usa el endpoint dedicado /productos/destacados en vez de
+                // traer todos los productos paginados y filtrar en el cliente.
+                // Esto garantiza que aparezcan los 3 destacados sin importar
+                // cuántos productos haya en la base de datos.
+                const [destacados, imagenes] = await Promise.all([
+                    obtenerProductosDestacados(),
                     carouselService.getCarouselImages()
                 ]);
 
-                // ✅ VALIDACIÓN: Verificar que productos sea array antes de filtrar
-                // Previene crash si backend retorna estructura diferente
-                const productos = Array.isArray(resultadoProductos?.productos)
-                    ? resultadoProductos.productos
-                    : Array.isArray(resultadoProductos?.data)
-                        ? resultadoProductos.data
-                        : Array.isArray(resultadoProductos)
-                            ? resultadoProductos
-                            : [];
-
-                const destacados = productos
-                    .filter(p => p && p.destacado === true)
-                    .slice(0, 3);
-
-                setProductosDestacados(destacados);
+                setProductosDestacados(destacados.slice(0, 3));
                 // ✅ VALIDACIÓN: Asegurar que imagenes sea array
                 setCarouselImages(Array.isArray(imagenes) ? imagenes : []);
             } catch (err) {
