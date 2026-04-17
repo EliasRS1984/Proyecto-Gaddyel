@@ -141,12 +141,21 @@ const Carrusel = ({ imagenes, intervalo = 5000 }) => {
                 {imagenes.map((imagen, index) => (
                     <div key={imagen.src} className="w-full h-full flex-shrink-0 relative overflow-hidden">
                         {/* Imagen con zoom en hover - URL optimizada para WebP/AVIF */}
-                        <img
-                            src={optimizarUrlCloudinary(imagen.src)}
-                            alt={imagen.alt}
-                            className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
-                            loading={index === diapositivaActual || index === diapositivaActual + 1 ? "eager" : "lazy"}
-                        />
+                        {/* En celulares (≤767px) muestra srcMobile si existe; si no, usa la imagen de escritorio como respaldo */}
+                        <picture className="block w-full h-full">
+                            {imagen.srcMobile && (
+                                <source
+                                    media="(max-width: 767px)"
+                                    srcSet={optimizarUrlCloudinary(imagen.srcMobile)}
+                                />
+                            )}
+                            <img
+                                src={optimizarUrlCloudinary(imagen.src)}
+                                alt={imagen.alt}
+                                className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+                                loading={index === diapositivaActual || index === diapositivaActual + 1 ? "eager" : "lazy"}
+                            />
+                        </picture>
                         
                         {/* Overlay con gradiente */}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
