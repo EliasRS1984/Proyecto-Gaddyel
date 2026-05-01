@@ -39,6 +39,148 @@ const PedidoConfirmado = () => {
     const hasLoadedRef = useRef(false);
     const hasCleanedCartRef = useRef(false);
 
+    // ======== DESCARGA DEL COMPROBANTE ========
+    // Cuando el usuario hace click en "Descargar comprobante", esta función
+    // abre una ventana nueva con el resumen del pedido listo para imprimir
+    // o guardar como PDF. No requiere librerías externas.
+    //
+    // SEGURIDAD: todos los datos del comprador se escapan antes de insertarse
+    // en el HTML para prevenir XSS (OWASP A03).
+    const handleDescargarComprobante = () => {
+        if (!orden) return;
+
+        // Escapa caracteres especiales de HTML para datos que vienen del usuario
+        const esc = (str) =>
+            String(str || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+
+        // Formatea un número como moneda argentina
+        const ars = (n) =>
+            `$${(n || 0).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+        const fechaHoy = new Date().toLocaleDateString('es-AR', {
+            day: '2-digit', month: 'long', year: 'numeric',
+        });
+
+        // Filas de la tabla de productos
+        const itemsHTML = (orden.items || []).map((item) => `
+            <tr>
+                <td style="padding:10px 16px;border-bottom:1px solid #e2e8f0;font-size:13px;color:#1e293b">${esc(item.nombre || item.titulo || 'Producto')}</td>
+                <td style="padding:10px 16px;border-bottom:1px solid #e2e8f0;font-size:13px;text-align:center;color:#475569">${esc(item.cantidad)}</td>
+                <td style="padding:10px 16px;border-bottom:1px solid #e2e8f0;font-size:13px;text-align:center;color:#475569">${esc(item.cantidadUnidades || 1)}</td>
+                <td style="padding:10px 16px;border-bottom:1px solid #e2e8f0;font-size:13px;text-align:center;color:#475569">${item.cantidad * (item.cantidadUnidades || 1)} uds.</td>
+                <td style="padding:10px 16px;border-bottom:1px solid #e2e8f0;font-size:13px;text-align:right;font-weight:600;color:#1e293b">${ars(item.subtotal || (item.precioUnitario || item.precio || 0) * item.cantidad)}</td>
+            </tr>
+        `).join('');
+
+        // Bloque de datos del comprador (solo si hay datos disponibles)
+        const c = orden.datosComprador || {};
+        const hayComprador = c.nombre || c.email || c.telefono || c.domicilio;
+        const compradorHTML = hayComprador ? `
+            <div style="margin-bottom:24px;padding:16px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0">
+                <h3 style="font-size:12px;font-weight:700;color:#64748b;margin:0 0 12px;text-transform:uppercase;letter-spacing:0.08em">Datos del comprador</h3>
+                ${c.nombre  ? `<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;color:#64748b">Nombre</span><span style="font-size:13px;color:#1e293b;font-weight:600">${esc(c.nombre)}</span></div>` : ''}
+                ${c.email   ? `<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;color:#64748b">Email</span><span style="font-size:13px;color:#1e293b;font-weight:600">${esc(c.email)}</span></div>` : ''}
+                ${c.telefono? `<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;color:#64748b">WhatsApp</span><span style="font-size:13px;color:#1e293b;font-weight:600">${esc(c.telefono)}</span></div>` : ''}
+                ${(c.domicilio || c.localidad) ? `
+                <div style="border-top:1px solid #e2e8f0;margin-top:10px;padding-top:10px">
+                    <span style="font-size:12px;color:#94a3b8;display:block;margin-bottom:4px">Dirección de entrega</span>
+                    <span style="font-size:13px;color:#1e293b;font-weight:600">${esc([c.domicilio, c.localidad, c.provincia, c.codigoPostal].filter(Boolean).join(', '))}</span>
+                </div>` : ''}
+            </div>
+        ` : '';
+
+        // Tabla de productos (solo si hay ítems)
+        const productosHTML = orden.items?.length > 0 ? `
+            <div style="margin-bottom:24px">
+                <h3 style="font-size:12px;font-weight:700;color:#64748b;margin:0 0 12px;text-transform:uppercase;letter-spacing:0.08em">Detalle de productos</h3>
+                <table style="width:100%;border-collapse:collapse;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden">
+                    <thead>
+                        <tr style="background:#f8fafc">
+                            <th style="padding:10px 16px;font-size:11px;font-weight:700;color:#64748b;text-align:left;border-bottom:2px solid #e2e8f0;text-transform:uppercase;letter-spacing:0.06em">Producto</th>
+                            <th style="padding:10px 16px;font-size:11px;font-weight:700;color:#64748b;text-align:center;border-bottom:2px solid #e2e8f0;text-transform:uppercase;letter-spacing:0.06em">Solic.</th>
+                            <th style="padding:10px 16px;font-size:11px;font-weight:700;color:#64748b;text-align:center;border-bottom:2px solid #e2e8f0;text-transform:uppercase;letter-spacing:0.06em">Uds./Paq.</th>
+                            <th style="padding:10px 16px;font-size:11px;font-weight:700;color:#64748b;text-align:center;border-bottom:2px solid #e2e8f0;text-transform:uppercase;letter-spacing:0.06em">Total Uds.</th>
+                            <th style="padding:10px 16px;font-size:11px;font-weight:700;color:#64748b;text-align:right;border-bottom:2px solid #e2e8f0;text-transform:uppercase;letter-spacing:0.06em">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>${itemsHTML}</tbody>
+                </table>
+            </div>
+        ` : '';
+
+        const html = `<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprobante ${esc(orden.orderNumber)} — Gaddyel</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; color: #1e293b; background: #fff; padding: 40px; max-width: 680px; margin: 0 auto; }
+        @media print { body { padding: 20px; } .no-imprimir { display: none !important; } }
+    </style>
+</head>
+<body>
+    <!-- Cabecera del comprobante -->
+    <div style="text-align:center;margin-bottom:32px;padding-bottom:24px;border-bottom:2px solid #e2e8f0">
+        <div style="display:inline-flex;align-items:center;gap:8px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:999px;padding:6px 16px;margin-bottom:16px">
+            <span style="width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block"></span>
+            <span style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#16a34a">Pedido Confirmado · Gaddyel Textiles B2B</span>
+        </div>
+        <h1 style="font-size:22px;font-weight:800;color:#1e293b;margin-bottom:6px">Comprobante de Compra</h1>
+        <p style="font-size:18px;color:#4f46e5;font-weight:700;font-family:monospace">Orden #${esc(orden.orderNumber)}</p>
+        <p style="font-size:12px;color:#94a3b8;margin-top:6px">Emitido el ${fechaHoy}</p>
+    </div>
+
+    <!-- Datos del comprador -->
+    ${compradorHTML}
+
+    <!-- Tabla de productos -->
+    ${productosHTML}
+
+    <!-- Resumen de totales -->
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;margin-bottom:24px">
+        ${orden.subtotal > 0 ? `<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:13px;color:#64748b">Subtotal</span><span style="font-size:13px;color:#1e293b">${ars(orden.subtotal)}</span></div>` : ''}
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+            <span style="font-size:13px;color:#64748b">Envío</span>
+            <span style="font-size:13px;font-weight:600;color:${orden.costoEnvio === 0 ? '#16a34a' : '#1e293b'}">${orden.costoEnvio === 0 ? 'Gratis' : ars(orden.costoEnvio)}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding-top:12px;border-top:2px solid #e2e8f0">
+            <span style="font-size:15px;font-weight:700;color:#1e293b">Total pagado</span>
+            <span style="font-size:22px;font-weight:800;color:#4f46e5">${ars(orden.total)}</span>
+        </div>
+    </div>
+
+    <!-- Aviso de producción -->
+    <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:14px;margin-bottom:24px">
+        <p style="font-size:13px;color:#3730a3;line-height:1.6">
+            Tu pedido será procesado en aproximadamente <strong>20 días corridos</strong> desde la confirmación del pago.
+            Te contactaremos por WhatsApp con las novedades del envío.
+        </p>
+    </div>
+
+    <!-- Pie del documento -->
+    <div style="text-align:center;padding-top:20px;border-top:1px solid #e2e8f0">
+        <p style="font-size:12px;color:#94a3b8">Gaddyel Textiles B2B · Comprobante generado automáticamente</p>
+    </div>
+
+    <!-- Activa el diálogo de impresión / guardar PDF al abrir la ventana -->
+    <script>window.addEventListener('load', function () { window.print(); });</script>
+</body>
+</html>`;
+
+        // Abre la ventana con el comprobante listo para imprimir o guardar como PDF
+        const ventana = window.open('', '_blank', 'width=800,height=700');
+        if (ventana) {
+            ventana.document.write(html);
+            ventana.document.close();
+        }
+    };
+
     useEffect(() => {
         // Si ya hemos cargado los datos, no hacerlo de nuevo
         if (hasLoadedRef.current) {
@@ -200,6 +342,20 @@ const PedidoConfirmado = () => {
                                     #{orden.orderNumber}
                                 </span>
                             </div>
+
+                            {/* Botón para descargar el comprobante como PDF */}
+                            {/* ¿El botón no aparece? Revisa que `orden` no sea null */}
+                            <div className="mt-6">
+                                <button
+                                    onClick={handleDescargarComprobante}
+                                    className="inline-flex items-center gap-2.5 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 px-6 py-2.5 rounded-2xl font-semibold tracking-tight text-[14px] transition-all duration-500 ease-out shadow-sm"
+                                >
+                                    <svg className="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    Descargar comprobante
+                                </button>
+                            </div>
                         </div>
 
                         {/* ── Productos del pedido ── */}
@@ -223,7 +379,7 @@ const PedidoConfirmado = () => {
                                 </div>
 
                                 {/* Lista de productos */}
-                                <div className="divide-y divide-slate-50 dark:divide-slate-800/50 max-h-56 overflow-y-auto">
+                                <div className="divide-y divide-slate-50 dark:divide-slate-800/50">
                                     {orden.items.map((item, idx) => (
                                         <div key={idx} className="flex justify-between items-start px-8 py-4">
                                             <div className="flex-1 min-w-0 pr-4">
@@ -253,23 +409,25 @@ const PedidoConfirmado = () => {
                                         <div className="flex justify-between">
                                             <span className="text-[14px] text-slate-500 dark:text-slate-400">Subtotal</span>
                                             <span className="text-[14px] font-medium text-slate-700 dark:text-slate-300">
-                                                ${orden.subtotal?.toFixed(2)}
+                                                ${(orden.subtotal ?? 0).toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                                             </span>
                                         </div>
                                     )}
-                                    {/* costoEnvio siempre es 0 o 12000 — nunca undefined */}
-                                    <div className="flex justify-between">
-                                        <span className="text-[14px] text-slate-500 dark:text-slate-400">Envío</span>
-                                        <span className={`text-[14px] font-semibold ${orden.costoEnvio === 0 ? 'text-green-600 dark:text-green-400' : 'text-slate-700 dark:text-slate-300'}`}>
-                                            {orden.costoEnvio === 0 ? 'Gratis' : `$${orden.costoEnvio.toFixed(2)}`}
-                                        </span>
-                                    </div>
+                                    {/* costoEnvio puede ser 0 (envío gratis) o un número positivo */}
+                                    {orden.costoEnvio !== undefined && (
+                                        <div className="flex justify-between">
+                                            <span className="text-[14px] text-slate-500 dark:text-slate-400">Envío</span>
+                                            <span className={`text-[14px] font-semibold ${orden.costoEnvio === 0 ? 'text-green-600 dark:text-green-400' : 'text-slate-700 dark:text-slate-300'}`}>
+                                                {orden.costoEnvio === 0 ? 'Gratis' : `$${(orden.costoEnvio ?? 0).toLocaleString('es-AR', { minimumFractionDigits: 2 })}`}
+                                            </span>
+                                        </div>
+                                    )}
                                     <div className="flex justify-between pt-2.5 border-t border-slate-200/60 dark:border-slate-700/60">
                                         <span className="text-[15px] font-semibold tracking-tight text-slate-700 dark:text-slate-200">
                                             Total pagado
                                         </span>
                                         <span className="text-2xl font-bold tracking-tight text-indigo-600 dark:text-indigo-400">
-                                            ${orden.total?.toFixed(2)}
+                                            ${(orden.total ?? 0).toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                                         </span>
                                     </div>
                                 </div>

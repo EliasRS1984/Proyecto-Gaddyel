@@ -13,7 +13,7 @@ export const Cart = () => {
     // Obtiene la regla de envío gratis desde el servidor.
     // Si el admin cambia el valor en el panel, el carrito se actualiza automáticamente.
     // ¿Banner de envío gratis no coincide con el FAQ? Revisá useShippingConfig.js
-    const { cantidadMinima, costoEnvio: costoEnvioBase } = useShippingConfig();
+    const { cantidadMinima, costoEnvio: costoEnvioBase, habilitarEnvioGratis } = useShippingConfig();
 
     // ======== CÁLCULO DE ENVÍO ========
     // IMPORTANTE: este useMemo debe estar ANTES del early return de carrito vacío.
@@ -21,14 +21,17 @@ export const Cart = () => {
     // Si se pusiera después del `if (isEmpty) return`, React lanzaría un error
     // al pasar de carrito vacío a carrito con productos (orden de hooks cambia).
     // ¿El envío gratis no se activa? Revisá la condición cantidadSolicitudes >= cantidadMinima
+    // ¿El envío gratis fue desactivado desde el admin? Revisá habilitarEnvioGratis en /api/config/envio
     const shippingInfo = useMemo(() => {
         const cantidadSolicitudes = cartItems.reduce((sum, item) => sum + item.cantidad, 0);
-        const envioGratis = cantidadSolicitudes >= cantidadMinima;
+        // Si el admin desactivó la promoción, el envío siempre se cobra sin importar la cantidad
+        const promoActiva = habilitarEnvioGratis && cantidadSolicitudes >= cantidadMinima;
+        const envioGratis = promoActiva;
         const costoEnvio = envioGratis ? 0 : costoEnvioBase;
         const totalConEnvio = total + costoEnvio;
         const productosRestantes = envioGratis ? 0 : cantidadMinima - cantidadSolicitudes;
         return { cantidadSolicitudes, envioGratis, costoEnvio, totalConEnvio, productosRestantes };
-    }, [cartItems, total, cantidadMinima, costoEnvioBase]);
+    }, [cartItems, total, cantidadMinima, costoEnvioBase, habilitarEnvioGratis]);
 
     // ======== CARRITO VACÍO ========
     // Cuando el usuario no tiene productos seleccionados, se muestra esta pantalla

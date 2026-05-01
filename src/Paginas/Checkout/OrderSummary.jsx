@@ -20,9 +20,9 @@ import { useShippingConfig } from '../../hooks/useShippingConfig';
 export const OrderSummary = ({ cartItems, total }) => {
     const cantidadSolicitudes = cartItems.reduce((sum, item) => sum + item.cantidad, 0);
     const subtotal = total;
-    // cantidadMinima y costoEnvio vienen del servidor (seteados por el admin en el panel)
-    const { cantidadMinima, costoEnvio: costoEnvioBase } = useShippingConfig();
-    const costoEnvio = orderService.calculateShipping(cantidadSolicitudes, cantidadMinima, costoEnvioBase);
+    // cantidadMinima, costoEnvio y habilitarEnvioGratis vienen del servidor (seteados por el admin)
+    const { cantidadMinima, costoEnvio: costoEnvioBase, habilitarEnvioGratis } = useShippingConfig();
+    const costoEnvio = orderService.calculateShipping(cantidadSolicitudes, cantidadMinima, costoEnvioBase, habilitarEnvioGratis);
     const totalFinal = subtotal + costoEnvio;
 
     return (

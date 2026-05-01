@@ -226,13 +226,19 @@ export const retryPayment = async (orderId) => {
 };
 
 /**
- * Calcula el costo de envío basado en cantidad de SOLICITUDES
- * @param {number} cantidadSolicitudes - Suma total de item.cantidad (total de veces que se agregaron productos)
- * @param {number} threshold - Cantidad mínima para envío gratis (por defecto 3, puede venir del servidor)
- * @param {number} costo - Costo del envío si no aplica la bonificación (por defecto $12.000)
- * @returns {number} Costo de envío en pesos argentinos (0 si aplica gratis)
+ * Calcula el costo de envío basado en cantidad de SOLICITUDES.
+ * Replica la misma lógica del método calcularEnvio() del backend (SystemConfig.js),
+ * para que frontend y backend siempre coincidan en el total enviado.
+ *
+ * @param {number} cantidadSolicitudes   - Suma total de item.cantidad
+ * @param {number} threshold             - Cantidad mínima para envío gratis (del servidor)
+ * @param {number} costo                 - Costo si no aplica el beneficio (del servidor)
+ * @param {boolean} habilitarEnvioGratis - Si la promoción está activa (del servidor)
+ * @returns {number} 0 si aplica gratis, o el costo base en ARS
  */
-export const calculateShipping = (cantidadSolicitudes, threshold = 3, costo = 12000) => {
+export const calculateShipping = (cantidadSolicitudes, threshold = 3, costo = 12000, habilitarEnvioGratis = true) => {
+  // Si la promoción está desactivada por el admin, siempre se cobra el envío
+  if (!habilitarEnvioGratis) return costo;
   return cantidadSolicitudes >= threshold ? 0 : costo;
 };
 

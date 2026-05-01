@@ -21,7 +21,7 @@ export const useCheckoutState = () => {
     const { isAuthenticated, cliente, refrescarPerfil } = useAuth();
 
     // Lee la regla de envío gratis del servidor (la misma que usa el carrito y el FAQ)
-    const { cantidadMinima, costoEnvio: costoEnvioBase } = useShippingConfig();
+    const { cantidadMinima, costoEnvio: costoEnvioBase, habilitarEnvioGratis } = useShippingConfig();
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -183,10 +183,10 @@ export const useCheckoutState = () => {
                 }
             }
 
-            // Calcular totales
+            // Calcular totales usando la misma lógica que el backend (SystemConfig.calcularEnvio)
             const cantidadSolicitudes = cartItems.reduce((sum, item) => sum + item.cantidad, 0);
             const subtotal = total;
-            const costoEnvio = orderService.calculateShipping(cantidadSolicitudes, cantidadMinima, costoEnvioBase);
+            const costoEnvio = orderService.calculateShipping(cantidadSolicitudes, cantidadMinima, costoEnvioBase, habilitarEnvioGratis);
             const totalFinal = subtotal + costoEnvio;
 
             // Preparar datos para crear orden
@@ -207,8 +207,22 @@ export const useCheckoutState = () => {
             logger.success('[Checkout] Orden creada', resultado.ordenId);
 
             // ✅ IMPORTANTE: Guardar datos de la orden en localStorage para PedidoConfirmado
-            // Esto asegura que los detalles del pedido estén disponibles en la página de confirmación
-            orderStorage.save(resultado, 'pending_payment');
+            // El backend NO devuelve los ítems ni los datos del comprador en la respuesta
+            // de creación de orden, así que los tomamos del carrito y del formulario
+            // y los incluimos manualmente para que PedidoConfirmado pueda mostrarlos.
+            orderStorage.save({
+                ...resultado,
+                items: cartItems,
+                datosComprador: {
+                    nombre: formData.nombre,
+                    email: formData.email,
+                    telefono: formData.whatsapp,
+                    domicilio: formData.domicilio,
+                    localidad: formData.localidad,
+                    provincia: formData.provincia,
+                    codigoPostal: formData.codigoPostal,
+                },
+            }, 'pending_payment');
 
             // Limpiar carrito
             clearCart();
