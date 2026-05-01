@@ -8,7 +8,7 @@
     <!-- Página principal -->
     <url>
         <loc>https://gaddyel.vercel.app/</loc>
-        <lastmod>2026-02-03</lastmod>
+        <lastmod>2026-04-30</lastmod>
         <changefreq>daily</changefreq>
         <priority>1.0</priority>
     </url>
@@ -16,7 +16,7 @@
     <!-- Catálogo de productos (alta prioridad) -->
     <url>
         <loc>https://gaddyel.vercel.app/catalogo</loc>
-        <lastmod>2026-02-03</lastmod>
+        <lastmod>2026-04-30</lastmod>
         <changefreq>daily</changefreq>
         <priority>0.9</priority>
     </url>
@@ -24,15 +24,15 @@
     <!-- Sobre Gaddyel -->
     <url>
         <loc>https://gaddyel.vercel.app/nosotros</loc>
-        <lastmod>2026-03-23</lastmod>
+        <lastmod>2026-04-30</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
     
     <!-- Nuestro Proceso -->
     <url>
-        <loc>https://gaddyel.vercel.app/proceso</loc>
-        <lastmod>2026-03-23</lastmod>
+        <loc>https://gaddyel.vercel.app/nuestro-proceso</loc>
+        <lastmod>2026-04-30</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
@@ -40,7 +40,7 @@
     <!-- Contacto -->
     <url>
         <loc>https://gaddyel.vercel.app/contacto</loc>
-        <lastmod>2026-02-03</lastmod>
+        <lastmod>2026-04-30</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
@@ -48,7 +48,7 @@
     <!-- Términos de Servicio -->
     <url>
         <loc>https://gaddyel.vercel.app/terminos-servicio</loc>
-        <lastmod>2026-02-03</lastmod>
+        <lastmod>2026-04-30</lastmod>
         <changefreq>yearly</changefreq>
         <priority>0.3</priority>
     </url>
@@ -56,7 +56,7 @@
     <!-- Política de Privacidad -->
     <url>
         <loc>https://gaddyel.vercel.app/politica-privacidad</loc>
-        <lastmod>2026-02-03</lastmod>
+        <lastmod>2026-04-30</lastmod>
         <changefreq>yearly</changefreq>
         <priority>0.3</priority>
     </url>
