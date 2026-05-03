@@ -54,6 +54,14 @@ if (import.meta.env.PROD) {
         return null;
       }
 
+      // Ignorar error del WebView de Safari en iOS (Instagram, Facebook, TikTok en iPhone).
+      // Causa: el puente nativo window.webkit.messageHandlers deja de existir cuando
+      // la app cierra el WebView antes de que el JS termine de ejecutarse.
+      // No es un bug de la app — no tiene solución desde el frontend.
+      if (errorMessage.includes('window.webkit.messageHandlers')) {
+        return null;
+      }
+
       // Ignorar el error de módulo no encontrado tras un nuevo deploy.
       // Causa: el usuario tenía la pestaña abierta antes del deploy. El navegador
       // intenta descargar un archivo JS con hash viejo que ya no existe en el servidor.
