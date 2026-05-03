@@ -53,12 +53,27 @@ if (import.meta.env.PROD) {
       if (errorMessage.includes('Java object is gone')) {
         return null;
       }
+
+      // Ignorar el error de módulo no encontrado tras un nuevo deploy.
+      // Causa: el usuario tenía la pestaña abierta antes del deploy. El navegador
+      // intenta descargar un archivo JS con hash viejo que ya no existe en el servidor.
+      // La solución real es el listener de 'vite:preloadError' que recarga la página.
+      if (errorMessage.includes('Failed to fetch dynamically imported module')) {
+        return null;
+      }
       
       return event;
     },
   });
   
 }
+
+// Cuando el navegador no puede descargar un módulo lazy (chunk con hash viejo tras deploy),
+// recarga la página automáticamente para que el usuario obtenga la versión nueva.
+// Esto ocurre cuando alguien tenía la pestaña abierta antes de que se hiciera un nuevo deploy.
+window.addEventListener('vite:preloadError', () => {
+  window.location.reload();
+});
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
