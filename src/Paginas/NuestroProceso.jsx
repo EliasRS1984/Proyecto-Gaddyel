@@ -65,7 +65,7 @@ const procesos = [
         paso: '05',
         title: 'Empaquetado y envío',
         etiqueta: 'Llegada en condiciones perfectas',
-        description: 'Cada pedido se empaqueta de forma que las prendas lleguen sin arrugas, sin humedad y en el orden correcto. Utilizamos bolsas individuales por pieza y cajas reforzadas para el envío. Una vez despachado, te compartimos el número de seguimiento para que puedas monitorear la entrega. Trabajamos con Correos Argentinos que proporciona logística de alcance nacional para garantizar tiempos de entrega predecibles.',
+        description: 'Cada pedido se empaqueta de forma que las prendas lleguen sin arrugas, sin humedad y en el orden correcto. Utilizamos bolsas individuales por pieza y cajas reforzadas para el envío. Una vez despachado, te compartimos el número de seguimiento para que puedas monitorear la entrega. Trabajamos con Correo Argentino que proporciona logística de alcance nacional para garantizar tiempos de entrega predecibles.',
         detalle: 'Envíos a todo el país con seguimiento en tiempo real.',
         image: entrega,
         alt: 'Empaquetado y envío de blanquería personalizada a todo el país - Proceso Gaddyel'

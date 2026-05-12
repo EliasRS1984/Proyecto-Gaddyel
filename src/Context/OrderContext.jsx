@@ -93,13 +93,41 @@ export const OrderProvider = ({ children }) => {
     try {
       const response = await orderService.createOrder(checkoutData, cartItems);
 
-      setLastOrder(response);
+      // ======== ENRIQUECIMIENTO DE LA RESPUESTA ========
+      // El backend devuelve solo los totales y el ID del pedido.
+      // Los ítems del carrito y los datos del comprador NO vienen del servidor
+      // porque ya se enviaron al crear el pedido.
+      // Los agregamos aquí para que el efecto de persistencia automática
+      // (unas líneas más arriba) los guarde en el navegador con toda la
+      // información necesaria para mostrar el comprobante de compra.
+      //
+      // ¿El comprobante no muestra productos o datos del comprador?
+      // Este es el lugar donde se agregan esos datos antes de guardarlos.
+      const enrichedResponse = {
+        ...response,
+        items: cartItems,
+        datosComprador: {
+          nombre: checkoutData.nombre,
+          email: checkoutData.email,
+          telefono: checkoutData.whatsapp,
+          domicilio: checkoutData.domicilio,
+          localidad: checkoutData.localidad,
+          provincia: checkoutData.provincia,
+          codigoPostal: checkoutData.codigoPostal,
+        }
+      };
+
+      // Guardar la respuesta enriquecida en el estado.
+      // El efecto de persistencia automática la escribirá en el navegador.
+      setLastOrder(enrichedResponse);
       setLastOrderStatus('pending_payment');
       setCurrentOrder(null);
 
       logger.success('[OrderContext] Orden creada y guardada:', response.ordenId);
 
-      return response;
+      // Devolver la respuesta enriquecida para que el checkout también
+      // la tenga disponible al guardar el comprobante localmente.
+      return enrichedResponse;
     } catch (error) {
       const errorMessage = error.message || 'Error al crear la orden';
       setLastError(errorMessage);

@@ -5,7 +5,6 @@ import { useOrder } from '../../Context/OrderContext';
 import { useAuth } from '../../hooks/useAuth';
 import orderService from '../../Servicios/orderService';
 import * as authService from '../../Servicios/authService';
-import orderStorage from '../../utils/orderStorage';
 import { validateForm, formatField, INITIAL_FORM_STATE } from '../../Servicios/checkoutSchema';
 import { logger } from '../../utils/logger';
 import { useShippingConfig } from '../../hooks/useShippingConfig';
@@ -202,27 +201,11 @@ export const useCheckoutState = () => {
             logger.debug('[Checkout] Enviando datos', checkoutData);
 
             // Crear orden
+            // OrderContext ya enriquece la respuesta con items y datosComprador
+            // y la persiste en localStorage a través de su efecto automático.
             const resultado = await createOrder(checkoutData, cartItems);
 
             logger.success('[Checkout] Orden creada', resultado.ordenId);
-
-            // ✅ IMPORTANTE: Guardar datos de la orden en localStorage para PedidoConfirmado
-            // El backend NO devuelve los ítems ni los datos del comprador en la respuesta
-            // de creación de orden, así que los tomamos del carrito y del formulario
-            // y los incluimos manualmente para que PedidoConfirmado pueda mostrarlos.
-            orderStorage.save({
-                ...resultado,
-                items: cartItems,
-                datosComprador: {
-                    nombre: formData.nombre,
-                    email: formData.email,
-                    telefono: formData.whatsapp,
-                    domicilio: formData.domicilio,
-                    localidad: formData.localidad,
-                    provincia: formData.provincia,
-                    codigoPostal: formData.codigoPostal,
-                },
-            }, 'pending_payment');
 
             // Limpiar carrito
             clearCart();
