@@ -20,7 +20,7 @@ export const useCheckoutState = () => {
     const { isAuthenticated, cliente, refrescarPerfil } = useAuth();
 
     // Lee la regla de envío gratis del servidor (la misma que usa el carrito y el FAQ)
-    const { cantidadMinima, costoEnvio: costoEnvioBase, habilitarEnvioGratis } = useShippingConfig();
+    const { cantidadMinima, montoParaEnvioGratis, costoEnvio: costoEnvioBase, habilitarEnvioGratis } = useShippingConfig();
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -125,10 +125,16 @@ export const useCheckoutState = () => {
     const handleSubmit = useCallback(async (e) => {
         e.preventDefault();
         
+        const cantidadProductos = cartItems.reduce((sum, item) => sum + (item.cantidad || 0), 0);
         logger.debug('[Checkout] handleSubmit iniciado', {
-            cartItemsLength: cartItems.length,
+            cartItemsLength: cantidadProductos,
             isEmpty
         });
+
+        if (cantidadProductos < cantidadMinima) {
+            setError(`Para continuar con tu pedido, necesitás al menos ${cantidadMinima} productos`);
+            return;
+        }
 
         // Validar formulario
         const isValid = performFormValidation();
@@ -183,16 +189,15 @@ export const useCheckoutState = () => {
             }
 
             // Calcular totales usando la misma lógica que el backend (SystemConfig.calcularEnvio)
-            const cantidadSolicitudes = cartItems.reduce((sum, item) => sum + item.cantidad, 0);
             const subtotal = total;
-            const costoEnvio = orderService.calculateShipping(cantidadSolicitudes, cantidadMinima, costoEnvioBase, habilitarEnvioGratis);
+            const costoEnvio = orderService.calculateShipping(subtotal, montoParaEnvioGratis, costoEnvioBase, habilitarEnvioGratis);
             const totalFinal = subtotal + costoEnvio;
 
             // Preparar datos para crear orden
             const checkoutData = {
                 ...formData,
                 clienteId: cliente?._id || null,
-                cantidadProductos: cantidadSolicitudes,
+                cantidadProductos,
                 subtotal,
                 costoEnvio,
                 total: totalFinal
@@ -251,6 +256,8 @@ export const useCheckoutState = () => {
         isEmpty,
         cartItems,
         total,
+        checkoutEnabled: cartItems.reduce((sum, item) => sum + (item.cantidad || 0), 0) >= cantidadMinima,
+        minimumProducts: cantidadMinima,
 
         // Funciones
         handleChange,

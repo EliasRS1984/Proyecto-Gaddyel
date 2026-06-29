@@ -13,7 +13,7 @@ export const Cart = () => {
     // Obtiene la regla de envío gratis desde el servidor.
     // Si el admin cambia el valor en el panel, el carrito se actualiza automáticamente.
     // ¿Banner de envío gratis no coincide con el FAQ? Revisá useShippingConfig.js
-    const { cantidadMinima, costoEnvio: costoEnvioBase, habilitarEnvioGratis } = useShippingConfig();
+    const { cantidadMinima, montoParaEnvioGratis, costoEnvio: costoEnvioBase, habilitarEnvioGratis } = useShippingConfig();
 
     // ======== CÁLCULO DE ENVÍO ========
     // IMPORTANTE: este useMemo debe estar ANTES del early return de carrito vacío.
@@ -23,15 +23,15 @@ export const Cart = () => {
     // ¿El envío gratis no se activa? Revisá la condición cantidadSolicitudes >= cantidadMinima
     // ¿El envío gratis fue desactivado desde el admin? Revisá habilitarEnvioGratis en /api/config/envio
     const shippingInfo = useMemo(() => {
-        const cantidadSolicitudes = cartItems.reduce((sum, item) => sum + item.cantidad, 0);
-        // Si el admin desactivó la promoción, el envío siempre se cobra sin importar la cantidad
-        const promoActiva = habilitarEnvioGratis && cantidadSolicitudes >= cantidadMinima;
-        const envioGratis = promoActiva;
+        const cantidadProductos = cartItems.reduce((sum, item) => sum + (item.cantidad || 0), 0);
+        const subtotal = total;
+        const envioGratis = habilitarEnvioGratis && subtotal >= montoParaEnvioGratis;
         const costoEnvio = envioGratis ? 0 : costoEnvioBase;
-        const totalConEnvio = total + costoEnvio;
-        const productosRestantes = envioGratis ? 0 : cantidadMinima - cantidadSolicitudes;
-        return { cantidadSolicitudes, envioGratis, costoEnvio, totalConEnvio, productosRestantes };
-    }, [cartItems, total, cantidadMinima, costoEnvioBase, habilitarEnvioGratis]);
+        const totalConEnvio = subtotal + costoEnvio;
+        const productosRestantes = Math.max(0, cantidadMinima - cantidadProductos);
+        const checkoutBloqueado = cantidadProductos < cantidadMinima;
+        return { cantidadProductos, subtotal, envioGratis, costoEnvio, totalConEnvio, productosRestantes, checkoutBloqueado };
+    }, [cartItems, total, cantidadMinima, montoParaEnvioGratis, costoEnvioBase, habilitarEnvioGratis]);
 
     // ======== CARRITO VACÍO ========
     // Cuando el usuario no tiene productos seleccionados, se muestra esta pantalla
@@ -45,7 +45,7 @@ export const Cart = () => {
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200/50 dark:border-slate-700/50 mb-10">
                         <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 flex-shrink-0" />
                         <span className="text-[11px] font-semibold tracking-[0.15em] uppercase text-slate-500 dark:text-slate-400">
-                            Tu Selección · Textiles B2B
+                            Tu Selección  
                         </span>
                     </div>
 
@@ -140,7 +140,7 @@ export const Cart = () => {
                     </h1>
                     {/* Contador de productos */}
                     <span className="text-[13px] font-medium text-slate-400 dark:text-slate-500">
-                        {cartItems.length} {cartItems.length === 1 ? 'producto' : 'productos'}
+                        {shippingInfo.cantidadProductos} {shippingInfo.cantidadProductos === 1 ? 'producto' : 'productos'}
                     </span>
                 </div>
             </div>
@@ -274,7 +274,26 @@ export const Cart = () => {
 
             {/* ---- Banner de envío ---- */}
             {/* Cambia de color según si ya aplica envío gratis o no */}
-            {shippingInfo.envioGratis ? (
+            {shippingInfo.checkoutBloqueado ? (
+                <div className="flex items-center gap-4 px-6 py-4 mb-6
+                    bg-amber-50/80 dark:bg-amber-950/20
+                    border border-amber-200/60 dark:border-amber-700/30
+                    rounded-2xl">
+                    <div className="w-9 h-9 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-900/40 flex-shrink-0">
+                        <svg className="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p className="font-semibold tracking-tight text-amber-800 dark:text-amber-300">
+                            Faltan {shippingInfo.productosRestantes} {shippingInfo.productosRestantes === 1 ? 'producto' : 'productos'} para poder finalizar la compra
+                        </p>
+                        <p className="text-[13px] text-amber-700 dark:text-amber-400">
+                            Se requieren {cantidadMinima} productos
+                        </p>
+                    </div>
+                </div>
+            ) : shippingInfo.envioGratis ? (
                 <div className="flex items-center gap-4 px-6 py-4 mb-6
                     bg-green-50/80 dark:bg-green-950/20
                     border border-green-200/60 dark:border-green-700/30
@@ -290,7 +309,7 @@ export const Cart = () => {
                             ¡Envío gratis incluido!
                         </p>
                         <p className="text-[13px] text-green-700 dark:text-green-400">
-                            Tu pedido califica con {shippingInfo.cantidadSolicitudes} {shippingInfo.cantidadSolicitudes === 1 ? 'producto' : 'productos'}
+                            Tu subtotal alcanza ${formatPrice(montoParaEnvioGratis)} para este beneficio
                         </p>
                     </div>
                 </div>
@@ -306,10 +325,10 @@ export const Cart = () => {
                     </div>
                     <div>
                         <p className="font-semibold tracking-tight text-indigo-800 dark:text-indigo-300">
-                            Faltan {shippingInfo.productosRestantes} {shippingInfo.productosRestantes === 1 ? 'producto' : 'productos'} para envío gratis
+                            Tu pedido aún no alcanza el importe para envío gratis
                         </p>
                         <p className="text-[13px] text-indigo-600 dark:text-indigo-400">
-                            Agregá más artículos del catálogo y ahorrá en el envío
+                            El envío se calculará sobre el subtotal actual
                         </p>
                     </div>
                 </div>
@@ -363,21 +382,38 @@ export const Cart = () => {
                     >
                         Seguir comprando
                     </Link>
-                    <Link
-                        to="/checkout"
-                        className="inline-flex items-center justify-center gap-2
-                            px-8 py-3.5 rounded-2xl flex-1
-                            bg-indigo-600 hover:bg-indigo-700
-                            text-white text-[14px] font-semibold tracking-tight
-                            transition-all duration-500 ease-out
-                            hover:shadow-lg hover:shadow-indigo-500/20 hover:-translate-y-0.5"
-                    >
-                        {/* Icono de candado = checkout seguro */}
-                        <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                        </svg>
-                        Continuar
-                    </Link>
+                    {shippingInfo.checkoutBloqueado ? (
+                        <button
+                            type="button"
+                            disabled
+                            className="inline-flex items-center justify-center gap-2
+                                px-8 py-3.5 rounded-2xl flex-1
+                                bg-slate-300 dark:bg-slate-700
+                                text-slate-600 dark:text-slate-300
+                                text-[14px] font-semibold tracking-tight
+                                cursor-not-allowed"
+                        >
+                            <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                            Continuar
+                        </button>
+                    ) : (
+                        <Link
+                            to="/checkout"
+                            className="inline-flex items-center justify-center gap-2
+                                px-8 py-3.5 rounded-2xl flex-1
+                                bg-indigo-600 hover:bg-indigo-700
+                                text-white text-[14px] font-semibold tracking-tight
+                                transition-all duration-500 ease-out
+                                hover:shadow-lg hover:shadow-indigo-500/20 hover:-translate-y-0.5"
+                        >
+                            <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                            Continuar
+                        </Link>
+                    )}
                 </div>
             </div>
         </div>

@@ -18,11 +18,10 @@ import { useShippingConfig } from '../../hooks/useShippingConfig';
 // ¿El envío gratis no se activa?     La regla de 3 unidades está en orderService.calculateShipping
 // =====================================================
 export const OrderSummary = ({ cartItems, total }) => {
-    const cantidadSolicitudes = cartItems.reduce((sum, item) => sum + item.cantidad, 0);
     const subtotal = total;
-    // cantidadMinima, costoEnvio y habilitarEnvioGratis vienen del servidor (seteados por el admin)
-    const { cantidadMinima, costoEnvio: costoEnvioBase, habilitarEnvioGratis } = useShippingConfig();
-    const costoEnvio = orderService.calculateShipping(cantidadSolicitudes, cantidadMinima, costoEnvioBase, habilitarEnvioGratis);
+    // cantidadMinima, montoParaEnvioGratis, costoEnvio y habilitarEnvioGratis vienen del servidor (seteados por el admin)
+    const { cantidadMinima, montoParaEnvioGratis, costoEnvio: costoEnvioBase, habilitarEnvioGratis } = useShippingConfig();
+    const costoEnvio = orderService.calculateShipping(subtotal, montoParaEnvioGratis, costoEnvioBase, habilitarEnvioGratis);
     const totalFinal = subtotal + costoEnvio;
 
     return (
@@ -82,9 +81,9 @@ export const OrderSummary = ({ cartItems, total }) => {
                 </div>
 
                 {/* Aviso de envío gratis si aún no aplica */}
-                {cantidadSolicitudes < cantidadMinima && costoEnvio > 0 && (
+                {subtotal < montoParaEnvioGratis && costoEnvio > 0 && (
                     <p className="text-[12px] text-indigo-500 dark:text-indigo-400">
-                        Envío gratis a partir de {cantidadMinima} productos
+                        Envío gratis a partir de ${montoParaEnvioGratis.toLocaleString()} de subtotal
                     </p>
                 )}
 

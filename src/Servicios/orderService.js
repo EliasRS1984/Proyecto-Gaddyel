@@ -230,16 +230,16 @@ export const retryPayment = async (orderId) => {
  * Replica la misma lógica del método calcularEnvio() del backend (SystemConfig.js),
  * para que frontend y backend siempre coincidan en el total enviado.
  *
- * @param {number} cantidadSolicitudes   - Suma total de item.cantidad
- * @param {number} threshold             - Cantidad mínima para envío gratis (del servidor)
+ * @param {number} subtotal              - Importe total del carrito sin envío
+ * @param {number} threshold             - Importe mínimo para envío gratis (del servidor)
  * @param {number} costo                 - Costo si no aplica el beneficio (del servidor)
  * @param {boolean} habilitarEnvioGratis - Si la promoción está activa (del servidor)
  * @returns {number} 0 si aplica gratis, o el costo base en ARS
  */
-export const calculateShipping = (cantidadSolicitudes, threshold = 3, costo = 12000, habilitarEnvioGratis = true) => {
+export const calculateShipping = (subtotal = 0, threshold = 200000, costo = 12000, habilitarEnvioGratis = true) => {
   // Si la promoción está desactivada por el admin, siempre se cobra el envío
   if (!habilitarEnvioGratis) return costo;
-  return cantidadSolicitudes >= threshold ? 0 : costo;
+  return subtotal >= threshold ? 0 : costo;
 };
 
 /**

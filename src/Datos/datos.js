@@ -5,16 +5,21 @@ import LogoGaddyel from '../Activos/Imagenes/Logo-Gaddyel.png';
 
 // ✅ Imagen de fondo con efecto parallax - Logo Neon Gaddyel
 import imagenFondo from '../Activos/Imagenes/imagenFondo.jpg';
+import { formatPrice } from '../utils/formatPrice';
 
 // =====================================================
-// Exportamos las preguntas frecuentes como una función que recibe la cantidad
-// mínima de productos necesaria para el envío gratis.
+// Exportamos las preguntas frecuentes como una función que recibe el umbral
+// configurado por el administrador para el checkout y el envío gratis.
 // Así, si el administrador cambia ese valor desde el panel, la respuesta
 // del FAQ se actualiza automáticamente sin tocar este archivo.
-//
-// ¿El FAQ muestra siempre "3"? Revisá useShippingConfig.js y /api/config/envio
 // =====================================================
-export const getFaqs = (cantidadMinima = 3) => [
+export const getFaqs = (cantidadMinima = 12, montoParaEnvioGratis = 200000) => [
+
+    {
+        question: '¿Cuál es la cantidad mínima para comprar?',
+        answer: `La cantidad mínima para comprar es de ${cantidadMinima} ${cantidadMinima === 1 ? 'producto' : 'productos'}, para que puedas armar tu combo funcional.`
+    },   
+    
     {
         question: '¿Cómo funciona el proceso de compra?',
         answer: 'Podés realizar tu compra directamente desde nuestra web a través del carrito Seleccionás los productos, cargás tus datos y finalizás el pago de forma segura mediante Mercado Pago. Una vez confirmado el pago, iniciamos la producción de tu pedido.'
@@ -34,7 +39,7 @@ export const getFaqs = (cantidadMinima = 3) => [
     },
     {
         question: 'Cuánto tiempo tarda la confección de mi pedido?',
-        answer: `El plazo de confección es de hasta 20 días corridos desde la confirmación del pago.
+        answer: `El plazo de confección es de hasta 20 días hábiles desde la confirmación del pago.
                 Al tratarse de productos personalizados, cada pedido se realiza a medida.`
     },
     {
@@ -44,7 +49,7 @@ export const getFaqs = (cantidadMinima = 3) => [
     },
     {
         question: '¿El envío tiene algún beneficio?',
-        answer: `Sí.\n                👉 Si comprás ${cantidadMinima} o más productos (iguales o diferentes), el envío es bonificado.`
+        answer: `Sí. 👉 Si comprás por un monto de $${formatPrice(montoParaEnvioGratis)}, el envío es bonificado.`
     },
     {
         question: 'Cómo puedo seguir mi pedido',

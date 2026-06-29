@@ -158,7 +158,7 @@ const PedidoConfirmado = () => {
     <!-- Aviso de producción -->
     <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:14px;margin-bottom:24px">
         <p style="font-size:13px;color:#3730a3;line-height:1.6">
-            Tu pedido será procesado en aproximadamente <strong>20 días corridos</strong> desde la confirmación del pago.
+            Tu pedido será procesado en aproximadamente <strong>20 días hábiles</strong> desde la confirmación del pago, considerando lunes a viernes.
             Te contactaremos por WhatsApp con las novedades del envío.
         </p>
     </div>
@@ -267,7 +267,7 @@ const PedidoConfirmado = () => {
                         // ✅ CORRECCIÓN: mapear datos de pago de MP si existen
                         payment: pedidoData.payment || null,
                         envio: {
-                            mensaje: 'Tu pedido será procesado en aproximadamente 20 días corridos desde la confirmación del pago.',
+                            mensaje: 'Tu pedido será procesado en aproximadamente 20 días hábiles desde la confirmación del pago, considerando lunes a viernes.',
                             diasProduccion: 20,
                             fechaEnvioEstimada: new Date(Date.now() + 20 * 24 * 60 * 60 * 1000)
                         }

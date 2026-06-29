@@ -37,7 +37,9 @@ export const Checkout = () => {
         handleChange,
         handleBlur,
         handleSubmit,
-        isAuthenticated
+        isAuthenticated,
+        checkoutEnabled,
+        minimumProducts
     } = useCheckoutState();
 
     // ======== CHECKOUT VACÍO ========
@@ -49,7 +51,7 @@ export const Checkout = () => {
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200/50 dark:border-slate-700/50 mb-10">
                         <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 flex-shrink-0" />
                         <span className="text-[11px] font-semibold tracking-[0.15em] uppercase text-slate-500 dark:text-slate-400">
-                            Finalizar Pedido · Textiles B2B
+                            Finalizar Pedido 
                         </span>
                     </div>
                     <div className="w-24 h-24 mx-auto mb-10 flex items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200/50 dark:border-slate-700/50 ring-2 ring-slate-200 dark:ring-slate-700 ring-offset-4 ring-offset-white dark:ring-offset-slate-950">
@@ -108,6 +110,8 @@ export const Checkout = () => {
                             isAuthenticated={isAuthenticated}
                             loading={loading}
                             error={error}
+                            checkoutEnabled={checkoutEnabled}
+                            minimumProducts={minimumProducts}
                             onSubmit={handleSubmit}
                             onChange={handleChange}
                             onBlur={handleBlur}

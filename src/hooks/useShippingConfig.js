@@ -23,7 +23,8 @@ import axiosInstance from '../Servicios/axiosInstance';
 // Se usan SOLO mientras carga la config del servidor o si hay un error de conexión.
 // NUNCA deben verse en producción con el servidor activo.
 const DEFAULTS = {
-    cantidadMinima: 3,   // Productos para envío gratis (fallback)
+    cantidadMinima: 12,   // Productos mínimos para habilitar checkout (fallback)
+    montoParaEnvioGratis: 200000,
     costoEnvio: 12000,   // Costo en pesos si no aplica el beneficio (fallback)
     habilitarEnvioGratis: true
 };
@@ -31,31 +32,40 @@ const DEFAULTS = {
 // ======== CACHÉ DE SESIÓN ========
 // Evita repetir la consulta si múltiples componentes (Carrito, FAQ, Checkout)
 // piden el dato al mismo tiempo durante la misma carga de página.
-// Se reinicia automáticamente cuando el usuario recarga el navegador.
+// El valor se vuelve a revisar automáticamente para reflejar cambios del admin.
 let cachedConfig = null;
 let fetchPromise = null;
+let lastFetchTime = 0;
+const REFRESH_INTERVAL_MS = 5000;
 
-const fetchConfig = () => {
-    // Si la consulta ya está en curso, espera esa misma consulta
+const fetchConfig = ({ force = false } = {}) => {
+    const now = Date.now();
+
+    // Si la consulta ya está en curso, espera esa misma consulta.
     if (fetchPromise) return fetchPromise;
 
-    // Si ya tenemos el dato de esta sesión, usarlo directamente
-    if (cachedConfig) return Promise.resolve(cachedConfig);
+    // Si ya tenemos un valor reciente y no se pidió una actualización forzada,
+    // lo reutiliza para no saturar el servidor.
+    if (!force && cachedConfig && now - lastFetchTime < REFRESH_INTERVAL_MS) {
+        return Promise.resolve(cachedConfig);
+    }
 
     fetchPromise = axiosInstance
         .get('/api/config/envio')
         .then(({ data }) => {
             cachedConfig = {
-                cantidadMinima: data.cantidadParaEnvioGratis ?? DEFAULTS.cantidadMinima,
+                cantidadMinima: data.cantidadMinimaPedido ?? data.cantidadParaEnvioGratis ?? DEFAULTS.cantidadMinima,
+                montoParaEnvioGratis: data.montoParaEnvioGratis ?? DEFAULTS.montoParaEnvioGratis,
                 costoEnvio: data.costoBase ?? DEFAULTS.costoEnvio,
                 habilitarEnvioGratis: data.habilitarEnvioGratis ?? DEFAULTS.habilitarEnvioGratis,
             };
+            lastFetchTime = Date.now();
             return cachedConfig;
         })
         .catch(() => {
-            // Si falla la consulta, usa los predeterminados pero NO los cachea,
-            // para intentar de nuevo la próxima vez que se monte el componente
-            return DEFAULTS;
+            // Si falla la consulta, conserva el valor anterior en vez de reemplazarlo
+            // por el fallback, para evitar parpadeos innecesarios.
+            return cachedConfig ?? DEFAULTS;
         })
         .finally(() => { fetchPromise = null; });
 
@@ -73,10 +83,42 @@ export const useShippingConfig = () => {
     const [config, setConfig] = useState(cachedConfig ?? DEFAULTS);
 
     useEffect(() => {
-        // Siempre consulta al servidor al montar (la primera vez que carga la página).
-        // Si cachedConfig ya tiene el valor de esta sesión, el useState de arriba ya
-        // mostró los datos correctos y fetchConfig devuelve la promesa resuelta.
-        fetchConfig().then(result => setConfig(result));
+        let cancelled = false;
+
+        const syncConfig = async () => {
+            const result = await fetchConfig({ force: true });
+            if (!cancelled) {
+                setConfig(result);
+            }
+        };
+
+        syncConfig();
+
+        const intervalId = window.setInterval(() => {
+            fetchConfig().then((result) => {
+                if (!cancelled) {
+                    setConfig(result);
+                }
+            });
+        }, REFRESH_INTERVAL_MS);
+
+        const handleFocus = () => {
+            fetchConfig({ force: true }).then((result) => {
+                if (!cancelled) {
+                    setConfig(result);
+                }
+            });
+        };
+
+        window.addEventListener('focus', handleFocus);
+        document.addEventListener('visibilitychange', handleFocus);
+
+        return () => {
+            cancelled = true;
+            window.clearInterval(intervalId);
+            window.removeEventListener('focus', handleFocus);
+            document.removeEventListener('visibilitychange', handleFocus);
+        };
     }, []);
 
     return config;

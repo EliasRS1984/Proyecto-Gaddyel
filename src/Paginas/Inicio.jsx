@@ -143,14 +143,13 @@ const Inicio = () => {
     const [showAllFaqs, setShowAllFaqs] = useState(false);
     const initialFaqCount = 3;
 
-    // Obtiene la cantidad mínima de productos para envío gratis desde el servidor.
+    // Obtiene la regla de checkout y envío gratis desde el servidor.
     // Si el admin cambia el valor en el panel, el FAQ se actualiza automáticamente.
-    // ¿El FAQ siempre muestra "3"? Revisá useShippingConfig.js y /api/config/envio
-    const { cantidadMinima } = useShippingConfig();
+    const { cantidadMinima, montoParaEnvioGratis } = useShippingConfig();
 
-    // Genera el array de FAQs con el valor dinámico de cantidadMinima.
-    // Se recalcula solo si cantidadMinima o showAllFaqs cambian.
-    const faqs = useMemo(() => getFaqs(cantidadMinima), [cantidadMinima]);
+    // Genera el array de FAQs con los valores dinámicos configurados.
+    // Se recalcula solo si el umbral o showAllFaqs cambian.
+    const faqs = useMemo(() => getFaqs(cantidadMinima, montoParaEnvioGratis), [cantidadMinima, montoParaEnvioGratis]);
     const faqsToShow = useMemo(() => {
         return showAllFaqs ? faqs : faqs.slice(0, initialFaqCount);
     }, [showAllFaqs, faqs]);
@@ -269,7 +268,7 @@ const Inicio = () => {
                                     border border-indigo-200/60 dark:border-indigo-800/60
                                     px-4 py-1.5 rounded-full
                                 ">
-                                    Blanquería Personalizada · Bordado Industrial
+                                    Blanquería Personalizada · Bordado de Alta Definición
                                 </span>
                             </div>
 
@@ -311,13 +310,15 @@ const Inicio = () => {
                                                 ¿Por qué Gaddyel?
                                             </p>
                                             <h3 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-4">
-                                                La Estrategia detrás del Confort
+                                                Fabricamos blanquería profesional personalizada para centros de estética y spa.
                                             </h3>
                                             <p className="text-[15px] text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
-                                                No solo personalizamos Blanquería, diseñamos embajadores silenciosos para tu gabinete. En cada bata y vincha bordada, tu logo está presente en el momento de mayor atención del cliente.
+                                                En Gaddyel diseñamos y confeccionamos blanquería profesional personalizada para centros de estética, spa, consultorios y profesionales del bienestar.
                                             </p>
                                             <p className="text-[15px] text-slate-700 dark:text-slate-300 leading-relaxed">
-                                                Nuestra blanquería de alta gama fusiona durabilidad extrema con una suavidad que cautiva. Estás invirtiendo en un sello de identidad que eleva la percepción de tu servicio.
+                                                Nuestra línea incluye batas, vinchas, toallas, pareos, pads reutilizables y otros accesorios profesionales, confeccionados con materiales seleccionados por su suavidad, resistencia y excelente presentación.
+
+No solo vendemos blanquería. Ayudamos a que cada detalle de tu espacio transmita profesionalismo, confianza y una experiencia que tus clientes recuerden.
                                             </p>
                                         </div>
 

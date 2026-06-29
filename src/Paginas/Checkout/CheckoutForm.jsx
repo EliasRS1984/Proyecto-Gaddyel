@@ -22,6 +22,8 @@ export const CheckoutForm = ({
     isAuthenticated,
     loading,
     error,
+    checkoutEnabled,
+    minimumProducts,
     onSubmit,
     onChange,
     onBlur,
@@ -297,7 +299,7 @@ export const CheckoutForm = ({
             {/* ¿No responde al click? Revisá handleSubmit en useCheckoutState */}
             <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || !checkoutEnabled}
                 className="w-full inline-flex items-center justify-center gap-3
                     py-4 rounded-2xl
                     disabled:opacity-50 disabled:cursor-not-allowed

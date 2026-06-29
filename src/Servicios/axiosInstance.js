@@ -23,9 +23,8 @@ import axios from 'axios';
 import { logger } from '../utils/logger';
 
 // Lee la URL del servidor desde la variable de entorno.
-// Si no está definida (por ejemplo en producción sin .env),
-// usa la URL del servidor de producción como respaldo.
-const API_BASE = import.meta.env.VITE_API_BASE || 'https://gaddyel-backend.onrender.com';
+// En desarrollo se usa el backend local para que los cambios del admin se reflejen enseguida.
+const API_BASE = import.meta.env.VITE_API_BASE || (import.meta.env.DEV ? '' : 'https://gaddyel-backend.onrender.com');
 
 const axiosInstance = axios.create({
     baseURL: API_BASE,
